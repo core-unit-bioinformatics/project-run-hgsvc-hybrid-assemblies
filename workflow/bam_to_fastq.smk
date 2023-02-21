@@ -14,7 +14,7 @@ CONSTRAINT_BAM_INPUT = "(" + "|".join(BAM_INPUT_PATHS) + ")"
 
 rule dump_bam_to_fastq:
     input:
-        bam = lambda wildcards: 
+        bam = lambda wildcards:
             MISSING_FASTQ.loc[
                 MISSING_FASTQ["path_hash"] == wildcards.path_hash, "input_path"
             ].values[0]
@@ -29,9 +29,9 @@ rule dump_bam_to_fastq:
     threads: 6
     resources:
         mem_mb = lambda wildcards, attempt: 2048 * attempt,
-        time_hrs = lambda wildcards, attempt: 8 * attempt
+        time_hrs = lambda wildcards, attempt: 4 * attempt
     params:
-        fastq = lambda wildcards: 
+        fastq = lambda wildcards:
             MISSING_FASTQ.loc[
                 MISSING_FASTQ["path_hash"] == wildcards.path_hash, "output_path"
             ].values[0]
