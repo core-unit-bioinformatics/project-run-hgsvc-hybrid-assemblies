@@ -1,0 +1,70 @@
+No	Project	SampleID	Sex	HiFi SeqSite	HiFi data generation complete?	ONT SeqSite	ONT data generation complete?	IGSR_STATUS	HHU_STATUS
+1	Yr1	NA19238	Female	JAX	no, in queue @UW	UW	no, in queue @UW	incomplete	incomplete
+2	Yr1	NA19239	Male	JAX	no, in queue @Jax	JAX	yes	incomplete	incomplete
+3	Yr1	NA19240	Female	JAX	no, in queue @Jax	UW	no, in queue @UW	incomplete	incomplete
+4	Yr1	HG00731	Male	UW	no, in queue @UW	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+5	Yr1	HG00732	Female	UW	yes	UW	yes, recently completed @UW	william	incomplete
+6	Yr1	HG00733	Female	UW	yes	UW/JAX	yes	complete	incomplete
+7	Yr1	HG00512	Male	UMIGS	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+8	Yr1	HG00513	Female	UMIGS	yes	UW	no, in queue @UW	incomplete	incomplete
+9	Yr1	HG00514	Female	UMIGS/UW	yes	UW	no, in queue @UW	incomplete	incomplete
+10	Yr1, Yr3	HG03732	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+11	Yr1, Yr3	HG01573	Female	UW	yes	UW	yes, recently completed @UW	william	incomplete
+12	Yr1, Yr3	HG00171	Female	UW	yes	UW	yes, recently completed @UW	william	incomplete
+13	Yr1, Yr3	HG02587	Female	UW	yes	UW	yes, recently completed @UW	william	incomplete
+14	Yr1, Yr3	HG01114	Female	UW	yes	UW	yes, recently completed @UW	william	incomplete
+15	Yr1, Yr3	HG02018	Female	UW	yes	UW	yes, recently completed @UW	william	incomplete
+16	Yr1, Yr3	NA19036	Female	UW	yes	UW	yes, recently completed @UW	william	incomplete
+17	Yr1, Yr3	NA12329	Female	UW	yes	UW	no, needs 1 more flow cell @UW	incomplete	incomplete
+18	Yr1, Yr3	HG02011	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+19	Yr1, Yr3	NA19983	Female	UW	yes	UW	yes, recently completed @UW	william	incomplete
+20	Yr1, Yr3	HG03371	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+21	Yr1, Yr3	HG02492	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+22	Yr1, Yr3	HG03009	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+23	Yr1, Yr3	HG03683	Female	UW	yes	UW	yes, recently completed @UW	william	incomplete
+24	Yr1, Yr3	HG03065	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+25	Yr1, Yr3	NA18534	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+26	Yr1, Yr3	HG01505	Male	JAX	yes	JAX	yes	complete	incomplete
+27	Yr1, Yr3	NA19650	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+28	Yr1, Yr3	NA18939	Female	UW	yes	UW	yes, recently completed @UW	william	incomplete
+29	Yr1, Yr3	HG00864	Female	UW	yes	UW	no, in queue @UW	incomplete	incomplete
+30	Yr1, Yr3	NA20847	Female	UW	yes	UW	no, in queue @UW	incomplete	incomplete
+31	Yr1, Yr3	NA20509	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+32	Yr1, Yr3	HG00096	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+33	Yr1, Yr3	HG01596	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+34	Yr1_Extension	NA24385 (HG002)	Male	PacBio	ignore?	yes	ignore?	skip	incomplete
+35	Yr1_Extension	NA12878 (HG001)	Female	PacBio	ignore?	UCSC? (old)	ignore?	skip	incomplete
+36	Yr1_Extension	HG02818	Female	WUSTL	yes	UW	yes	complete	incomplete
+37	Yr1_Extension	HG03125	Female	WUSTL	ignore	no	ignore	skip	incomplete
+38	Yr1_Extension	HG03486	Female	WUSTL	ignore	no	ignore	skip	incomplete
+39	Yr2	HG01352	Female	UW	yes	UW	yes	complete	incomplete
+40	Yr2	HG02059	Female	UW	yes	UW	yes	complete	incomplete
+41	Yr2	NA19434	Female	UMIGS	yes	JAX	yes	complete	incomplete
+42	Yr2	HG04217	Female	JAX	yes	JAX	yes	complete	incomplete
+43	Yr2	HG03807	Female	JAX	yes	JAX	yes	complete	incomplete
+44	Yr2	NA19836	Female	UMIGS	yes	JAX	yes	complete	incomplete
+45	Yr2	HG02106	Female	JAX	yes	JAX	yes	complete	incomplete
+46	Yr2	HG00268	Female	JAX	yes	JAX	yes	complete	incomplete
+47	Yr2	GM20355	Female	UW	yes	UW	yes	complete	incomplete
+48	Yr2	GM19320	Female	UW	yes	UW	yes	complete	incomplete
+49	Yr2	GM19129	Female	UW	yes	UW	yes	complete	incomplete
+50	Yr2	HG02769	Female	UW	yes	UW	yes	complete	incomplete
+51	Yr2	HG03452	Female	UW	yes	UW	yes	complete	incomplete
+52	Yr2	HG03520	Female	UMIGS	yes	JAX	yes	complete	incomplete
+53	Yr2	HG02282	Female	UMIGS	yes	JAX	yes	complete	incomplete
+54	Yr2	HG02554	Male	UW	yes	UW	yes	complete	incomplete
+55	Yr2	HG02953	Male	UW	yes	UW	yes	complete	incomplete
+56	Yr2	GM21487	Female	UW	yes	UW	yes	complete	incomplete
+57	Yr2	NA18989	Male	JAX	yes	JAX	yes	complete	incomplete
+58	Yr2	NA19331	Male	JAX	yes	JAX	yes	complete	incomplete
+59	Yr2	HG02666	Male	JAX	yes	JAX	yes	complete	incomplete
+60	Yr2	NA19317	Male	JAX	yes	JAX	yes	complete	incomplete
+61	Yr2	NA19347	Male	JAX	yes	JAX	yes	complete	incomplete
+62	Yr2	HG03248	Male	JAX	yes	JAX	yes	complete	incomplete
+63	Yr2	HG04036	Female	UW	yes	UW	yes	complete	incomplete
+64	Yr2	HG01457	Male	JAX	yes	JAX	yes	complete	incomplete
+65	Yr2	NA19384	Male	JAX	yes	JAX	yes	complete	incomplete
+66	Yr3	HG01890	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+67	Yr3	NA19705	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+68	Yr3	HG03456	Male	JAX	yes	JAX	no, needs 1 more flow cell @Jax	incomplete	incomplete
+69	Yr3	HG00358	Male	JAX	yes	JAX	yes	complete	incomplete
