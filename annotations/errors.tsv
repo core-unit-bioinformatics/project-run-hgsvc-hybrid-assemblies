@@ -1,13 +1,4 @@
 sample_name	cell_id	path_or_annotated_sample	file_cell_matched	error_source
-HG00732	m54329U_190604_224858	HG00732	no-match-found	missing-file-on-share
-HG00732	m54329U_190610_071123	HG00732	no-match-found	missing-file-on-share
-HG00732	m54329U_190611_132246	HG00732	no-match-found	missing-file-on-share
-HG00732	m54329U_190612_193411	HG00732	no-match-found	missing-file-on-share
-HG00732	m54329U_190705_000551	HG00732	no-match-found	missing-file-on-share
-HG00732	m54329U_190901_130210	HG00732	no-match-found	missing-file-on-share
-HG00732	m54329U_200528_200534	20200722_PUR_PacBio_HG00732_HiFi/HG00732_20200722_EEE_m54329U_200528_200534.ccs.fastq.gz	match-found	no-error
-HG00732	m64076_200601_234627	20200722_PUR_PacBio_HG00732_HiFi/HG00732_20200722_EEE_m64076_200601_234627.ccs.fastq.gz	match-found	no-error
-HG00732	m64076_200603_055852	20200722_PUR_PacBio_HG00732_HiFi/HG00732_20200722_EEE_m64076_200603_055852.ccs.fastq.gz	match-found	no-error
 HG02769	HG02769_20210825_UL_eee-prom1-2C-PAH62122_guppy-5	20230228_UW_EEE_ONT_UL/HG02769/HG02769_20210825_UL_eee-prom1-2C-PAH62122_guppy-5.0.11-sup-prom_fastq_pass.fastq.gz	match-found	no-error
 HG02769	HG02769_20210826_UL_eee-prom1-2C-PAH62122_guppy-5	20230228_UW_EEE_ONT_UL/HG02769/HG02769_20210826_UL_eee-prom1-2C-PAH62122_guppy-5.0.11-sup-prom_fastq_pass.fastq.gz	match-found	no-error
 HG02769	HG02769_20210831_UL_eee-prom1-3B-PAH61842_guppy-5	20230228_UW_EEE_ONT_UL/HG02769/HG02769_20210831_UL_eee-prom1-3B-PAH61842_guppy-5.0.11-sup-prom_fastq_pass.fastq.gz	match-found	no-error
