@@ -26,10 +26,12 @@ HG00733	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric
 HG00733	ont	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00733/HG00733_ont_fastq.hgsvc-JAX-2021.fofn
 HG00733	ont	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00733/HG00733_ont_fastq.hgsvc-UW-2023.fofn
 HG00733	target	unphased
+HG00733red1	batch	20230428T1139
 HG00733red1	hgsvc_sample_num	6
 HG00733red1	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00733/HG00733_hifi_fastq.unknown-EEEext-20XX.fofn
 HG00733red1	ont	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00733/HG00733_ont_fastq.hgsvc-JAX-2021.fofn
 HG00733red1	target	unphased
+HG00733red2	batch	20230428T1139
 HG00733red2	hgsvc_sample_num	6
 HG00733red2	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00733/HG00733_hifi_fastq.unknown-EEEext-20XX.fofn
 HG00733red2	ont	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00733/HG00733_ont_fastq.hgsvc-JAX-2021.fofn
