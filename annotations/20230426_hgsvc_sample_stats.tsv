@@ -34,7 +34,7 @@ sample_num	project_phase	sample	data_production
 33	Yr1,Yr3	HG01596	incomplete
 34	Yr1_Extension	NA24385	external
 35	Yr1_Extension	NA12878	skip
-36	Yr1_Extension	HG02818	incomplete
+36	Yr1_Extension	HG02818	complete
 37	Yr1_Extension	HG03125	skip
 38	Yr1_Extension	HG03486	skip
 39	Yr2	HG01352	complete
@@ -48,11 +48,11 @@ sample_num	project_phase	sample	data_production
 47	Yr2	GM20355	complete
 48	Yr2	GM19320	complete
 49	Yr2	GM19129	complete
-50	Yr2	HG02769	incomplete
+50	Yr2	HG02769	complete
 51	Yr2	HG03452	complete
 52	Yr2	HG03520	complete
 53	Yr2	HG02282	complete
-54	Yr2	HG02554	incomplete
+54	Yr2	HG02554	complete
 55	Yr2	HG02953	complete
 56	Yr2	GM21487	complete
 57	Yr2	NA18989	complete
