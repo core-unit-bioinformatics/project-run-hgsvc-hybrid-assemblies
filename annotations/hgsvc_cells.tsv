@@ -418,7 +418,6 @@ sample_num	sample	read_type	source	cell	project_phase	data_production	HHU_comple
 50	HG02769	HiFi	UW	m54329U_210127_001445	Yr2	complete	yes	SIN:02769
 50	HG02769	HiFi	UW	m54329U_210221_195419	Yr2	complete	yes	SIN:02769
 50	HG02769	ONT	UW	20220315_HG02769_UL_eee-prom1-2F-PAK03888_guppy-5.0.11-sup-prom_fastq_pass	Yr2	complete	yes	SIN:02769
-50	HG02769	ONT	UW	20220315_HG02769_UL_eee-prom1-2F-PAK03888_guppy-6.1.2-sup-prom_fastq_pass	Yr2	complete	yes	SIN:02769
 50	HG02769	ONT	UW	HG02769_20210825_UL_eee-prom1-2C-PAH62122_guppy-5.0.11-sup-prom_fastq_pass	Yr2	complete	yes	SIN:02769
 50	HG02769	ONT	UW	HG02769_20210826_UL_eee-prom1-2C-PAH62122_guppy-5.0.11-sup-prom_fastq_pass	Yr2	complete	yes	SIN:02769
 50	HG02769	ONT	UW	HG02769_20210831_UL_eee-prom1-3B-PAH61842_guppy-5.0.11-sup-prom_fastq_pass	Yr2	complete	yes	SIN:02769
