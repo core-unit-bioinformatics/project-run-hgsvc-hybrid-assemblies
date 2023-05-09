@@ -1,4 +1,4 @@
-# 20230428T1139
+# 20230509T1458
 sample_num	sample	read_type	source	cell	project_phase	data_production	HHU_complete	sin
 1	NA19238	HiFi	JAX	m54336U_191015_222230	Yr1	incomplete	no	SIN:19238
 1	NA19238	HiFi	JAX	m54336U_191017_101413	Yr1	incomplete	no	SIN:19238
@@ -282,6 +282,10 @@ sample_num	sample	read_type	source	cell	project_phase	data_production	HHU_comple
 34	NA24385	ONT	EEEext	20190128_UL_ext-prom1-1-E9-H9-PAD28926_guppy-5	Yr1_Extension	external	yes	SIN:24385
 34	NA24385	ONT	EEEext	20190129_UL_ext-prom1-1-A9-D9-PAD28937_guppy-5	Yr1_Extension	external	yes	SIN:24385
 34	NA24385	ONT	EEEext	20190129_UL_ext-prom1-1-E9-H9-PAD28926_guppy-5	Yr1_Extension	external	yes	SIN:24385
+36	HG02818	HiFi	PRJNA731524	m64043_200209_061852	Yr1_Extension	complete	yes	SIN:02818
+36	HG02818	HiFi	PRJNA731524	m64043_200314_004623	Yr1_Extension	complete	yes	SIN:02818
+36	HG02818	HiFi	PRJNA731524	m64043_200315_071057	Yr1_Extension	complete	yes	SIN:02818
+36	HG02818	HiFi	PRJNA731524	m64043_200318_040100	Yr1_Extension	complete	yes	SIN:02818
 36	HG02818	ONT	UW	HG02818_20210609_STD_eee-prom1-2E-PAG74325_guppy-5.0.11-sup-prom_fastq_pass	Yr1_Extension	complete	yes	SIN:02818
 36	HG02818	ONT	UW	HG02818_20210615_STD_eee-prom1-1F-PAG74325_guppy-5.0.11-sup-prom_fastq_pass	Yr1_Extension	complete	yes	SIN:02818
 36	HG02818	ONT	UW	HG02818_20210616_STD_eee-prom1-1F-PAG74325_guppy-5.0.11-sup-prom_fastq_pass	Yr1_Extension	complete	yes	SIN:02818
