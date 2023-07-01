@@ -1,4 +1,4 @@
-# 20230630T1754
+# 20230701T1458
 index	sample	cell	alt_id	read_type	data_source	file_source	project	file_rel_path	file_date	file_group	group_date	matched
 0	GM19129	m54329U_201021_182400	m54329U_201021_182400	hifi	HGSVCuw	20230627_hgsvc_hifi_cell-UW.tsv	HGSVCuw	project-centric/hgsvc/pacbio_hifi/20220418_UW_HiFi/GM19129/m54329U_201021_182400.ccs.fastq.gz	2020	8a60482a5f0cf3227b3b5d9585ddb5ed	2022	1
 1	GM19129	m54329U_210223_194607	m54329U_210223_194607	hifi	HGSVCuw	20230627_hgsvc_hifi_cell-UW.tsv	HGSVCuw	project-centric/hgsvc/pacbio_hifi/20220418_UW_HiFi/GM19129/m54329U_210223_194607.ccs.fastq.gz	2021	8a60482a5f0cf3227b3b5d9585ddb5ed	2022	1
