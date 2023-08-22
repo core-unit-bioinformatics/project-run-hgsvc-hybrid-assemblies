@@ -1,4 +1,5 @@
 # 20230822T1023
+# rerun after update: notebooks/data_management/20_process_sample_table.ipynb
 order_num	sample	sex	hifi_complete	ont_complete	igsr_status	sample_batch	is_pilot
 1	NA19238	Female	no	no	incomplete	2	0
 2	NA19239	Male	no	yes	incomplete	2	0
