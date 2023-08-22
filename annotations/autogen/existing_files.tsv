@@ -1,4 +1,4 @@
-# 20230822T1202
+# 20230822T1330
 sample	read_type	file_name	file_path	matched_to_md	curated_by	file_group	group_date
 GM19129	hifi	m54329U_201021_182400.ccs.fastq.gz	project-centric/hgsvc/pacbio_hifi/20220418_UW_HiFi/GM19129/m54329U_201021_182400.ccs.fastq.gz	0	metadata_table	8a60482a5f0cf3227b3b5d9585ddb5ed	2022
 GM19129	hifi	m54329U_210223_194607.ccs.fastq.gz	project-centric/hgsvc/pacbio_hifi/20220418_UW_HiFi/GM19129/m54329U_210223_194607.ccs.fastq.gz	1	metadata_table	8a60482a5f0cf3227b3b5d9585ddb5ed	2022
