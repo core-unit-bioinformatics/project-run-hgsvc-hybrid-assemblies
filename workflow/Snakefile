@@ -1,0 +1,4 @@
+
+include: "modules/settings/paths.smk"
+include: "modules/settings/sample_table.smk"
+include: "modules/settings/constants.smk"
