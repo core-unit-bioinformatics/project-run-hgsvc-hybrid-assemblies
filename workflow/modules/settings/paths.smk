@@ -9,7 +9,7 @@ WORKDIR_ASSEMBLY = TOP_ROOT_DIR.joinpath("projects/assemblies/hybrids/verkko/wd"
 
 # project repo
 DIR_SNAKEFILE = pathlib.Path(workflow.basedir).resolve(strict=True)
-assert str(DIR_SNAKEFILE.parent) == "workflow"
+assert DIR_SNAKEFILE.name == "workflow", DIR_SNAKEFILE
 
 DIR_SCRIPTS = DIR_SNAKEFILE.joinpath("scripts").resolve(strict=True)
 

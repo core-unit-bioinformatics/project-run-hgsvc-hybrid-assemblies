@@ -24,11 +24,11 @@ rule verkko_dump_assembly_coverage_issue_table:
     output:
         tview_bed = DIR_RES.joinpath(
             "issues", "contig_ref", "t2tv2",
-            "{sample}.t2tv2.ctg-cov-issues.bed.gz"
+            "{sample}.t2tv2.ctg-cov-issues.ref.bed.gz"
         ),
         qview_bed = DIR_RES.joinpath(
             "issues", "contig_ref", "t2tv2",
-            "{sample}.t2tv2.ctg-cov-issues.bed.gz"
+            "{sample}.t2tv2.ctg-cov-issues.assm.bed.gz"
         ),
         stats = DIR_RES.joinpath(
             "issues", "contig_ref",
