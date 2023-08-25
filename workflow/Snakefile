@@ -2,3 +2,11 @@
 include: "modules/settings/paths.smk"
 include: "modules/settings/sample_table.smk"
 include: "modules/settings/constants.smk"
+
+include: "modules/coverage/contig_cov.smk"
+
+rule run_all:
+    input:
+        everything = [
+            rules.run_all_issue_tracks.input.stats,
+        ]
