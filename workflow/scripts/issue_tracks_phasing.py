@@ -4,6 +4,7 @@ import argparse as argp
 import collections as col
 import hashlib as hl
 import pathlib as pl
+import sys
 
 import pandas as pd
 
@@ -41,12 +42,48 @@ def parse_command_line():
     )
 
     parser.add_argument(
+        "--aln-disconnect",
+        "-d",
+        type=lambda x: pl.Path(x).resolve(strict=True),
+        dest="aln_disconnect"
+    )
+
+    parser.add_argument(
         "--acrocentrics",
         "-a",
         type=str,
         nargs="+",
         dest="acrocentrics",
         default=["chr13", "chr14", "chr15", "chr21", "chr22"]
+    )
+
+    parser.add_argument(
+        "--window-size",
+        "-ws",
+        type=int,
+        dest="window_size",
+        default=10000
+    )
+
+    parser.add_argument(
+        "--out-target-view",
+        "-ot",
+        type=lambda x: pl.Path(x).resolve(strict=False),
+        dest="out_target"
+    )
+
+    parser.add_argument(
+        "--out-query-view",
+        "-oq",
+        type=lambda x: pl.Path(x).resolve(strict=False),
+        dest="out_query"
+    )
+
+    parser.add_argument(
+        "--out-stats",
+        "-os",
+        type=lambda x: pl.Path(x).resolve(strict=False),
+        dest="out_stats"
     )
 
     args = parser.parse_args()
@@ -82,7 +119,27 @@ def load_contig_coverages(norm_paf, acrocentrics):
     return cov, rdna_none
 
 
-def load_alignments(hap1, hap2, unassign):
+def aln_add_view_infos(row):
+    target_view_aln = (
+        f"QN:{row.query_name},"
+        f"QL:{row.query_length},"
+        f"OR:{row.align_orient},"
+        f"QS:{row.query_start},"
+        f"QE:{row.query_end},"
+        f"MQ:{row.mapq}"
+    )
+    query_view_aln = (
+        f"TN:{row.target_name},"
+        f"QL:{row.query_length},"
+        f"OR:{row.align_orient},"
+        f"TS:{row.target_start},"
+        f"TE:{row.target_end},"
+        f"MQ:{row.mapq}"
+    )
+    return target_view_aln, query_view_aln
+
+
+def load_alignments(hap1, hap2, unassign, disconnect):
 
     drop_columns = [
         "cg_cigar", "cs_tag_diffs", "s1_chaining_score", "s2_chaining_score",
@@ -92,21 +149,29 @@ def load_alignments(hap1, hap2, unassign):
     aln_hap1 = pd.read_csv(hap1, sep="\t", header=0)
     aln_hap1.drop(drop_columns, axis=1, inplace=True)
     aln_hap1 = aln_hap1.loc[aln_hap1["tp_align_type"] == 1, :].copy()
+    aln_hap1[["tview", "qview"]] = aln_hap1.apply(aln_add_view_infos, axis=1, result_type="expand")
 
     aln_hap2 = pd.read_csv(hap2, sep="\t", header=0)
     aln_hap2.drop(drop_columns, axis=1, inplace=True)
     aln_hap2 = aln_hap2.loc[aln_hap2["tp_align_type"] == 1, :].copy()
+    aln_hap2[["tview", "qview"]] = aln_hap2.apply(aln_add_view_infos, axis=1, result_type="expand")
 
     aln_unassign = pd.read_csv(unassign, sep="\t", header=0)
     aln_unassign.drop(drop_columns, axis=1, inplace=True)
     aln_unassign = aln_unassign.loc[aln_unassign["tp_align_type"] == 1, :].copy()
+    aln_unassign[["tview", "qview"]] = aln_unassign.apply(aln_add_view_infos, axis=1, result_type="expand")
+
+    aln_disconnect = pd.read_csv(disconnect, sep="\t", header=0)
+    aln_disconnect.drop(drop_columns, axis=1, inplace=True)
+    aln_disconnect = aln_disconnect.loc[aln_disconnect["tp_align_type"] == 1, :].copy()
+    aln_disconnect[["tview", "qview"]] = aln_disconnect.apply(aln_add_view_infos, axis=1, result_type="expand")
 
     alignments = {
         "hap1": aln_hap1,
         "hap2": aln_hap2,
-        "unassigned": aln_unassign
+        "unassigned": aln_unassign,
+        "disconnected": aln_disconnect
     }
-
     return alignments
 
 
@@ -130,10 +195,10 @@ def create_target_regions(tview_regions, tview_aln_records, issue_label, min_siz
             continue
         aln_records = tview_aln_records[block_name]
         plain_regions.append(
-            (chrom, start, end, block_name, issue_label, aln_records)
+            (chrom, start, end, issue_label, block_name, aln_records)
         )
     plain_regions = pd.DataFrame.from_records(
-        plain_regions, columns=["chrom", "start", "end", "name", "label", "align_records"]
+        plain_regions, columns=["chrom", "start", "end", "name", "issue_id", "align_records"]
     )
     plain_regions.sort_values(["chrom", "start", "end"], inplace=True)
 
@@ -142,21 +207,33 @@ def create_target_regions(tview_regions, tview_aln_records, issue_label, min_siz
 
 def create_query_regions(qview_nested_regions, qview_aln_records, issue_label, match_blocks):
 
+    column_order = ["contig", "start", "end", "name", "issue_id", "align_records"]
     plain_regions = []
     for block_name, region_lists in qview_nested_regions.items():
         if block_name not in match_blocks:
             continue
-        for query_name, query_coords in region_lists.items():
-            start = min(t[0] for t in query_coords)
-            end = max(t[1] for t in query_coords)
-            assert start < end
-            aln_records = qview_aln_records[block_name]
-            plain_regions.append(
-                (query_name, start, end, block_name, issue_label, aln_records)
-            )
-    plain_regions = pd.DataFrame.from_records(
-        plain_regions, columns=["contig", "start", "end", "name", "label", "align_records"]
+        region_lists.reset_index(drop=False, inplace=True)
+        region_lists["name"] = issue_label
+        region_lists["issue_id"] = block_name
+        region_lists["align_records"] = region_lists["issue_id"].replace(qview_aln_records)
+        region_lists.rename(
+            {
+                "query_start": "start",
+                "query_end": "end",
+                "query_name": "contig"
+            },
+            inplace=True, axis=1
+        )
+        plain_regions.append(region_lists)
+    plain_regions = pd.concat(plain_regions, axis=0, ignore_index=False)
+    plain_regions = plain_regions[column_order]
+    plain_regions = plain_regions.groupby(["contig", "start", "end", "name"]).agg(
+        {
+            "issue_id": lambda x: "@".join(x),
+            "align_records": lambda x: "@".join(x)
+        }
     )
+    plain_regions.reset_index(drop=False, inplace=True)
     plain_regions.sort_values(["contig", "start", "end"], inplace=True)
 
     return plain_regions
@@ -167,22 +244,24 @@ def extract_diploid_regions(ctg_cov, rdna_free, alignments):
     select_h1 = get_cov_selector("hap1")
     select_h2 = get_cov_selector("hap2")
     select_un = get_cov_selector("unassigned")
+    select_dis = get_cov_selector("disconnected")
 
     no_unassign = (ctg_cov[select_un] == 0).all(axis=1)
+    no_disconn = (ctg_cov[select_dis] == 0).all(axis=1)
     any_h1 = (ctg_cov[select_h1] == 1).any(axis=1)
     any_h2 = (ctg_cov[select_h2] == 1).any(axis=1)
 
-    selector = rdna_free & no_unassign & any_h1 & any_h2
+    selector = rdna_free & no_disconn & no_unassign & any_h1 & any_h2
 
-    diploid_regions = ctg_cov.loc[selector, :]
-    use_alignments = ["hap1", "hap2"]
-    label = "diploid"
+    #diploid_regions = ctg_cov.loc[selector, :]
+    #use_alignments = ["hap1", "hap2"]
+    #label = "diploid"
 
-    tview_regions, qview_regions = process_selected_regions(
-        diploid_regions, use_alignments, alignments, label
-    )
+    #tview_regions, qview_regions = process_selected_regions(
+    #    diploid_regions, use_alignments, alignments, label
+    #)
 
-    return tview_regions, qview_regions
+    return sum(selector)
 
 
 def extract_dip_phasing_error(ctg_cov, rdna_free, alignments):
@@ -197,14 +276,14 @@ def extract_dip_phasing_error(ctg_cov, rdna_free, alignments):
 
     selector = rdna_free & unassign & no_h1 & no_h2
     error_regions = ctg_cov.loc[selector, :]
-    label = "dip_phasing_error"
+    label = "dip_phasing_issue"
     use_alignments = ["unassigned"]
 
     tview_regions, qview_regions = process_selected_regions(
         error_regions, use_alignments, alignments, label
     )
 
-    return tview_regions, qview_regions
+    return tview_regions, qview_regions, sum(selector)
 
 
 def extract_hap_phasing_error(ctg_cov, rdna_free, alignments, main, other):
@@ -219,14 +298,14 @@ def extract_hap_phasing_error(ctg_cov, rdna_free, alignments, main, other):
 
     selector = rdna_free & unassign & no_main & some_other
     error_regions = ctg_cov.loc[selector, :]
-    label = f"{main}_phasing_error"
+    label = f"{main}_phasing_issue"
     use_alignments = ["unassigned"]
 
     tview_regions, qview_regions = process_selected_regions(
         error_regions, use_alignments, alignments, label
     )
 
-    return tview_regions, qview_regions
+    return tview_regions, qview_regions, sum(selector)
 
 
 def extract_loh_regions(ctg_cov, rdna_free, alignments):
@@ -241,19 +320,44 @@ def extract_loh_regions(ctg_cov, rdna_free, alignments):
 
     selector = no_unassign & rdna_free & (hap_h1 ^ hap_h2)
     error_regions = ctg_cov.loc[selector, :]
-    label = "LOH"
+    label = "LOH_misassm"
     use_alignments = ["hap1", "hap2"]
 
     tview_regions, qview_regions = process_selected_regions(
         error_regions, use_alignments, alignments, label, int(1e6)
     )
 
-    return tview_regions, qview_regions
+    return tview_regions, qview_regions, sum(selector)
+
+
+def extract_shattered_regions(ctg_cov, rdna_free, alignments):
+
+    select_h1 = get_cov_selector("hap1")
+    select_h2 = get_cov_selector("hap2")
+    select_un = get_cov_selector("unassigned")
+    select_dis = get_cov_selector("disconnected")
+
+    no_unassign = (ctg_cov[select_un] == 0).all(axis=1)
+    disconn = (ctg_cov[select_dis] > 0).any(axis=1)
+    no_h1 = (ctg_cov[select_h1] == 0).any(axis=1)
+    no_h2 = (ctg_cov[select_h2] == 0).any(axis=1)
+
+    selector = rdna_free & no_unassign & no_h1 & no_h2 & disconn
+    error_regions = ctg_cov.loc[selector, :]
+    label = "assm_broken"
+    use_alignments = ["disconnected"]
+
+    tview_regions, qview_regions = process_selected_regions(
+        error_regions, use_alignments, alignments, label
+    )
+
+    return tview_regions, qview_regions, sum(selector)
 
 
 def process_selected_regions(ctg_cov, use_alignments, alignments, label, min_size=0):
 
     annotated_regions = annotate_regions_with_alignments(ctg_cov, use_alignments, alignments)
+
     tview_regions = create_target_regions(
         annotated_regions["target_view_regions"],
         annotated_regions["target_view_aln_records"],
@@ -263,7 +367,7 @@ def process_selected_regions(ctg_cov, use_alignments, alignments, label, min_siz
     qview_regions = create_query_regions(
         annotated_regions["query_view_regions"],
         annotated_regions["query_view_aln_records"],
-        label, set(tview_regions["name"].unique())
+        label, set(tview_regions["issue_id"].unique())
     )
 
     return tview_regions, qview_regions
@@ -283,7 +387,7 @@ def annotate_regions_with_alignments(issue_regions, use_alignments, alignments):
 
         target_view_records = set()
         query_view_records = set()
-        regions_by_query = col.defaultdict(list)
+        regions_by_query = dict()
         for aln_name in use_alignments:
             aln = alignments[aln_name]
             select_chrom = aln["target_name"] == chrom
@@ -291,33 +395,10 @@ def annotate_regions_with_alignments(issue_regions, use_alignments, alignments):
             select_end = aln["target_start"] < end
 
             sub = aln.loc[select_chrom & select_start & select_end, :]
-            # TODO: the below can be made more succinct
-            # by preprocessing the alignments
-            for row in sub.itertuples():
-                # target/ref perspective
-                # - what query aligns here?
-                target_view_aln = (
-                    f"QN:{row.query_name},"
-                    f"QL:{row.query_length},"
-                    f"OR:{row.align_orient},"
-                    f"QS:{row.query_start},"
-                    f"QE:{row.query_end},"
-                    f"MQ:{row.mapq}"
-                )
-                target_view_records.add(target_view_aln)
+            target_view_records = target_view_records.union(set(sub["tview"].values))
+            query_view_records = query_view_records.union(set(sub["qview"].values))
 
-                # query/assembly perspective
-                # - where do I align to?
-                query_view_aln = (
-                    f"TN:{row.target_name},"
-                    f"QL:{row.query_length},"
-                    f"OR:{row.align_orient},"
-                    f"TS:{row.target_start},"
-                    f"TE:{row.target_end},"
-                    f"MQ:{row.mapq}"
-                )
-                query_view_records.add(query_view_aln)
-                regions_by_query[row.query_name].append((row.query_start, row.query_end))
+            regions_by_query = sub.groupby("query_name")[["query_start", "query_end"]].agg({"query_start": min, "query_end": max})
 
         target_view_records = "|".join(sorted(target_view_records))
         query_view_records = "|".join(sorted(query_view_records))
@@ -346,24 +427,79 @@ def main():
 
     cov, rdna_free = load_contig_coverages(args.contig_cov, args.acrocentrics)
 
-    alignments = load_alignments(args.aln_hap1, args.aln_hap2, args.aln_unassign)
+    total_regions = cov.shape[0]
+    other_regions = total_regions
+    rdna_regions = (~rdna_free).sum()
+    other_regions -= rdna_regions
+    stats = [
+        ("total_windows_autosomes", total_regions, int(total_regions * args.window_size)),
+        ("rDNA_windows",rdna_regions, (rdna_regions * args.window_size))
+    ]
 
-    #dip_regions = extract_diploid_regions(cov, rdna_free, alignments)
-    #dip_phase_error = extract_dip_phasing_error(cov, rdna_free, alignments)
+    alignments = load_alignments(
+        args.aln_hap1, args.aln_hap2,
+        args.aln_unassign, args.aln_disconnect
+    )
 
-    #hap1_phase_error = extract_hap_phasing_error(cov, rdna_free, alignments, "hap1", "hap2")
-    #hap2_phase_error = extract_hap_phasing_error(cov, rdna_free, alignments, "hap2", "hap1")
+    target_view_out = []
+    query_view_out = []
 
-    loh_regions = extract_loh_regions(cov, rdna_free, alignments)
+    num_dip_regions = extract_diploid_regions(cov, rdna_free, alignments)
+    other_regions -= num_dip_regions
+    stats.append(("diploid_regions", num_dip_regions, int(num_dip_regions * args.window_size)))
 
-    t, q = loh_regions
+    tview_dip, qview_dip, num_dip = extract_dip_phasing_error(cov, rdna_free, alignments)
+    other_regions -= num_dip
+    target_view_out.append(tview_dip)
+    query_view_out.append(qview_dip)
+    stats.append(("dip_phase_issue_windows", num_dip, int(num_dip * args.window_size)))
 
-    print(t)
-    print('===')
-    print(q)
+    tview_hap1, qview_hap1, num_hap1 = extract_hap_phasing_error(cov, rdna_free, alignments, "hap1", "hap2")
+    other_regions -= num_hap1
+    target_view_out.append(tview_hap1)
+    query_view_out.append(qview_hap1)
+    stats.append(("hap1_phase_issue_windows", num_hap1, int(num_hap1 * args.window_size)))
 
-    return
+    tview_hap2, qview_hap2, num_hap2 = extract_hap_phasing_error(cov, rdna_free, alignments, "hap2", "hap1")
+    other_regions -= num_hap2
+    target_view_out.append(tview_hap2)
+    query_view_out.append(qview_hap2)
+    stats.append(("hap2_phase_issue_windows", num_hap2, int(num_hap2 * args.window_size)))
+
+    tview_loh, qview_loh, num_loh = extract_loh_regions(cov, rdna_free, alignments)
+    other_regions -= num_loh
+    target_view_out.append(tview_loh)
+    query_view_out.append(qview_loh)
+    stats.append(("loh_assm_issue_windows", num_loh, int(num_loh * args.window_size)))
+
+    tview_broken, qview_broken, num_broken = extract_shattered_regions(cov, rdna_free, alignments)
+    other_regions -= num_broken
+    target_view_out.append(tview_broken)
+    query_view_out.append(qview_broken)
+    stats.append(("misassm_broken_windows", num_broken, int(num_broken * args.window_size)))
+    stats.append(("other_windows", other_regions, int(other_regions * args.window_size)))
+
+    target_view_out = pd.concat(target_view_out, axis=0, ignore_index=False)
+    target_view_out.sort_values(["chrom", "start"], inplace=True)
+    args.out_target.parent.mkdir(exist_ok=True, parents=True)
+    with open(args.out_target, "w") as tsv:
+        _ = tsv.write("#")
+        target_view_out.to_csv(tsv, sep="\t", header=True, index=False)
+
+    query_view_out = pd.concat(query_view_out, axis=0, ignore_index=False)
+    query_view_out.sort_values(["contig", "start"], inplace=True)
+    args.out_query.parent.mkdir(exist_ok=True, parents=True)
+    with open(args.out_query, "w") as tsv:
+        _ = tsv.write("#")
+        query_view_out.to_csv(tsv, sep="\t", header=True, index=False)
+
+    stats = pd.DataFrame.from_records(stats, columns=["statistic", "num_windows", "num_bp"])
+    stats["window_size"] = int(args.window_size)
+    args.out_stats.parent.mkdir(exist_ok=True, parents=True)
+    stats.to_csv(args.out_stats, sep="\t", header=True, index=False)
+
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
