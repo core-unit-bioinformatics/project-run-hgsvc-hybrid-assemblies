@@ -274,15 +274,22 @@ def extract_dip_phasing_error(ctg_cov, rdna_free, alignments):
     no_h2 = (ctg_cov[select_h2] == 0).all(axis=1)
 
     selector = rdna_free & unassign & no_h1 & no_h2
-    error_regions = ctg_cov.loc[selector, :]
-    label = "dip_phasing_issue"
-    use_alignments = ["unassigned"]
+    num_regions = sum(selector)
 
-    tview_regions, qview_regions = process_selected_regions(
-        error_regions, use_alignments, alignments, label
-    )
+    if num_regions > 0:
 
-    return tview_regions, qview_regions, sum(selector)
+        error_regions = ctg_cov.loc[selector, :]
+        label = "dip_phasing_issue"
+        use_alignments = ["unassigned"]
+
+        tview_regions, qview_regions = process_selected_regions(
+            error_regions, use_alignments, alignments, label
+        )
+    else:
+        tview_regions = None
+        qview_regions = None
+
+    return tview_regions, qview_regions, num_regions
 
 
 def extract_hap_phasing_error(ctg_cov, rdna_free, alignments, main, other):
@@ -296,15 +303,21 @@ def extract_hap_phasing_error(ctg_cov, rdna_free, alignments, main, other):
     some_other = (ctg_cov[select_other] > 0).any(axis=1)
 
     selector = rdna_free & unassign & no_main & some_other
-    error_regions = ctg_cov.loc[selector, :]
-    label = f"{main}_phasing_issue"
-    use_alignments = ["unassigned"]
+    num_regions = sum(selector)
 
-    tview_regions, qview_regions = process_selected_regions(
-        error_regions, use_alignments, alignments, label
-    )
+    if num_regions > 0:
+        error_regions = ctg_cov.loc[selector, :]
+        label = f"{main}_phasing_issue"
+        use_alignments = ["unassigned"]
 
-    return tview_regions, qview_regions, sum(selector)
+        tview_regions, qview_regions = process_selected_regions(
+            error_regions, use_alignments, alignments, label
+        )
+    else:
+        tview_regions = None
+        qview_regions = None
+
+    return tview_regions, qview_regions, num_regions
 
 
 def extract_loh_regions(ctg_cov, rdna_free, alignments):
@@ -318,15 +331,21 @@ def extract_loh_regions(ctg_cov, rdna_free, alignments):
     hap_h2 = (ctg_cov[select_h2] == 1).all(axis=1)
 
     selector = no_unassign & rdna_free & (hap_h1 ^ hap_h2)
-    error_regions = ctg_cov.loc[selector, :]
-    label = "LOH_misassm"
-    use_alignments = ["hap1", "hap2"]
+    num_regions = sum(selector)
 
-    tview_regions, qview_regions = process_selected_regions(
-        error_regions, use_alignments, alignments, label, int(1e6)
-    )
+    if num_regions > 0:
+        error_regions = ctg_cov.loc[selector, :]
+        label = "LOH_misassm"
+        use_alignments = ["hap1", "hap2"]
 
-    return tview_regions, qview_regions, sum(selector)
+        tview_regions, qview_regions = process_selected_regions(
+            error_regions, use_alignments, alignments, label, int(1e6)
+        )
+    else:
+        tview_regions = None
+        qview_regions = None
+
+    return tview_regions, qview_regions, num_regions
 
 
 def extract_shattered_regions(ctg_cov, rdna_free, alignments):
@@ -342,15 +361,21 @@ def extract_shattered_regions(ctg_cov, rdna_free, alignments):
     no_h2 = (ctg_cov[select_h2] == 0).any(axis=1)
 
     selector = rdna_free & no_unassign & no_h1 & no_h2 & disconn
-    error_regions = ctg_cov.loc[selector, :]
-    label = "assm_broken"
-    use_alignments = ["disconnected"]
+    num_regions = sum(selector)
 
-    tview_regions, qview_regions = process_selected_regions(
-        error_regions, use_alignments, alignments, label
-    )
+    if num_regions > 0:
+        error_regions = ctg_cov.loc[selector, :]
+        label = "assm_broken"
+        use_alignments = ["disconnected"]
 
-    return tview_regions, qview_regions, sum(selector)
+        tview_regions, qview_regions = process_selected_regions(
+            error_regions, use_alignments, alignments, label
+        )
+    else:
+        tview_regions = None
+        qview_regions = None
+
+    return tview_regions, qview_regions, num_regions
 
 
 def process_selected_regions(ctg_cov, use_alignments, alignments, label, min_size=0):
@@ -449,32 +474,37 @@ def main():
 
     tview_dip, qview_dip, num_dip = extract_dip_phasing_error(cov, rdna_free, alignments)
     other_regions -= num_dip
-    target_view_out.append(tview_dip)
-    query_view_out.append(qview_dip)
+    if num_dip > 0:
+        target_view_out.append(tview_dip)
+        query_view_out.append(qview_dip)
     stats.append(("dip_phase_issue_windows", num_dip, int(num_dip * args.window_size)))
 
     tview_hap1, qview_hap1, num_hap1 = extract_hap_phasing_error(cov, rdna_free, alignments, "hap1", "hap2")
     other_regions -= num_hap1
-    target_view_out.append(tview_hap1)
-    query_view_out.append(qview_hap1)
+    if num_hap1 > 0:
+        target_view_out.append(tview_hap1)
+        query_view_out.append(qview_hap1)
     stats.append(("hap1_phase_issue_windows", num_hap1, int(num_hap1 * args.window_size)))
 
     tview_hap2, qview_hap2, num_hap2 = extract_hap_phasing_error(cov, rdna_free, alignments, "hap2", "hap1")
     other_regions -= num_hap2
-    target_view_out.append(tview_hap2)
-    query_view_out.append(qview_hap2)
+    if num_hap2 > 0:
+        target_view_out.append(tview_hap2)
+        query_view_out.append(qview_hap2)
     stats.append(("hap2_phase_issue_windows", num_hap2, int(num_hap2 * args.window_size)))
 
     tview_loh, qview_loh, num_loh = extract_loh_regions(cov, rdna_free, alignments)
     other_regions -= num_loh
-    target_view_out.append(tview_loh)
-    query_view_out.append(qview_loh)
+    if num_loh > 0:
+        target_view_out.append(tview_loh)
+        query_view_out.append(qview_loh)
     stats.append(("loh_assm_issue_windows", num_loh, int(num_loh * args.window_size)))
 
     tview_broken, qview_broken, num_broken = extract_shattered_regions(cov, rdna_free, alignments)
     other_regions -= num_broken
-    target_view_out.append(tview_broken)
-    query_view_out.append(qview_broken)
+    if num_broken > 0:
+        target_view_out.append(tview_broken)
+        query_view_out.append(qview_broken)
     stats.append(("misassm_broken_windows", num_broken, int(num_broken * args.window_size)))
     stats.append(("other_windows", other_regions, int(other_regions * args.window_size)))
 
