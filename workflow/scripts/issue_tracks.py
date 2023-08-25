@@ -105,9 +105,8 @@ def load_contig_coverages(norm_paf, acrocentrics):
 
     acro_rows = cov.index.get_level_values("chrom").isin(acrocentrics)
 
-    rdna_has_cov = (cov[
-        [("asm-rdna", "0", "ctg_align_cov"), ("asm-rdna", "60", "ctg_align_cov")]
-    ] > 0).any(axis=1)
+    select_rdna = get_cov_selector("rdna")
+    rdna_has_cov = (cov[select_rdna] > 0).any(axis=1)
 
     # create a boolean mask that indicates rows in the
     # coverage table that are likely uncovered by
@@ -177,8 +176,8 @@ def load_alignments(hap1, hap2, unassign, disconnect):
 
 def get_cov_selector(asm_unit):
     selector = [
-        (f"asm-{asm_unit}", "0", "ctg_align_cov"),
-        (f"asm-{asm_unit}", "60", "ctg_align_cov"),
+        (f"asm-{asm_unit}", "MQ00", "ctg_align_cov"),
+        (f"asm-{asm_unit}", "MQ60", "ctg_align_cov"),
     ]
     return selector
 
