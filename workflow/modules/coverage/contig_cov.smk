@@ -2,7 +2,7 @@
 rule verkko_dump_assembly_coverage_issue_table:
     input:
         tsv = WORKDIR_EVAL.joinpath(
-            "results/alignments/contig_to_ref/t2tv2/table",
+            "results/coverage/contig_ref/t2tv2",
             "{sample}.t2tv2.win-ctg-cov.tsv.gz"
         ),
         aln_hap1 = WORKDIR_EVAL.joinpath(
