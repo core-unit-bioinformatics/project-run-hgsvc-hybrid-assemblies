@@ -2,28 +2,63 @@
 rule verkko_dump_assembly_coverage_issue_table:
     input:
         tsv = WORKDIR_EVAL.joinpath(
-            "results/coverage/contig_ref/t2tv2",
+            "results/alignments/contig_to_ref/t2tv2/table",
             "{sample}.t2tv2.win-ctg-cov.tsv.gz"
-        )
+        ),
+        aln_hap1 = WORKDIR_EVAL.joinpath(
+            "results/alignments/contig_to_ref/t2tv2/table",
+            "{sample}.asm-hap1.t2tv2.norm-paf.tsv.gz"
+        ),
+        aln_hap2 = WORKDIR_EVAL.joinpath(
+            "results/alignments/contig_to_ref/t2tv2/table",
+            "{sample}.asm-hap2.t2tv2.norm-paf.tsv.gz"
+        ),
+        aln_unassigned = WORKDIR_EVAL.joinpath(
+            "results/alignments/contig_to_ref/t2tv2/table",
+            "{sample}.asm-unassigned.t2tv2.norm-paf.tsv.gz"
+        ),
+        aln_disconnected = WORKDIR_EVAL.joinpath(
+            "results/alignments/contig_to_ref/t2tv2/table",
+            "{sample}.asm-disconnected.t2tv2.norm-paf.tsv.gz"
+        ),
     output:
-        bed = DIR_RES.joinpath(
-            "issues", "contig_ref",
+        tview_bed = DIR_RES.joinpath(
+            "issues", "contig_ref", "t2tv2",
             "{sample}.t2tv2.ctg-cov-issues.bed.gz"
+        ),
+        qview_bed = DIR_RES.joinpath(
+            "issues", "contig_ref", "t2tv2",
+            "{sample}.t2tv2.ctg-cov-issues.bed.gz"
+        ),
+        stats = DIR_RES.joinpath(
+            "issues", "contig_ref",
+            "{sample}.t2tv2.ctg-cov-issues.stats.tsv"
         )
-    run:
-        import pandas as pd
+    conda:
+        DIR_ENVS.joinpath("pyseq.yaml")
+    params:
+        script = DIR_SCRIPTS.joinpath("issue_tracks.py"),
+        tmp_tview = lambda wildcards, output: pathlib.Path(output.tview_bed).with_suffix(".tmp.bed"),
+        tmp_qview = lambda wildcards, output: pathlib.Path(output.qview_bed).with_suffix(".tmp.bed"),
+        acros = ACROS
+    shell:
+        "{params.script} --contig-cov {input.tsv} --aln-unassign {input.aln_unassigned} "
+        "--aln-hap1 {input.aln_hap1} --aln-hap2 {input.aln_hap2} --aln-disconnect {input.aln_disconnected} "
+        "--acrocentrics {params.acros} --window-size 10000 --out-stats {output.stats} "
+        "--out-target-view {params.tmp_tview} --out-query-view {params.tmp_qview}"
+            " && "
+        "bgzip -c {params.tmp_tview} > {output.tview_bed}"
+            " && "
+        "tabix -p bed {output.tview_bed} && rm {params.tmp_tview}"
+            " && "
+        "bgzip -c {params.tmp_qview} > {output.qview_bed}"
+            " && "
+        "tabix -p bed {output.qview_bed} && rm {params.tmp_qview}"
 
-        select_cols = dict()
-        for asm_unit in ["hap1", "hap2", "unassigned", "disconnected", "rdna"]:
-            select_cov = [
-                (f"asm-{asm_unit}", "MQ00", "ctg_align_cov"), (f"asm-{asm_unit}", "MQ60", "ctg_align_cov")
-            ]
-            select_cols[asm_unit] = select_cov
-        select_cols["dip"] = select_cols["hap1"] + select_cols["hap2"]
 
-        wg = pd.read_csv(input.tsv, sep="\t", header=[0, 1, 2], index_col=[0, 1, 2])
-        # drop chrM
-        not_mito = wg.index.get_level_values("chrom") != "chrM"
-        wg = wg.loc[not_mito, :].copy()
-
-        # build a boolean mask
+rule run_all_issue_tracks:
+    input:
+        stats = expand(
+            rules.verkko_dump_assembly_coverage_issue_table.output.stats,
+            sample=SAMPLES
+        )
