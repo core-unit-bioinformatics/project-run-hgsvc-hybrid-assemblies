@@ -31,7 +31,7 @@ rule verkko_dump_assembly_coverage_issue_table:
             "{sample}.t2tv2.ctg-cov-issues.assm.bed.gz"
         ),
         stats = DIR_RES.joinpath(
-            "issues", "contig_ref",
+            "issues", "contig_ref", "t2tv2",
             "{sample}.t2tv2.ctg-cov-issues.stats.tsv"
         )
     conda:
