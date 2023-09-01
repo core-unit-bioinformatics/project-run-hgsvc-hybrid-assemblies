@@ -1,2 +1,3 @@
 chrom	start	end	name	reference
-chr6	29594784	32950465	HLA	T2Tv2
+# region between end of MOG/NM_206814.6	and beginning of COL11/XM_054354229
+chr6	29547063	32984046	HLA	T2Tv2
