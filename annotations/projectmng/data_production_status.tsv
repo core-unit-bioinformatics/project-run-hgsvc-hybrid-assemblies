@@ -1,15 +1,15 @@
-# 20230822T1023
+# 20230831T1042
 # rerun after update: notebooks/data_management/20_process_sample_table.ipynb
 order_num	sample	sex	hifi_complete	ont_complete	igsr_status	sample_batch	is_pilot
-1	NA19238	Female	no	no	incomplete	2	0
-2	NA19239	Male	no	yes	incomplete	2	0
-3	NA19240	Female	no	no	incomplete	2	0
-4	HG00731	Male	no	no	incomplete	2	0
+1	NA19238	Female	yes	yes	complete	2	0
+2	NA19239	Male	yes	yes	complete	2	0
+3	NA19240	Female	yes	yes	complete	2	0
+4	HG00731	Male	yes	yes	complete	2	0
 5	HG00732	Female	yes	yes	complete	1	0
 6	HG00733	Female	yes	yes	complete	1	1
 7	HG00512	Male	yes	yes	complete	2	0
-8	HG00513	Female	yes	no	incomplete	2	0
-9	HG00514	Female	yes	no	incomplete	2	0
+8	HG00513	Female	yes	yes	complete	2	0
+9	HG00514	Female	yes	yes	complete	2	0
 10	HG03732	Male	yes	yes	complete	2	0
 11	HG01573	Female	yes	yes	complete	1	0
 12	HG00171	Female	yes	yes	complete	1	1
@@ -22,19 +22,19 @@ order_num	sample	sex	hifi_complete	ont_complete	igsr_status	sample_batch	is_pilo
 19	NA19983	Female	yes	yes	complete	1	0
 20	HG03371	Male	yes	yes	complete	2	0
 21	HG02492	Male	yes	yes	complete	2	0
-22	HG03009	Male	yes	no	incomplete	2	0
+22	HG03009	Male	yes	yes	complete	2	0
 23	HG03683	Female	yes	yes	complete	1	0
-24	HG03065	Male	yes	no	incomplete	2	0
+24	HG03065	Male	yes	yes	complete	2	0
 25	NA18534	Male	yes	yes	complete	2	0
 26	HG01505	Male	yes	yes	complete	1	0
 27	NA19650	Male	yes	yes	complete	2	0
 28	NA18939	Female	yes	no	incomplete	2	0
-29	HG00864	Female	yes	no	incomplete	2	0
-30	NA20847	Female	yes	no	incomplete	2	0
+29	HG00864	Female	yes	yes	complete	2	0
+30	NA20847	Female	yes	yes	complete	2	0
 31	NA20509	Male	yes	yes	complete	2	0
 32	HG00096	Male	yes	yes	complete	2	0
 33	HG01596	Male	yes	yes	complete	2	0
-34	NA24385	Male	yes	no	incomplete	2	0
+34	NA24385	Male	yes	yes	complete	2	0
 35	NA12878	Female	skip	skip	skip	-1	0
 36	HG02818	Female	yes	yes	complete	1	0
 37	HG03125	Female	skip	skip	skip	-1	0
@@ -48,7 +48,7 @@ order_num	sample	sex	hifi_complete	ont_complete	igsr_status	sample_batch	is_pilo
 45	HG02106	Female	yes	yes	complete	1	0
 46	HG00268	Female	yes	yes	complete	1	0
 47	GM20355	Female	yes	yes	complete	1	0
-48	GM19320	Female	yes	no	complete	-1	0
+48	GM19320	Female	yes	yes	complete	-1	0
 49	GM19129	Female	yes	yes	complete	1	0
 50	HG02769	Female	yes	yes	complete	1	0
 51	HG03452	Female	yes	yes	complete	1	0
