@@ -19,10 +19,11 @@ rule build_hla_cut_table:
         hla_end = int(34e6)
     run:
         import pandas as pd
+        import pathlib as pl
         cut_table = []
 
         for paf in input.norm_paf:
-            source_file = paf.name
+            source_file = pl.Path(paf).name
             sample = source_file.split(".")[0]
 
             df = pd.read_csv(paf, sep="\t", comment="#")
