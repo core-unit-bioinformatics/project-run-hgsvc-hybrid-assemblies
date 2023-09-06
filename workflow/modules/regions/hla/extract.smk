@@ -3,12 +3,12 @@ rule build_hla_cut_table:
     input:
         norm_paf = expand(
                 WORKDIR_EVAL.joinpath(
-                "results/alignments/contig_to_ref/t2tv2/table",
-                "{sample}.asm-{asm_unit}.t2tv2.norm-paf.tsv.gz",
+                    "results/alignments/contig_to_ref/t2tv2/table",
+                    "{sample}.asm-{asm_unit}.t2tv2.norm-paf.tsv.gz"
+                ),
                 sample=SAMPLES,
                 asm_unit=["hap1", "hap2", "unassigned"]
             )
-        )
     output:
         cut_table = DIR_RES.joinpath(
             "regions", "hla", "assembly_cut_table.tsv"
