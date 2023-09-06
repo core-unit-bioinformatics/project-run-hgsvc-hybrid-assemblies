@@ -1,4 +1,5 @@
 
+localrules: build_hla_cut_table
 rule build_hla_cut_table:
     input:
         norm_paf = expand(
@@ -20,7 +21,7 @@ rule build_hla_cut_table:
         import pandas as pd
         cut_table = []
 
-        for paf in norm_paf:
+        for paf in input.norm_paf:
             source_file = paf.name
             sample = source_file.split(".")[0]
 
