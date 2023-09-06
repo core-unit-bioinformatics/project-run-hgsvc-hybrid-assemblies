@@ -79,3 +79,38 @@ rule build_hla_cut_table:
         )
         cut_table.to_csv(output.cut_table, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
+
+
+rule extract_hla_sequences:
+    input:
+        fasta = expand(
+                WORKDIR_EVAL.joinpath(
+                    "results/assemblies", "{sample}",
+                    "{sample}.asm-{asm_unit}.fasta.gz"
+                ),
+                sample=SAMPLES,
+                asm_unit=["hap1", "hap2", "unassigned"]
+            ),
+        cut_table = rules.build_hla_cut_table.output.cut_table
+    output:
+        table_comp = DIR_RES.joinpath(
+            "regions", "hla", "assembly_seq_composition.tsv"
+        ),
+        all_seqs = DIR_RES.joinpath(
+            "regions", "hla", "assembly_all_hla.fasta.gz"
+        )
+    conda:
+        DIR_ENVS.joinpath("pyseq.yaml")
+    resources:
+        mem_mb=lambda wildcards, attempt: 2048 * attempt
+    params:
+        script=DIR_SCRIPTS.joinpath("extract_region.py"),
+        out_dir=lambda wildcards, output: pathlib.Path(output.table_comp).parent.joinpath("single_fasta")
+    shell:
+        "{params.script} --fasta {input.fasta} --cut-table {input.cut_table} "
+            "--add-suffix HLA --dump-separately {params.out_dir} "
+            "--dump-merged stdout --dump-stats {output.table_comp} "
+            " && "
+        "bgzip > {output.all_seqs}"
+            " && "
+        "samtools faidx {output.all_seqs}"

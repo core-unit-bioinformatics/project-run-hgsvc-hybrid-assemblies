@@ -11,4 +11,6 @@ rule run_all:
     input:
         everything = [
             rules.run_all_issue_tracks.input.stats,
+            rules.extract_hla_sequences.output.table_comp,
+            rules.extract_hla_sequences.output.all_seqs
         ]
