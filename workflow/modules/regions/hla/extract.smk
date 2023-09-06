@@ -108,7 +108,7 @@ rule extract_hla_sequences:
         out_dir=lambda wildcards, output: pathlib.Path(output.table_comp).parent.joinpath("single_fasta")
     shell:
         "{params.script} --fasta {input.fasta} --cut-table {input.cut_table} "
-            "--add-suffix HLA --dump-separately {params.out_dir} "
+            "--add-suffix HLA --dump-separately {params.out_dir} --clean-out-dir "
             "--dump-merged stdout --dump-stats {output.table_comp} "
             " && "
         "bgzip > {output.all_seqs}"

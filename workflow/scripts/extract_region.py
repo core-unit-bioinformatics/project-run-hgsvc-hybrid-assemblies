@@ -4,6 +4,7 @@ import argparse as argp
 import collections as col
 import io
 import pathlib as pl
+import shutil
 import sys
 
 import dnaio
@@ -52,6 +53,15 @@ def parse_command_line():
     )
 
     parser.add_argument(
+        "--clean-out-dir",
+        "-c",
+        action="store_true",
+        dest="clean_out_dir",
+        default=False,
+        help="Delete out dir at startup"
+    )
+
+    parser.add_argument(
         "--dump-merged",
         "-m",
         type=lambda x: pl.Path(x).resolve(strict=False),
@@ -76,6 +86,8 @@ def parse_command_line():
 def main():
 
     args = parse_command_line()
+    if args.clean_out_dir and args.separate.is_dir():
+        shutil.rmtree(args.separate, ignore_errors=False)
     cut_table = pd.read_csv(args.cut_table, sep="\t", header=0, comment="#")
     cut_table.sort_values(["sample", "source_assembly", "query"], inplace=True)
 
