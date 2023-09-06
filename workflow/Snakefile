@@ -5,6 +5,8 @@ include: "modules/settings/constants.smk"
 
 include: "modules/coverage/contig_cov.smk"
 
+include: "modules/regions/hla/extract.smk"
+
 rule run_all:
     input:
         everything = [
