@@ -1,5 +1,4 @@
 
-localrules: build_hla_cut_table
 rule build_hla_cut_table:
     input:
         norm_paf = expand(
@@ -14,6 +13,8 @@ rule build_hla_cut_table:
         cut_table = DIR_RES.joinpath(
             "regions", "hla", "assembly_cut_table.tsv"
         )
+    resources:
+        mem_mb=lambda wildcards, attempt: 1024 * attempt
     params:
         hla_start = int(28e6),
         hla_end = int(34e6)
@@ -24,7 +25,8 @@ rule build_hla_cut_table:
 
         for paf in input.norm_paf:
             source_file = pl.Path(paf).name
-            sample = source_file.split(".")[0]
+            source_asm_unit = source_file.rsplit(".", 4)[0]
+            sample = source_file.split(".asm-")[0]
 
             df = pd.read_csv(paf, sep="\t", comment="#")
             df = df.loc[(df["target_name"] == "chr6") & (df["tp_align_type"] != 2), :]
@@ -45,12 +47,9 @@ rule build_hla_cut_table:
                     # use small query sequences as is, likely garbage anyway
                     cut_table.append(
                         (sample, query, min_q, max_q, min_t, max_t,
-                         0, query_length, query_length, source_file))
+                         0, query_length, query_length, source_asm_unit, source_file))
                     continue
-                min_q = alignments["query_start"].min()
-                max_q = alignments["query_end"].max()
-                min_t = alignments["target_start"].min()
-                max_t = alignments["target_end"].max()
+
                 # following: slack of 1 Mbp because rare
                 # cases exist where the alignment starts a few
                 # 100 kbp into the MHC window; assert that is does
@@ -68,14 +67,14 @@ rule build_hla_cut_table:
                 cut_table.append(
                     (sample, query, min_q, max_q, min_t, max_t,
                      min_q + offset_start, max_q + offset_end,
-                     cut_length, source_file))
+                     cut_length, source_asm_unit, source_file))
 
         cut_table = pd.DataFrame.from_records(
             cut_table, columns=[
                 "sample", "query", "query_start", "query_end",
                 "target_start", "target_end",
                 "cut_query_begin", "cut_query_end",
-                "cut_length", "source_file"
+                "cut_length", "source_assembly", "source_file"
             ]
         )
         cut_table.to_csv(output.cut_table, sep="\t", header=True, index=False)
