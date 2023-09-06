@@ -102,7 +102,7 @@ rule extract_hla_sequences:
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")
     resources:
-        mem_mb=lambda wildcards, attempt: 2048 * attempt
+        mem_mb=lambda wildcards, attempt: 4096 * attempt
     params:
         script=DIR_SCRIPTS.joinpath("extract_region.py"),
         out_dir=lambda wildcards, output: pathlib.Path(output.table_comp).parent.joinpath("single_fasta")

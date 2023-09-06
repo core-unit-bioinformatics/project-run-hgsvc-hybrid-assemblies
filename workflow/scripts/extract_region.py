@@ -77,6 +77,7 @@ def main():
 
     args = parse_command_line()
     cut_table = pd.read_csv(args.cut_table, sep="\t", header=0, comment="#")
+    cut_table.sort_values(["sample", "source_assembly", "query"], inplace=True)
 
     collect_all = io.StringIO()
     composition_all = []
@@ -93,7 +94,6 @@ def main():
             query_name = row.query
             sample = row.sample
             src_assembly = row.source_assembly
-            break
 
         with dnaio.open(fasta_file) as fasta:
             for record in fasta:
@@ -119,8 +119,11 @@ def main():
 
         if args.separate is not None:
             outfile = args.separate.joinpath(f"{src_assembly}.{args.suffix}.fasta.gz")
+            file_mode = "w"
             outfile.parent.mkdir(exist_ok=True, parents=True)
-            with dnaio.open(outfile, fileformat="fasta", mode="w", compression_level=9) as fasta:
+            if outfile.is_file():
+                file_mode = "a"
+            with dnaio.open(outfile, fileformat="fasta", mode=file_mode, compression_level=9) as fasta:
                 fasta.write(new_header, subseq)
 
     stats = pd.DataFrame.from_records(composition_all)
