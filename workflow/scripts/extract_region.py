@@ -128,6 +128,7 @@ def main():
                 }
                 stats.update(composition)
                 composition_all.append(stats)
+                break
 
         if args.separate is not None:
             outfile = args.separate.joinpath(f"{src_assembly}.{args.suffix}.fasta.gz")
