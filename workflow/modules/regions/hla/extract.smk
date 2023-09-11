@@ -114,3 +114,51 @@ rule extract_hla_sequences:
         "bgzip > {output.all_seqs}"
             " && "
         "samtools faidx {output.all_seqs}"
+
+
+rule extract_hla_reference_sequence:
+    input:
+        fasta = WORKDIR_EVAL.joinpath(
+            "global_ref", "chm13v2.0.fasta"
+        ),
+        faidx = WORKDIR_EVAL.joinpath(
+            "global_ref", "chm13v2.0.fasta.fai"
+        )
+    output:
+        fasta = DIR_LOCAL_REF.joinpath(
+            "chm13v2.0.HLA.fasta.gz"
+        )
+    conda:
+        DIR_ENVS.joinpath("pyseq.yaml")
+    params:
+        hla_start = int(28e6),
+        hla_end = int(34e6)
+    shell:
+        "samtools faidx {input.fasta} chr6:{params.hla_start}-{params.hla_end} "
+        " | gzip > {output.fasta}"
+
+
+rule produce_hla_msa:
+    input:
+        ref_fasta = rules.extract_hla_reference_sequence.output.fasta
+        asm_fasta = rules.extract_hla_sequences.output.all_seqs,
+    output:
+        msa = DIR_RES.joinpath(
+            "regions", "hla", "assembly_all_hla.msa.fasta"
+        ),
+        distmat = DIR_RES.joinpath(
+            "regions", "hla", "assembly_all_hla.msa-distmat.txt"
+        )
+    log:
+        DIR_LOG.joinpath("regions", "hla", "extract", "clustalo.log")
+    conda:
+        DIR_ENVS.joinpath("msa.yaml")
+    threads: 12
+    resources:
+        mem_mb = lambda wildcards, attempt: 24576 * attempt,
+        time_hrs = lambda wildcards, attempt: 47 * attempt
+    shell:
+        "zcat {input} | clustalo --in - --seqtype=DNA --infmt=fasta "
+        "--percent-id --outfmt=fasta --threads 6 --verbose "
+        "--full --distmat-out={output.distmat} "
+        "--out {output.msa} &> {log}"
