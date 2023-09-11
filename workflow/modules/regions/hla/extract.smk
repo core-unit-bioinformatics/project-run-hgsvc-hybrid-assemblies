@@ -159,6 +159,6 @@ rule produce_hla_msa:
         time_hrs = lambda wildcards, attempt: 47 * attempt
     shell:
         "zcat {input} | clustalo --in - --seqtype=DNA --infmt=fasta "
-        "--percent-id --outfmt=fasta --threads 6 --verbose "
+        "--percent-id --outfmt=fasta --threads {threads} --verbose "
         "--full --distmat-out={output.distmat} "
         "--out {output.msa} &> {log}"
