@@ -140,7 +140,7 @@ rule extract_hla_reference_sequence:
 
 rule produce_hla_msa:
     input:
-        ref_fasta = rules.extract_hla_reference_sequence.output.fasta
+        ref_fasta = rules.extract_hla_reference_sequence.output.fasta,
         asm_fasta = rules.extract_hla_sequences.output.all_seqs,
     output:
         msa = DIR_RES.joinpath(
