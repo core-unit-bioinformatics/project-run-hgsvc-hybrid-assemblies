@@ -94,8 +94,13 @@ def main():
     collect_all = io.StringIO()
     composition_all = []
 
+    processed = set()
     for fasta_file in sorted(args.fasta):
         fasta_name = fasta_file.name
+        if fasta_name in processed:
+            sys.stderr.write(f"\nWARNING: duplicate input - skipping: {fasta_name}\n")
+            continue
+        processed.add(fasta_name)
 
         for row in cut_table.itertuples():
             if not fasta_name.startswith(row.source_assembly):
@@ -107,37 +112,37 @@ def main():
             sample = row.sample
             src_assembly = row.source_assembly
 
-        with dnaio.open(fasta_file) as fasta:
-            for record in fasta:
-                if record.name != query_name:
-                    continue
-                subseq = record.sequence[cut_begin:cut_end]
-                composition = col.Counter(subseq.upper())
-                new_header = (
-                    f"{sample}_{query_name}_{args.suffix}"
-                    f"_{cut_begin}:{cut_end}"
-                )
-                collect_all.write(f">{new_header}\n{subseq}\n")
-                stats = {
-                    "sample": sample,
-                    "assembly": src_assembly,
-                    "contig": query_name,
-                    "cut_begin": cut_begin,
-                    "cut_end": cut_end,
-                    "cut_length": cut_length
-                }
-                stats.update(composition)
-                composition_all.append(stats)
-                break
+            with dnaio.open(fasta_file) as fasta:
+                for record in fasta:
+                    if record.name != query_name:
+                        continue
+                    subseq = record.sequence[cut_begin:cut_end]
+                    composition = col.Counter(subseq.upper())
+                    new_header = (
+                        f"{sample}_{query_name}_{args.suffix}"
+                        f"_{cut_begin}:{cut_end}"
+                    )
+                    collect_all.write(f">{new_header}\n{subseq}\n")
+                    stats = {
+                        "sample": sample,
+                        "assembly": src_assembly,
+                        "contig": query_name,
+                        "cut_begin": cut_begin,
+                        "cut_end": cut_end,
+                        "cut_length": cut_length
+                    }
+                    stats.update(composition)
+                    composition_all.append(stats)
+                    break
 
-        if args.separate is not None:
-            outfile = args.separate.joinpath(f"{src_assembly}.{args.suffix}.fasta.gz")
-            file_mode = "w"
-            outfile.parent.mkdir(exist_ok=True, parents=True)
-            if outfile.is_file():
-                file_mode = "a"
-            with dnaio.open(outfile, fileformat="fasta", mode=file_mode, compression_level=9) as fasta:
-                fasta.write(new_header, subseq)
+            if args.separate is not None:
+                outfile = args.separate.joinpath(f"{src_assembly}.{args.suffix}.fasta.gz")
+                file_mode = "w"
+                outfile.parent.mkdir(exist_ok=True, parents=True)
+                if outfile.is_file():
+                    file_mode = "a"
+                with dnaio.open(outfile, fileformat="fasta", mode=file_mode, compression_level=9) as fasta:
+                    fasta.write(new_header, subseq)
 
     stats = pd.DataFrame.from_records(composition_all)
     args.stats.parent.mkdir(exist_ok=True, parents=True)
