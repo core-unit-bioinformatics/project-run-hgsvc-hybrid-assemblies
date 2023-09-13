@@ -17,7 +17,7 @@ order_num	sample	sex	hifi_complete	ont_complete	igsr_status	sample_batch	is_pilo
 14	HG01114	Female	yes	yes	complete	1	0
 15	HG02018	Female	yes	yes	complete	1	0
 16	NA19036	Female	yes	yes	complete	1	0
-17	NA12329	Female	yes	no	incomplete	2	0
+17	NA12329	Female	yes	yes	complete	2	0
 18	HG02011	Male	yes	yes	complete	2	0
 19	NA19983	Female	yes	yes	complete	1	0
 20	HG03371	Male	yes	yes	complete	2	0
@@ -28,7 +28,7 @@ order_num	sample	sex	hifi_complete	ont_complete	igsr_status	sample_batch	is_pilo
 25	NA18534	Male	yes	yes	complete	2	0
 26	HG01505	Male	yes	yes	complete	1	0
 27	NA19650	Male	yes	yes	complete	2	0
-28	NA18939	Female	yes	no	incomplete	2	0
+28	NA18939	Female	yes	yes	complete	2	0
 29	HG00864	Female	yes	yes	complete	2	0
 30	NA20847	Female	yes	yes	complete	2	0
 31	NA20509	Male	yes	yes	complete	2	0
