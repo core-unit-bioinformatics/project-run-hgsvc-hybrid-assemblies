@@ -41,12 +41,15 @@ rule build_hla_cut_table:
                 max_q = alignments["query_end"].max()
                 min_t = alignments["target_start"].min()
                 max_t = alignments["target_end"].max()
+                # determine alignment orientation by majority
+                align_orient = alignments.groupby("align_orient")["align_matching"].sum()
+                align_orient = align_orient.idxmax()
 
                 query_length = alignments["query_length"].values[0]
                 if query_length < int(1e6):
                     # use small query sequences as is, likely garbage anyway
                     cut_table.append(
-                        (sample, query, min_q, max_q, min_t, max_t,
+                        (sample, query, min_q, max_q, align_orient, min_t, max_t,
                          0, query_length, query_length, source_asm_unit, source_file))
                     continue
 
@@ -65,14 +68,15 @@ rule build_hla_cut_table:
                 assert cut_length > int(5.5e6)
                 assert cut_length < int(6.5e6)
                 cut_table.append(
-                    (sample, query, min_q, max_q, min_t, max_t,
+                    (sample, query, min_q, max_q, align_orient, min_t, max_t,
                      min_q + offset_start, max_q + offset_end,
-                     cut_length, source_asm_unit, source_file))
+                     cut_length, source_asm_unit, source_file)
+                )
 
         cut_table = pd.DataFrame.from_records(
             cut_table, columns=[
                 "sample", "query", "query_start", "query_end",
-                "target_start", "target_end",
+                "query_orientation", "target_start", "target_end",
                 "cut_query_begin", "cut_query_end",
                 "cut_length", "source_assembly", "source_file"
             ]

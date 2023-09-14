@@ -109,6 +109,7 @@ def main():
             cut_end = row.cut_query_end
             cut_length = row.cut_length
             query_name = row.query
+            query_orientation = row.query_orientation
             sample = row.sample
             src_assembly = row.source_assembly
 
@@ -116,7 +117,10 @@ def main():
                 for record in fasta:
                     if record.name != query_name:
                         continue
-                    subseq = record.sequence[cut_begin:cut_end]
+                    if query_orientation < 0:
+                        subseq = record.sequence[::-1][cut_begin:cut_end]
+                    else:
+                        subseq = record.sequence[cut_begin:cut_end]
                     composition = col.Counter(subseq.upper())
                     new_header = (
                         f"{sample}_{query_name}_{args.suffix}"
@@ -129,7 +133,8 @@ def main():
                         "contig": query_name,
                         "cut_begin": cut_begin,
                         "cut_end": cut_end,
-                        "cut_length": cut_length
+                        "cut_length": cut_length,
+                        "seq_orient": query_orientation
                     }
                     stats.update(composition)
                     composition_all.append(stats)
