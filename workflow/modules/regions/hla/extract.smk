@@ -147,7 +147,7 @@ rule check_extracted_sequences:
     """
     input:
         all_seqs = rules.extract_hla_sequences.output.all_seqs,
-        ref_seq = extract_hla_reference_sequence.output.fasta,
+        ref_seq = rules.extract_hla_reference_sequence.output.fasta,
         hla = DIR_GLOBAL_REF.joinpath("hla_coding_transcripts.nuc.fasta")
     output:
         blast_all = DIR_PROC.joinpath("regions", "hla", "blast_out", "assembly_all_hla.blast.txt"),
