@@ -136,7 +136,8 @@ def main():
                     if record.name != query_name:
                         continue
                     if query_orientation < 0:
-                        subseq = revcomp(record.sequence)[cut_begin:cut_end]
+                        subseq = record.sequence[cut_begin:cut_end]
+                        subseq = revcomp(subseq)
                         orient = "REV"
                     else:
                         subseq = record.sequence[cut_begin:cut_end]
@@ -170,8 +171,9 @@ def main():
                     fasta.write(new_header, subseq)
 
     stats = pd.DataFrame.from_records(composition_all)
-    args.stats.parent.mkdir(exist_ok=True, parents=True)
-    stats.to_csv(args.stats, sep="\t", header=True, index=False)
+    if args.stats is not None:
+        args.stats.parent.mkdir(exist_ok=True, parents=True)
+        stats.to_csv(args.stats, sep="\t", header=True, index=False)
 
     if args.merged.name in ["stdout", "-", ""]:
         sys.stdout.write(collect_all.getvalue())

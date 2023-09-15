@@ -62,15 +62,28 @@ rule build_hla_cut_table:
                 offset_start = params.hla_start - min_t
                 assert params.hla_end - int(1e6) < max_t, f"{sample} / {query} / {max_t}"
                 offset_end = params.hla_end - max_t
-                cut_begin = min_q + offset_start
-                cut_end = max_q + offset_end
+
+                if align_orient > 0:
+                    # Alignment in forward orientation;
+                    # NB: offset end will typically be negative
+                    cut_begin = min_q + offset_start
+                    cut_end = max_q + offset_end
+                elif align_orient < 0:
+                    # Alignment in reverse orientation,
+                    # hence end in query is start in target
+                    # and vice versa, so flip sign of offset
+                    # values
+                    cut_begin = min_q + offset_end * -1
+                    cut_end = max_q + offset_start * -1
+                else:
+                    raise ValueError("Cannot process alignment orientation 0")
                 cut_length = cut_end - cut_begin
                 assert cut_length > int(5.5e6)
                 assert cut_length < int(6.5e6)
                 cut_table.append(
                     (sample, query, min_q, max_q, align_orient, min_t, max_t,
-                     min_q + offset_start, max_q + offset_end,
-                     cut_length, source_asm_unit, source_file)
+                     cut_begin, cut_end, cut_length,
+                     source_asm_unit, source_file)
                 )
 
         cut_table = pd.DataFrame.from_records(
@@ -142,7 +155,7 @@ rule extract_hla_reference_sequence:
         " | gzip > {output.fasta}"
 
 
-rule check_extracted_sequences:
+rule blast_check_extracted_sequences:
     """NB: blast cannot read gzipped files ...
     """
     input:
@@ -173,6 +186,29 @@ rule check_extracted_sequences:
         "blastn -query {input.hla} -subject {params.tmp_all} "
             "-word_size {params.word_size} -outfmt=6 -evalue {params.evalue} "
         "-out {output.blast_all} && rm {params.tmp_all}"
+
+
+rule summarize_blast_hits:
+    input:
+        blast_all = rules.blast_check_extracted_sequences.output.blast_all,
+        blast_ref = rules.blast_check_extracted_sequences.output.blast_ref
+    output:
+        summary = DIR_RES.joinpath(
+            "regions", "hla", "blast_hits.summary.tsv"
+        ),
+        table = DIR_RES.joinpath(
+            "regions", "hla", "blast_hits.tsv.gz"
+        )
+    run:
+        import pandas as pd
+        blast_columns = "qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore".split()
+        df = pd.read_csv(input.blast_ref, sep="\t", header=None, names=blast_columns)
+        assert not df.empty  # sanity check
+        df = pd.read_csv(input.blast_all, sep="\t", header=None, names=blast_columns)
+        df.sort_values(["sseqid", "bitscore"], ascending=[True, False], inplace=True)
+        df.to_csv(output.table, sep="\t", header=True, index=False)
+
+
 
 
 rule produce_hla_msa:
