@@ -226,7 +226,7 @@ rule summarize_blast_hits:
 localrules: blast_summarize_hits_per_sequence
 rule blast_summarize_hits_per_sequence:
     input:
-        summary = rules.summarize_blast_hits.output.summary
+        summary = rules.summarize_blast_hits.output.summary,
         all_seqs = rules.extract_hla_sequences.output.all_seqs
     output:
         hit_count = DIR_RES.joinpath(
