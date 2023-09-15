@@ -3,6 +3,7 @@
 import argparse as argp
 import collections as col
 import io
+import functools as ft
 import pathlib as pl
 import shutil
 import sys
@@ -83,6 +84,21 @@ def parse_command_line():
     return args
 
 
+def get_nucleotide_complement_table():
+
+    nuc_comp = {
+        "A": "T", "C": "G", "G": "C", "T": "A",
+        "a": "t", "c": "g", "g": "c", "t": "a"
+    }
+    nuc_comp = str.maketrans(nuc_comp)
+    return nuc_comp
+
+
+def reverse_complement_sequence(complement, seq):
+    assert isinstance(seq, str)
+    return seq[::-1].translate(complement)
+
+
 def main():
 
     args = parse_command_line()
@@ -93,6 +109,8 @@ def main():
 
     collect_all = io.StringIO()
     composition_all = []
+
+    revcomp = ft.partial(reverse_complement_sequence, get_nucleotide_complement_table())
 
     processed = set()
     for fasta_file in sorted(args.fasta):
@@ -118,13 +136,15 @@ def main():
                     if record.name != query_name:
                         continue
                     if query_orientation < 0:
-                        subseq = record.sequence[::-1][cut_begin:cut_end]
+                        subseq = revcomp(record.sequence)[cut_begin:cut_end]
+                        orient = "REV"
                     else:
                         subseq = record.sequence[cut_begin:cut_end]
+                        orient = "FWD"
                     composition = col.Counter(subseq.upper())
                     new_header = (
                         f"{sample}_{query_name}_{args.suffix}"
-                        f"_{cut_begin}:{cut_end}"
+                        f"_{orient}-{cut_begin}:{cut_end}"
                     )
                     collect_all.write(f">{new_header}\n{subseq}\n")
                     stats = {
