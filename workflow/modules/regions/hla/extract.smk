@@ -159,6 +159,8 @@ rule check_extracted_sequences:
         tmp_ref=lambda wildcards, input: pathlib.Path(input.ref_seq).with_suffix(".tmp.fa"),
         word_size=101,
         evalue=0.001
+    resources:
+        mem_mb=lambda wildcards, attempt: 2048 * attempt,
     shell:
         "pigz -d -c {input.all_seq} > {params.tmp_all}"
             " && "
