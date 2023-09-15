@@ -19,6 +19,7 @@ DIR_PROC = pathlib.Path("proc")
 DIR_RES = pathlib.Path("results")
 DIR_LOG = pathlib.Path("log")
 DIR_LOCAL_REF = pathlib.Path("local_ref")
+DIR_GLOBAL_REF = pathlib.Path("global_ref")
 
 DIR_WORKING = pathlib.Path(workflow.workdir_init).resolve(strict=True)
 WORKDIR = DIR_WORKING
