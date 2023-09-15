@@ -239,5 +239,5 @@ rule produce_hla_msa:
 
 rule run_blast_checks:
     input:
-        ref = rules.check_extracted_sequences.output.blast_ref,
-        assm = rules.check_extracted_sequences.output.blast_all,
+        ref = rules.blast_check_extracted_sequences.output.blast_ref,
+        assm = rules.blast_check_extracted_sequences.output.blast_all,
