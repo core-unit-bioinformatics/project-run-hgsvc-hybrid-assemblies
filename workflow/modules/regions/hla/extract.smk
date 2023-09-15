@@ -162,7 +162,7 @@ rule check_extracted_sequences:
     resources:
         mem_mb=lambda wildcards, attempt: 2048 * attempt,
     shell:
-        "pigz -d -c {input.all_seq} > {params.tmp_all}"
+        "pigz -d -c {input.all_seqs} > {params.tmp_all}"
             " && "
         "pigz -d -c {input.ref_seq} > {params.tmp_ref}"
             " && "
