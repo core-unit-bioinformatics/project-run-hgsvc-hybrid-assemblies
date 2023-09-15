@@ -188,13 +188,14 @@ rule blast_check_extracted_sequences:
         "-out {output.blast_all} && rm {params.tmp_all}"
 
 
+localrules: summarize_blast_hits
 rule summarize_blast_hits:
     input:
         blast_all = rules.blast_check_extracted_sequences.output.blast_all,
         blast_ref = rules.blast_check_extracted_sequences.output.blast_ref
     output:
         summary = DIR_RES.joinpath(
-            "regions", "hla", "blast_hits.summary.tsv"
+            "regions", "hla", "blast_hits.summary.tsv.gz"
         ),
         table = DIR_RES.joinpath(
             "regions", "hla", "blast_hits.tsv.gz"
@@ -202,13 +203,64 @@ rule summarize_blast_hits:
     run:
         import pandas as pd
         blast_columns = "qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore".split()
-        df = pd.read_csv(input.blast_ref, sep="\t", header=None, names=blast_columns)
-        assert not df.empty  # sanity check
-        df = pd.read_csv(input.blast_all, sep="\t", header=None, names=blast_columns)
+        df = pd.concat(
+            [
+                pd.read_csv(input.blast_ref, sep="\t", header=None, names=blast_columns),
+                pd.read_csv(input.blast_all, sep="\t", header=None, names=blast_columns)
+            ],
+            axis=0, ignore_index=False
+        )
         df.sort_values(["sseqid", "bitscore"], ascending=[True, False], inplace=True)
         df.to_csv(output.table, sep="\t", header=True, index=False)
 
+        summary = df.groupby(["sseqid", "qseqid"]).agg(
+            median_bitscore=("bitscore", "median"),
+            median_evalue=("evalue", "median"),
+            total_hits=("length", "count")
+        )
+        summary.sort_index(inplace=True)
+        summary.to_csv(output.summary, sep="\t", header=True, index=True)
+    # END OF RUN BLOCK
 
+
+localrules: blast_summarize_hits_per_sequence
+rule blast_summarize_hits_per_sequence:
+    input:
+        summary = rules.summarize_blast_hits.output.summary
+        all_seqs = rules.extract_hla_sequences.output.all_seqs
+    output:
+        hit_count = DIR_RES.joinpath(
+            "regions", "hla", "blast_hits_per_seq.tsv"
+        )
+    run:
+        import pathlib as pl
+        import pandas as pd
+        summary = pd.read_csv(input.summary, sep="\t")
+        summary["sample"] = summary["sseqid"].apply(lambda x: "chm13v2.0" if "chr6" in x else x.split("_")[0])
+
+        def assign_hap(seqid):
+            if "haplotype1" in seqid:
+                return "asm-hap1"
+            if "haplotype2" in seqid:
+                return "asm-hap2"
+            if "unassigned" in seqid:
+                return "asm-unassigned"
+            return "chm13v2.0"
+        summary["assembly"] = summary["sseqid"].apply(assign_hap)
+
+        single_seq_folder = pl.Path(input.all_seqs).parent.joinpath("single_fasta")
+        single_seq_fastas = sorted([filepath.name for filepath in single_seq_folder.glob("*.fasta.gz")])
+        fasta_df = []
+        for fasta in single_seq_fastas:
+            sample, asm_unit, _, _, _ = fasta.rsplit(".", 4)
+            fasta_df.append((sample, asm_unit, fasta))
+        fasta_df = pd.DataFrame.from_records(fasta_df, columns=["sample", "assembly", "fasta"])
+        summary = summary.merge(fasta_df, on=["sample", "assembly"], how="outer")
+        summary["total_hits"].fillna(0, inplace=True)
+        hits_per_seq = summary.groupby(["sample", "assembly", "fasta"])["total_hits"].sum()
+        hit_count.sort_index(inplace=True)
+        hit_count.to_csv(output.hit_count, sep="\t", header=True, index=True)
+    # END OF RUN BLOCK
 
 
 rule produce_hla_msa:
@@ -239,5 +291,4 @@ rule produce_hla_msa:
 
 rule run_blast_checks:
     input:
-        ref = rules.blast_check_extracted_sequences.output.blast_ref,
-        assm = rules.blast_check_extracted_sequences.output.blast_all,
+        summary = rules.blast_summarize_hits_per_sequence.output.hit_count
