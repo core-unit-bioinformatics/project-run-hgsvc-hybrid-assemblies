@@ -258,7 +258,7 @@ rule blast_summarize_hits_per_sequence:
         summary = summary.merge(fasta_df, on=["sample", "assembly"], how="outer")
         summary["total_hits"].fillna(0, inplace=True)
         summary.rename({"total_hits": "total_blast_hla_hits"}, axis=1, inplace=True)
-        hits_per_seq = summary.groupby(["sample", "assembly", "fasta"])["total_hits"].sum()
+        hits_per_seq = summary.groupby(["sample", "assembly", "fasta"])["total_blast_hla_hits"].sum()
         hits_per_seq.sort_index(inplace=True)
         hits_per_seq.to_csv(output.hit_count, sep="\t", header=True, index=True)
     # END OF RUN BLOCK
