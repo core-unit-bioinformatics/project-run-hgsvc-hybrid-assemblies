@@ -254,6 +254,7 @@ rule blast_summarize_hits_per_sequence:
         for fasta in single_seq_fastas:
             sample, asm_unit, _, _, _ = fasta.rsplit(".", 4)
             fasta_df.append((sample, asm_unit, fasta))
+        fasta_df.append(("chm13v2.0", "chm13v2.0", "chm13v2.0.HLA.fasta.gz"))
         fasta_df = pd.DataFrame.from_records(fasta_df, columns=["sample", "assembly", "fasta"])
         summary = summary.merge(fasta_df, on=["sample", "assembly"], how="outer")
         summary["total_hits"].fillna(0, inplace=True)
