@@ -22,3 +22,4 @@ Production version currently is v1.4+dirty [added commits #3119b39 and #4f6a54e]
 ## Trio kmer DBs
 
 HXT - Illumina HiSeq X Ten
+NVS - Illumina NovaSeq (6000)
