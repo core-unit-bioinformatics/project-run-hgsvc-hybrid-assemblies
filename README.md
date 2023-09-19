@@ -16,3 +16,9 @@ NA21487 HiFi - v1.4.1+dirty assembly completed
 # Notes on Verkko
 
 Production version currently is v1.4+dirty [added commits #3119b39 and #4f6a54e]
+
+# Notes on nomenclature
+
+## Trio kmer DBs
+
+HXT - Illumina HiSeq X Ten
