@@ -11,3 +11,12 @@ HG00731-HXT	PUR-HXT	father	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/
 NA19240-HXT	YRI-HXT	child	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19240/NA19240_shortwgs_fastq.wustl-PRJNA477862-20XX.fofn
 NA19238-HXT	YRI-HXT	mother	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19238/NA19238_shortwgs_fastq.wustl-PRJNA477862-20XX.fofn
 NA19239-HXT	YRI-HXT	father	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19239/NA19239_shortwgs_fastq.wustl-PRJNA477862-20XX.fofn
+HG00514-NVS	CHS-NVS	child	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00514/HG00514_shortwgs_fastq.nygc-PRJEB36890-2020.fofn
+HG00513-NVS	CHS-NVS	mother	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00513/HG00513_shortwgs_fastq.nygc-PRJEB31736-2019.fofn
+HG00512-NVS	CHS-NVS	father	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00512/HG00512_shortwgs_fastq.nygc-PRJEB36890-2020.fofn
+HG00733-NVS	PUR-NVS	child	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00733/HG00733_shortwgs_fastq.nygc-PRJEB36890-2020.fofn
+HG00732-NVS	PUR-NVS	mother	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00732/HG00732_shortwgs_fastq.nygc-PRJEB31736-2019.fofn
+HG00731-NVS	PUR-NVS	father	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00731/HG00731_shortwgs_fastq.nygc-PRJEB31736-2019.fofn
+NA19240-NVS	YRI-NVS	child	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19240/NA19240_shortwgs_fastq.nygc-PRJEB36890-2020.fofn
+NA19238-NVS	YRI-NVS	mother	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19238/NA19238_shortwgs_fastq.nygc-PRJEB31736-2019.fofn
+NA19239-NVS	YRI-NVS	father	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19239/NA19239_shortwgs_fastq.nygc-PRJEB31736-2019.fofn
