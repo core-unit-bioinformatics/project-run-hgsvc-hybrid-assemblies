@@ -294,3 +294,56 @@ rule produce_hla_msa:
 rule run_blast_checks:
     input:
         summary = rules.blast_summarize_hits_per_sequence.output.hit_count
+
+
+rule copy_files_to_share:
+    input:
+        cut_table = rules.build_hla_cut_table.output.cut_table,
+        all_seqs = rules.extract_hla_sequences.output.all_seqs,
+        seq_comp = rules.extract_hla_sequences.output.table_comp,
+        ref_seq = rules.extract_hla_reference_sequence.output.fasta,
+        blast_summary = rules.summarize_blast_hits.output.summary,
+        blast_table = rules.summarize_blast_hits.output.table,
+        blast_count = rules.blast_summarize_hits_per_sequence.output.hit_count
+    output:
+        file_listing = DIR_PROC.joinpath(
+            "regions", "hla", "files_shared.lst"
+        )
+    params:
+        single_fasta=lambda wildcards, input: pathlib.Path(input.seq_comp).parent.joinpath("single_fasta")
+    run:
+        import pathlib as pl
+        import shutil as sh
+        HLA_GLOBUS_SHARE = BASE_SHARE_LOCATION.joinpath("sig_hla")
+        HLA_GLOBUS_SHARE.mkdir(exist_ok=True, parents=True)
+        index_extensions = [".fai", ".tbi", ".gzi"]
+
+        copied_files = []
+        for share_file in input:
+            source_path = pl.Path(share_file)
+            assert source_path.is_file()
+            target_path = HLA_GLOBUS_SHARE.joinpath(source_path.name)
+            sh.copy(source_path, target_path)
+            copied_files.append(
+                (str(source_path), str(target_path))
+            )
+            for index_ext in index_extensions:
+                source_ext = source_path.suffix  # starts with "."
+                source_index = source_path.with_suffix(f"{source_ext}{index_ext}")
+                if source_index.is_file():
+                    target_index = HLA_GLOBUS_SHARE.joinpath(source_index.name)
+                    sh.copy(source_index, target_index)
+                    copied_files.append(
+                        (str(source_index), str(target_index))
+                    )
+
+        target_single_seq = HLA_GLOBUS_SHARE.joinpath("single_fasta")
+        target_single_seq.mkdir(exist_ok=True, parents=True)
+        for source_file in pl.iterdir(params.single_fasta):
+            target_file = target_single_seq.joinpath(source_file.name)
+            sh.copy(source_file, target_file)
+
+        with open(output, "w") as listing:
+            for src, trg in copied_files:
+                listing.write(f"{src}\t{trg}\n")
+    # END OF RUN BLOCK

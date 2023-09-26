@@ -7,6 +7,8 @@ TOP_ROOT_DIR = GPFS_BASE_HILBERT
 WORKDIR_EVAL = TOP_ROOT_DIR.joinpath("projects/assemblies/hybrids/eval/wd")
 WORKDIR_ASSEMBLY = TOP_ROOT_DIR.joinpath("projects/assemblies/hybrids/verkko/wd")
 
+BASE_SHARE_LOCATION = TOP_ROOT_DIR.joinpath("data/00_RESTRUCTURE/shares/globus/outgoing/hgsvc")
+
 # project repo
 DIR_SNAKEFILE = pathlib.Path(workflow.basedir).resolve(strict=True)
 assert DIR_SNAKEFILE.name == "workflow", DIR_SNAKEFILE
