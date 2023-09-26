@@ -339,7 +339,10 @@ rule copy_files_to_share:
 
         target_single_seq = HLA_GLOBUS_SHARE.joinpath("single_fasta")
         target_single_seq.mkdir(exist_ok=True, parents=True)
-        for source_file in pl.iterdir(params.single_fasta):
+        source_single_seq = pl.Path(params.single_fasta)
+        for source_file in source_single_seq.iterdir():
+            if not source_file.is_file():
+                continue
             target_file = target_single_seq.joinpath(source_file.name)
             sh.copy(source_file, target_file)
 
