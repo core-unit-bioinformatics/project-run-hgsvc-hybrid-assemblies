@@ -346,7 +346,7 @@ rule copy_files_to_share:
             target_file = target_single_seq.joinpath(source_file.name)
             sh.copy(source_file, target_file)
 
-        with open(output, "w") as listing:
+        with open(output.file_listing, "w") as listing:
             for src, trg in copied_files:
                 listing.write(f"{src}\t{trg}\n")
     # END OF RUN BLOCK
