@@ -1,13 +1,13 @@
 # 20230831T1042
 # rerun after update: notebooks/data_management/20_process_sample_table.ipynb
 order_num	sample	sex	hifi_complete	ont_complete	igsr_status	sample_batch	is_pilot
-1	NA19238	Female	yes	yes	complete	2	0
-2	NA19239	Male	yes	yes	complete	2	0
-3	NA19240	Female	yes	yes	complete	2	0
+1	NA19238	Female	yes	yes	complete	3	0
+2	NA19239	Male	yes	yes	complete	3	0
+3	NA19240	Female	yes	yes	complete	3	0
 4	HG00731	Male	yes	yes	complete	2	0
 5	HG00732	Female	yes	yes	complete	1	0
 6	HG00733	Female	yes	yes	complete	1	1
-7	HG00512	Male	yes	yes	complete	2	0
+7	HG00512	Male	yes	yes	complete	3	0
 8	HG00513	Female	yes	yes	complete	2	0
 9	HG00514	Female	yes	yes	complete	2	0
 10	HG03732	Male	yes	yes	complete	2	0
@@ -17,7 +17,7 @@ order_num	sample	sex	hifi_complete	ont_complete	igsr_status	sample_batch	is_pilo
 14	HG01114	Female	yes	yes	complete	1	0
 15	HG02018	Female	yes	yes	complete	1	0
 16	NA19036	Female	yes	yes	complete	1	0
-17	NA12329	Female	yes	yes	complete	2	0
+17	NA12329	Female	yes	yes	complete	3	0
 18	HG02011	Male	yes	yes	complete	2	0
 19	NA19983	Female	yes	yes	complete	1	0
 20	HG03371	Male	yes	yes	complete	2	0
@@ -28,11 +28,11 @@ order_num	sample	sex	hifi_complete	ont_complete	igsr_status	sample_batch	is_pilo
 25	NA18534	Male	yes	yes	complete	2	0
 26	HG01505	Male	yes	yes	complete	1	0
 27	NA19650	Male	yes	yes	complete	2	0
-28	NA18939	Female	yes	yes	complete	2	0
-29	HG00864	Female	yes	yes	complete	2	0
+28	NA18939	Female	yes	yes	complete	3	0
+29	HG00864	Female	yes	yes	complete	3	0
 30	NA20847	Female	yes	yes	complete	2	0
 31	NA20509	Male	yes	yes	complete	2	0
-32	HG00096	Male	yes	yes	complete	2	0
+32	HG00096	Male	yes	yes	complete	3	0
 33	HG01596	Male	yes	yes	complete	2	0
 34	NA24385	Male	yes	yes	complete	2	0
 35	NA12878	Female	skip	skip	skip	-1	0
