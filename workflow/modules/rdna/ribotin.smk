@@ -18,7 +18,7 @@ rule run_ribotin_on_verkko:
         asm_folder = lambda wildcards, input: pathlib.Path(input.verkko_asm_check).with_suffix(".wd"),
         out_folder = lambda wildcards, output: pathlib.Path(output.checkfile).with_suffix(".wd"),
     shell:
-        "ribotin-verkko --sample-name {sample} -x human "
+        "ribotin-verkko --sample-name {wildcards.sample} -x human "
         "-i {params.asm_folder} -o {params.out_folder} "
         "--mbg `which MBG` --graphaligner `which GraphAligner`"
             " && "
