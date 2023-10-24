@@ -12,15 +12,17 @@ rule run_ribotin_on_verkko:
         DIR_ENVS.joinpath("ribotin.yaml")
     threads: 6
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 32768,
-        time_hrs=lambda wildcards, attempt: attempt * 11
+        mem_mb=lambda wildcards, attempt: attempt * 4096,
+        time_hrs=lambda wildcards, attempt: attempt
     params:
         asm_folder = lambda wildcards, input: pathlib.Path(input.verkko_asm_check).with_suffix(".wd"),
         out_folder = lambda wildcards, output: pathlib.Path(output.checkfile).with_suffix(".wd"),
+        tmp_folder = lambda wildcards, output: pathlib.Path(output.checkfile).with_suffix(".wd").joinpath("tmp"),
     shell:
         "ribotin-verkko --sample-name {wildcards.sample} -x human "
         "-i {params.asm_folder} -o {params.out_folder} "
-        "--mbg `which MBG` --graphaligner `which GraphAligner`"
+        "--mbg `which MBG` --graphaligner `which GraphAligner` "
+        "--ul-tmp-folder {params.tmp_folder} "
             " && "
         "touch {output.checkfile}"
 
