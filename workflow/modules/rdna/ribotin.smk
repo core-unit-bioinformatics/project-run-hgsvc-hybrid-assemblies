@@ -12,8 +12,8 @@ rule run_ribotin_on_verkko:
         DIR_ENVS.joinpath("ribotin.yaml")
     threads: 6
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 4096,
-        time_hrs=lambda wildcards, attempt: attempt
+        mem_mb=lambda wildcards, attempt: attempt * 6144,
+        time_hrs=lambda wildcards, attempt: attempt * 11
     params:
         asm_folder = lambda wildcards, input: pathlib.Path(input.verkko_asm_check).with_suffix(".wd"),
         out_folder = lambda wildcards, output: pathlib.Path(output.checkfile).with_suffix(".wd"),
