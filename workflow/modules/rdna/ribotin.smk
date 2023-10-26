@@ -8,6 +8,10 @@ rule run_ribotin_on_verkko:
         checkfile = DIR_PROC.joinpath(
             "rdna", "ribotin", "{sample}.ps-none.ribotin.ok"
         )
+    benchmark:
+        DIR_RSRC.joinpath(
+            "rdna", "ribotin", "{sample}.ps-none.ribotin.ok"
+        )
     conda:
         DIR_ENVS.joinpath("ribotin.yaml")
     threads: 6

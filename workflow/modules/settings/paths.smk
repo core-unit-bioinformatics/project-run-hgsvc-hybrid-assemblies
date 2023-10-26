@@ -19,6 +19,7 @@ DIR_ENVS = DIR_SNAKEFILE.joinpath("envs").resolve(strict=True)
 
 DIR_PROC = pathlib.Path("proc")
 DIR_RES = pathlib.Path("results")
+DIR_RSRC = pathlib.Path("rsrc")
 DIR_LOG = pathlib.Path("log")
 DIR_LOCAL_REF = pathlib.Path("local_ref")
 DIR_GLOBAL_REF = pathlib.Path("global_ref")
