@@ -1,4 +1,4 @@
-# 20230913T1126
+# 20231030T1105
 sample	read_type	fofn_path
 HG00096	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00096/HG00096_hifi_fastq.hgsvc-JAX-2022.fofn
 HG00096	ont	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00096/HG00096_ont_fastq.hgsvc-JAX-2021.fofn
