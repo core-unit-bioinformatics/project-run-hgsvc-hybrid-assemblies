@@ -28,7 +28,7 @@ rule dump_bam_to_fastq:
     wildcard_constraints:
         path_hash = CONSTRAINT_BAM_INPUT
     conda:
-        "envs/samtools.yaml"
+        "../envs/samtools.yaml"
     threads: 6
     resources:
         mem_mb = lambda wildcards, attempt: 2048 * attempt,
@@ -56,7 +56,7 @@ rule gzip_plain_fastq:
     wildcard_constraints:
         path_hash = CONSTRAINT_FASTQ_INPUT
     conda:
-        "envs/samtools.yaml"
+        "../envs/samtools.yaml"
     threads: 6
     resources:
         mem_mb = lambda wildcards, attempt: 2048 * attempt,
