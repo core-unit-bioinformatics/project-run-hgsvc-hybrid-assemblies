@@ -32,7 +32,7 @@ rule dump_bam_to_fastq:
     threads: 6
     resources:
         mem_mb = lambda wildcards, attempt: 2048 * attempt,
-        time_hrs = lambda wildcards, attempt: 4 * attempt
+        time_hrs = lambda wildcards, attempt: 48 * attempt
     params:
         fastq = lambda wildcards:
             MISSING_FASTQ.loc[
