@@ -2,7 +2,7 @@
 # rerun after update: notebooks/data_management/20_process_sample_table.ipynb
 order_num	sample	sex	hifi_complete	ont_complete	igsr_status	sample_batch	is_pilot
 1	NA19238	Female	yes	yes	complete	3	0
-2	NA19239	Male	no	yes	incomplete	3	0
+2	NA19239	Male	yes	yes	complete	3	0
 3	NA19240	Female	yes	yes	complete	3	0
 4	HG00731	Male	yes	yes	complete	2	0
 5	HG00732	Female	yes	yes	complete	3	0

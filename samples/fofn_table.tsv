@@ -1,4 +1,4 @@
-# 20231219T0845
+# 20240124T1621
 sample	read_type	fofn_path
 HG00096	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00096/HG00096_hifi_fastq.hgsvc-JAX-2022.fofn
 HG00096	ont	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/HG00096/HG00096_ont_fastq.hgsvc-JAX-2021.fofn
@@ -109,6 +109,9 @@ NA19238	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric
 NA19238	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19238/NA19238_hifi_fastq.hgsvc-UW-2023.fofn
 NA19238	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19238/NA19238_hifi_fastq.hgsvc-JAX-2022.fofn
 NA19238	ont	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19238/NA19238_ont_fastq.hgsvc-UW-2023.fofn
+NA19239	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19239/NA19239_hifi_fastq.hgsvc-JAX-2019.fofn
+NA19239	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19239/NA19239_hifi_fastq.hgsvc-UW-2024.fofn
+NA19239	ont	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19239/NA19239_ont_fastq.hgsvc-JAX-2021.fofn
 NA19240	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19240/NA19240_hifi_fastq.hgsvc-JAX-2019.fofn
 NA19240	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19240/NA19240_hifi_fastq.hgsvc-JAX-2022.fofn
 NA19240	hifi	/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/sample-centric/NA19240/NA19240_hifi_fastq.hgsvc-UW-2023.fofn

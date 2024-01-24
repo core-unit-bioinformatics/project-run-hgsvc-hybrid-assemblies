@@ -1,4 +1,4 @@
-# 20231219T0845
+# 20240124T1621
 sample	read_type	processing_batch	file_name	file_path	matched	curated_by	file_group	group_date	cell	alt_id	data_source	file_source	project	file_rel_path	file_date
 GM19320	hifi	-1	n/a		0	metadata	n/a	n/a	m54329U_201019_191314	m54329U_201019_191314	HGSVCuw	20230627_hgsvc_hifi_cell-UW.tsv	HGSVCuw	n/a	n/a
 GM19320	hifi	-1	n/a		0	metadata	n/a	n/a	m54329U_201023_003851	m54329U_201023_003851	HGSVCuw	20230627_hgsvc_hifi_cell-UW.tsv	HGSVCuw	n/a	n/a
