@@ -1,4 +1,4 @@
-# 20231129T1535
+# 20240124T1628
 # rerun after update: notebooks/data_management/20_process_sample_table.ipynb
 order_num	sample	sex	hifi_complete	ont_complete	igsr_status	sample_batch	is_pilot
 1	NA19238	Female	yes	yes	complete	3	0
