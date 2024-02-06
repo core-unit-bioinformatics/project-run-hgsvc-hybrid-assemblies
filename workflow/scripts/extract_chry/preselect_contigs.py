@@ -2,6 +2,7 @@
 
 import argparse as argp
 import pathlib as pl
+import sys
 
 import pandas as pd
 
@@ -103,7 +104,8 @@ def read_motif_hit_file(file_path):
             return None
         query_infos = [(row.target, row.target_length, row.query, row.num_hits_hiq, -1, "hit") for row in subset.itertuples()]
     else:
-        raise
+        sys.stderr.write(f"\nWARNING: motif unknown - skipping ... {hits['query'].unique()[0]}\n")
+        return None
     return query_infos
 
 

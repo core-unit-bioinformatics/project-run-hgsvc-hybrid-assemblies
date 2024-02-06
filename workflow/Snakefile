@@ -9,6 +9,8 @@ include: "modules/rdna/ribotin.smk"
 
 include: "modules/regions/hla/extract.smk"
 
+include: "modules/extract_chrom/preselect_tigs.smk"
+
 rule run_all:
     input:
         everything = [
