@@ -74,7 +74,7 @@ rule fetch_tigs_from_sequence_files:
     params:
         script=DIR_SCRIPTS.joinpath("extract_chrom", "fetch_seq.py")
     shell:
-        "{params.script} --fasta-files {input.fastas} --select-contigs {input.listing} "
+        "{params.script} --fasta-files {input.fastas} --selected-contigs {input.listing} "
             "--output {output.fasta}"
 
 
