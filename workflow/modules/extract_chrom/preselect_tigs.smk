@@ -32,11 +32,11 @@ rule preselect_chrom_contigs:
         motif_hits = expand(
             WORKDIR_EVAL.joinpath(
                 "results", "annotations", "hmmer",
-                "{{sample}}.{asm_unit}.{motif}.hmmer.agg-hits.tsv.gz"
+                "{{sample}}.asm-{asm_unit}.{motif}.hmmer.agg-hits.tsv.gz"
             ),
             asm_unit=MAIN_ASSEMBLY_UNITS,
             motif=CHROM_Y_SELECT_MOTIFS
-        ),
+        )
     output:
         contig_list = DIR_RES.joinpath(
             "extract_chrom", "select_tigs",
