@@ -39,7 +39,7 @@ rule preselect_chrom_contigs:
         ),
     output:
         contig_list = DIR_RES.joinpath(
-            "extract_chry", "select_tigs",
+            "extract_chrom", "select_tigs",
             "{sample}.{select_chrom}.selected_tigs.tsv"
         )
     wildcard_constraints:
@@ -47,7 +47,7 @@ rule preselect_chrom_contigs:
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")
     params:
-        script = DIR_SCRIPTS.joinpath("extract_chry", "preselect_contigs.py"),
+        script = DIR_SCRIPTS.joinpath("extract_chrom", "preselect_contigs.py"),
 
     shell:
         "{params.script} --contig-ref-align {input.aln} --motif-hits {input.motif_hits} "
@@ -59,20 +59,20 @@ rule fetch_tigs_from_sequence_files:
         listing = rules.preselect_chrom_contigs.output.contig_list,
         fastas = expand(
             WORKDIR_EVAL.joinpath(
-                "results/assemblies/", "{sample}",
-                "{sample}.asm-{asm_unit}.fasta.gz"
+                "results/assemblies/", "{{sample}}",
+                "{{sample}}.asm-{asm_unit}.fasta.gz"
             ),
             asm_unit=MAIN_ASSEMBLY_UNITS
         )
     output:
         fasta = DIR_RES.joinpath(
-            "extract_chry", "fasta_seqs",
+            "extract_chrom", "fasta_seqs",
             "{sample}.{select_chrom}.oriented.fasta.gz"
         )
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")
     params:
-        script=DIR_SCRIPTS.joinpath("extract_chry", "fetch_seq.py")
+        script=DIR_SCRIPTS.joinpath("extract_chrom", "fetch_seq.py")
     shell:
         "{params.script} --fasta-files {input.fastas} --select-contigs {input.listing} "
             "--output {output.fasta}"
