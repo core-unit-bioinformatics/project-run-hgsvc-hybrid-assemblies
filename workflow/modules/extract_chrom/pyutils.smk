@@ -27,7 +27,7 @@ def hmmer_scaling(resource, motif_name):
 
     assert resource in ["cpu", "mem", "time"]
     try:
-        scaling_factor = int(HMMER_MOTIF_SEARCH[motif_name][f"scale_{resource}"])
+        scaling_factor = int(HMMER_MOTIF_PARAMS[motif_name][f"scale_{resource}"])
     except KeyError:
         scaling_factor = 1
     return scaling_factor
