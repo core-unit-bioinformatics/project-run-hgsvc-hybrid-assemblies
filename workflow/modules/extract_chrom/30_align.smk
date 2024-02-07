@@ -8,7 +8,7 @@ rule create_extract_chrom_seq_idx:
     output:
         fai = DIR_PROC.joinpath(
             "extract_chrom", "fasta_seqs",
-            "{sample}.{select_chrom}.oriented.fasta.fai"
+            "{sample}.{chrom}.oriented.fasta.fai"
         )
     conda:
         DIR_ENVS.joinpath("samtools.yaml")

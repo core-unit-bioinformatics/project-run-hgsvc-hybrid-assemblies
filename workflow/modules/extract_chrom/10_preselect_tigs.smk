@@ -50,6 +50,8 @@ rule fetch_tigs_from_sequence_files:
         )
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")
+    wildcard_constraints:
+        chrom="(chrY|chrX)"
     params:
         script=DIR_SCRIPTS.joinpath("extract_chrom", "fetch_seq.py")
     shell:
