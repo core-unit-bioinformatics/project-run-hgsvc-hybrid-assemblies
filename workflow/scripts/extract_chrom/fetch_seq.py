@@ -46,6 +46,10 @@ def reverse_complement_sequence(rc_table, sequence):
 def read_selected_contigs_file(table_file):
 
     df = pd.read_csv(table_file, sep="\t", header=0, comment="#")
+    # the following: it is possible that a tig is identified solely
+    # based on motif hits and has no alignments to chrY (although that
+    # is a rare case)
+    all_tigs = set(df["tig_name"].values)
     df = df.loc[df["info_type"] == "aln", :].copy()
 
     tig_infos = {}
@@ -55,6 +59,13 @@ def read_selected_contigs_file(table_file):
         assert tig_orient in [-1, 1]
         assert tig not in tig_infos
         tig_infos[tig] = tig_orient
+
+    for tig in all_tigs:
+        if tig in tig_infos:
+            continue
+        # see above: no alignment
+        # assign default orientation of forward
+        tig_infos[tig] = 1
 
     return tig_infos
 

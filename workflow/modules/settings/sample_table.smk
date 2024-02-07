@@ -7,6 +7,17 @@ SAMPLE_TABLE = pandas.read_csv(
     header=0
 )
 
+SAMPLE_SEX = None
+MALE_SAMPLES = None
+FEMALE_SAMPLES = None
+if "sex" in SAMPLE_TABLE:
+    SAMPLE_SEX = dict()
+    for row in SAMPLE_TABLE.itertuples():
+        SAMPLE_SEX[row.sample] = row.sex
+    MALE_SAMPLES = [s for s in SAMPLES if SAMPLE_SEX[s] in ["male", "m"]]
+    FEMALE_SAMPLES = [s for s in SAMPLES if SAMPLE_SEX[s] in ["female", "f"]]
+
+
 SAMPLES = sorted(SAMPLE_TABLE["sample"].unique())
 
 if all("vrk-ps" in s for s in SAMPLES):

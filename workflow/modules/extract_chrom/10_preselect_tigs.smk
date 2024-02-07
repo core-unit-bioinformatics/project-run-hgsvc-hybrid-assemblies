@@ -1,25 +1,4 @@
 
-
-CHROM_Y_SELECT_MOTIFS = [
-    "DYZ18_Yq",
-    "DYZ1_Yq",
-    "DYZ2_Yq",
-    "DYZ3-sec_Ycentro"
-]
-
-CHROM_Y_ALL_MOTIFS = [
-    "DYZ18_Yq",
-    "DYZ1_Yq",
-    "DYZ2_Yq",
-    "DYZ3-sec_Ycentro",
-    "DYZ19_Yq",
-    "DYZ3-prim_Ycentro",
-    "TSPY",
-    "Yqhet_2k7bp",
-    "Yqhet_3k1bp",
-]
-
-
 rule preselect_chrom_contigs:
     input:
         aln = expand(
@@ -65,9 +44,9 @@ rule fetch_tigs_from_sequence_files:
             asm_unit=MAIN_ASSEMBLY_UNITS
         )
     output:
-        fasta = DIR_RES.joinpath(
+        fasta = DIR_PROC.joinpath(
             "extract_chrom", "fasta_seqs",
-            "{sample}.{select_chrom}.oriented.fasta.gz"
+            "{sample}.{select_chrom}.oriented.fasta"
         )
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")
