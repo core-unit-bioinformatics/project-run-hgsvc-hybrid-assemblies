@@ -62,5 +62,5 @@ rule run_all_fetch_chrom_contigs:
         fasta = expand(
             rules.fetch_tigs_from_sequence_files.output.fasta,
             sample=SAMPLES,
-            select_chrom=["chrY"]
+            chrom=["chrY"]
         )
