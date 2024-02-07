@@ -24,7 +24,7 @@ rule minimap_chrom_to_ref_align:
     output:
         paf = DIR_RES.joinpath(
             "extract_chrom", "chrom_to_ref",
-            "minimap", "{sample}.{ref}.{chrom}.seq.paf"
+            "minimap", "{sample}.{ref}.{chrom}.seq.paf.gz"
         )
     conda:
         DIR_ENVS.joinpath("minimap.yaml")
