@@ -6,7 +6,7 @@ def get_num_threads_hmmer(motif_name):
     to encapsulate the THREADS value set for
     a default run, i.e. CPU_LOW
     """
-    num_threads = int(min(CPU_MAX, CPU_LOW * hmmer_scaling("cpu", motif_name)))
+    num_threads = int(min(72, 6 * hmmer_scaling("cpu", motif_name)))
     return num_threads
 
 

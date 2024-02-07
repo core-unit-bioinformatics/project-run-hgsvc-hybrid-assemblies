@@ -28,7 +28,7 @@ rule minimap_chrom_to_ref_align:
         )
     conda:
         DIR_ENVS.joinpath("minimap.yaml")
-    threads: CPU_LOW
+    threads: 6
     resources:
         mem_mb=lambda wildcards, attempt: 8192 * attempt,
         time_hrs=lambda wildcards, attempt: attempt
@@ -51,7 +51,7 @@ rule minimap_seqclass_to_chrom_align:
         )
     conda:
         DIR_ENVS.joinpath("minimap.yaml")
-    threads: CPU_LOW
+    threads: 6
     resources:
         mem_mb=lambda wildcards, attempt: 8192 * attempt,
         time_hrs=lambda wildcards, attempt: attempt
