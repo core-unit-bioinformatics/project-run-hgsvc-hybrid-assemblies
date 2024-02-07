@@ -19,10 +19,10 @@ rule preselect_chrom_contigs:
     output:
         contig_list = DIR_RES.joinpath(
             "extract_chrom", "select_tigs",
-            "{sample}.{select_chrom}.selected_tigs.tsv"
+            "{sample}.{chrom}.selected_tigs.tsv"
         )
     wildcard_constraints:
-        select_chrom = "(chrX|chrY)"
+        chrom = "(chrX|chrY)"
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")
     params:
@@ -30,7 +30,7 @@ rule preselect_chrom_contigs:
 
     shell:
         "{params.script} --contig-ref-align {input.aln} --motif-hits {input.motif_hits} "
-            "--select-chrom {wildcards.select_chrom} --output {output.contig_list}"
+            "--select-chrom {wildcards.chrom} --output {output.contig_list}"
 
 
 rule fetch_tigs_from_sequence_files:
@@ -46,7 +46,7 @@ rule fetch_tigs_from_sequence_files:
     output:
         fasta = DIR_PROC.joinpath(
             "extract_chrom", "fasta_seqs",
-            "{sample}.{select_chrom}.oriented.fasta"
+            "{sample}.{chrom}.oriented.fasta"
         )
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")

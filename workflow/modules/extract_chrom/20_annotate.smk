@@ -22,17 +22,17 @@ rule hmmer_motif_search_extracted_seq:
         txt = DIR_PROC.joinpath(
             "extract_chrom", "hmmer_plain",
             "{sample}.hmmer.wd",
-            "{sample}.{motif}.hmmer-out.txt"
+            "{sample}.{chrom}.{motif}.hmmer-out.txt"
         ),
         table = DIR_PROC.joinpath(
             "extract_chrom", "hmmer_plain",
             "{sample}.hmmer.wd",
-            "{sample}.{motif}.hmmer-table.txt"
+            "{sample}.{chrom}.{motif}.hmmer-table.txt"
         ),
     benchmark:
         DIR_RSRC.joinpath(
             "extract_chrom", "hmmer_plain",
-            "{sample}.{motif}.hmmer.rsrc"
+            "{sample}.{chrom}.{motif}.hmmer.rsrc"
         )
     conda:
         DIR_ENVS.joinpath("hmmer.yaml")
@@ -54,5 +54,6 @@ rule run_all_hmmer_extract_chrom:
         tables = expand(
             rules.hmmer_motif_search_extracted_seq.output.table,
             sample=MALE_SAMPLES,
-            motif=CHROM_Y_ALL_MOTIFS
+            motif=CHROM_Y_ALL_MOTIFS,
+            chrom=["chrY"]
         )
