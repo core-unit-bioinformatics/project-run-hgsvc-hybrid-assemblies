@@ -23,8 +23,6 @@ CHROM_Y_ALL_MOTIFS = [
     "Yqhet_3k1bp",
 ]
 
-HMMER_MOTIF_NAMES = sorted(HMMER_MOTIF_SEARCH.keys())
-
 HMMER_MOTIF_PARAMS = {
     "DYZ18_Yq": {
         "score_t": 2100,
@@ -67,3 +65,5 @@ HMMER_MOTIF_PARAMS = {
         "evalue_t": '1.60E-200'
     }
 }
+
+HMMER_MOTIF_NAMES = sorted(HMMER_MOTIF_PARAMS.keys())
