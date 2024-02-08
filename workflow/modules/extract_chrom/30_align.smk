@@ -30,7 +30,7 @@ rule minimap_chrom_to_ref_align:
         DIR_ENVS.joinpath("minimap.yaml")
     threads: 6
     resources:
-        mem_mb=lambda wildcards, attempt: 8192 * attempt,
+        mem_mb=lambda wildcards, attempt: 16384 * attempt,
         time_hrs=lambda wildcards, attempt: attempt
     shell:
         "minimap2 -x asm20 -L --eqx --MD --cs -c --secondary=no "
@@ -53,7 +53,7 @@ rule minimap_seqclass_to_chrom_align:
         DIR_ENVS.joinpath("minimap.yaml")
     threads: 6
     resources:
-        mem_mb=lambda wildcards, attempt: 8192 * attempt,
+        mem_mb=lambda wildcards, attempt: 16384 * attempt,
         time_hrs=lambda wildcards, attempt: attempt
     shell:
         "minimap2 -x asm20 -L --eqx --MD --cs -c --secondary=yes -N 10 -p 0.95 "

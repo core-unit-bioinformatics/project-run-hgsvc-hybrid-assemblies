@@ -46,8 +46,8 @@ HMMER_MOTIF_PARAMS = {
         "score_t": 1000,
         "evalue_t": '1.60E-200',
         "scale_cpu": 4,
-        "scale_time": 35,
-        "scale_mem": 5
+        "scale_time": 47,
+        "scale_mem": 6
     },
     "DYZ19_Yq": {
         "evalue_t": '1.60E-15'
