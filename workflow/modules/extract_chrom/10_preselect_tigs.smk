@@ -54,6 +54,8 @@ rule fetch_tigs_from_sequence_files:
         chrom="(chrY|chrX)"
     params:
         script=DIR_SCRIPTS.joinpath("extract_chrom", "fetch_seq.py")
+    resources:
+        mem_mb=lambda wildcards, attempt: 2048 * attempt
     shell:
         "{params.script} --fasta-files {input.fastas} --selected-contigs {input.listing} "
             "--output {output.fasta}"
