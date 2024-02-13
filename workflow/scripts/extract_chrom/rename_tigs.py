@@ -245,7 +245,7 @@ def check_sequences_no_seq_class(fasta_input, name_lookup, seq_align_file, class
             select_right = end < class_order_infos["end"]
             selector = select_left & select_right
             if not selector.any():
-                raise
+                raise ValueError(f"no end selectable: {sample} / {tig}")
             end_class, end_pad_order = class_order_infos.loc[selector, ["name", "padded"]].values[0]
 
             for unmap_tig, pp_len in no_sqcls_hits:
