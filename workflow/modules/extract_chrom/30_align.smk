@@ -62,16 +62,35 @@ rule minimap_seqclass_to_chrom_align:
         "pigz > {output.paf}"
 
 
-rule normalize_minimap_paf:
+rule normalize_minimap_paf_seqclass:
     input:
         paf = DIR_RES.joinpath(
             "extract_chrom", "seqclass_to_chrom",
-            "minimap", "{sample}.{ref}.{chrom}.{aln_type}.paf.gz"
+            "minimap", "{sample}.{ref}.{chrom}.cls.paf.gz"
         )
     output:
         tsv = DIR_RES.joinpath(
             "extract_chrom", "seqclass_to_chrom",
-            "minimap", "{sample}.{ref}.{chrom}.{aln_type}.norm-paf.tsv.gz"
+            "minimap", "{sample}.{ref}.{chrom}.cls.norm-paf.tsv.gz"
+        )
+    conda:
+        DIR_ENVS.joinpath("pyseq.yaml")
+    params:
+        script=DIR_SCRIPTS.joinpath("normalize_paf.py").resolve(strict=True)
+    shell:
+        "{params.script} --input {input.paf} --output {output.tsv}"
+
+
+rule normalize_minimap_paf_seqtoref:
+    input:
+        paf = DIR_RES.joinpath(
+            "extract_chrom", "chrom_to_ref",
+            "minimap", "{sample}.{ref}.{chrom}.seq.paf.gz"
+        )
+    output:
+        tsv = DIR_RES.joinpath(
+            "extract_chrom", "chrom_to_ref",
+            "minimap", "{sample}.{ref}.{chrom}.seq.norm-paf.tsv.gz"
         )
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")
@@ -95,10 +114,15 @@ rule run_all_minimap_alignments:
             chrom=["chrY"],
             ref=["hg38", "t2t"]
         ),
-        norm = expand(
+        norm_cls = expand(
             rules.normalize_minimap_paf.output.tsv,
             sample=MALE_SAMPLES,
             chrom=["chrY"],
             ref=["hg38", "t2t"],
-            aln_type=["cls"]
+        ),
+        norm_seq = expand(
+            rules.normalize_minimap_paf.output.tsv,
+            sample=MALE_SAMPLES,
+            chrom=["chrY"],
+            ref=["hg38", "t2t"],
         ),
