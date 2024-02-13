@@ -96,7 +96,7 @@ rule run_all_minimap_alignments:
             ref=["hg38", "t2t"]
         ),
         norm = expand(
-            rules.minimap_seqclass_to_chrom_align.output.paf,
+            rules.normalize_minimap_paf.output.tsv,
             sample=MALE_SAMPLES,
             chrom=["chrY"],
             ref=["hg38", "t2t"],
