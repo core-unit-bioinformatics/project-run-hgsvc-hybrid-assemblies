@@ -100,5 +100,5 @@ rule run_all_minimap_alignments:
             sample=MALE_SAMPLES,
             chrom=["chrY"],
             ref=["hg38", "t2t"],
-            aln_type=["seq", "cls"]
+            aln_type=["cls"]
         ),
