@@ -2,8 +2,14 @@
 rule rename_extracted_tigs:
     input:
         fasta = rules.fetch_tigs_from_sequence_files.output.fasta,
-        sqcls_align = rules.normalize_minimap_paf_seqclass.output.tsv,
-        ref_align = rules.normalize_minimap_paf_seqtoref.output.tsv
+        sqcls_align = tsv = DIR_RES.joinpath(
+            "extract_chrom", "seqclass_to_chrom",
+            "minimap", "{sample}.t2t.{chrom}.cls.norm-paf.tsv.gz"
+        ),
+        ref_align = tsv = DIR_RES.joinpath(
+            "extract_chrom", "chrom_to_ref",
+            "minimap", "{sample}.t2t.{chrom}.seq.norm-paf.tsv.gz"
+        )
     output:
         fasta = DIR_RES.joinpath(
             "extract_chrom", "renamed",
