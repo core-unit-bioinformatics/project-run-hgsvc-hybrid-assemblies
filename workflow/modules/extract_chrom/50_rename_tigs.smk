@@ -36,7 +36,7 @@ rule rename_extracted_tigs:
 localrules: rename_dump_sed_file
 rule rename_dump_sed_file:
     input:
-        table = rules.rename.rename_extracted_tigs.output.table
+        table = rules.rename_extracted_tigs.output.table
     output:
         txt = DIR_RES.joinpath(
             "extract_chrom", "renamed", "aux",
