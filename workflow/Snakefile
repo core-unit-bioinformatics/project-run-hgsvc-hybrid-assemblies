@@ -13,6 +13,7 @@ include: "modules/extract_chrom/pyutils.smk"
 include: "modules/extract_chrom/10_preselect_tigs.smk"
 include: "modules/extract_chrom/20_annotate.smk"
 include: "modules/extract_chrom/30_align.smk"
+include: "modules/extract_chrom/50_rename_tigs.smk"
 
 
 rule run_all:
