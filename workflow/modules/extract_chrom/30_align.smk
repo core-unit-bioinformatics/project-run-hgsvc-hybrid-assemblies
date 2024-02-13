@@ -115,13 +115,13 @@ rule run_all_minimap_alignments:
             ref=["hg38", "t2t"]
         ),
         norm_cls = expand(
-            rules.normalize_minimap_paf.output.tsv,
+            rules.normalize_minimap_paf_seqclass.output.tsv,
             sample=MALE_SAMPLES,
             chrom=["chrY"],
             ref=["hg38", "t2t"],
         ),
         norm_seq = expand(
-            rules.normalize_minimap_paf.output.tsv,
+            rules.normalize_minimap_paf_seqtoref.output.tsv,
             sample=MALE_SAMPLES,
             chrom=["chrY"],
             ref=["hg38", "t2t"],
