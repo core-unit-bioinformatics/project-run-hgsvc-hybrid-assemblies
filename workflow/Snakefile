@@ -24,3 +24,15 @@ rule run_all:
             rules.extract_hla_sequences.output.all_seqs,
             rules.run_all_ribotin.input.checkfiles
         ]
+
+
+rule run_rsync_chry:
+    output:
+        chk = DIR_PROC.joinpath("rsync_chrY_share.ok")
+    params:
+        source=DIR_RES.joinpath("extract_chrom"),
+        target="/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/shares/globus/outgoing/hgsvc/sig_chry"
+    shell:
+        "rsync --recursive --checksum {params.source}/ {params.target}"
+            " && "
+        "date > {output.chk}"
