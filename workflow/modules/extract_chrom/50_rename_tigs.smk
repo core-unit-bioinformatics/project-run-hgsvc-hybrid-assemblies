@@ -11,15 +11,15 @@ rule rename_extracted_tigs:
         ),
         sqcls_align = DIR_RES.joinpath(
             "extract_chrom", "renamed", "seqclass_to_chrom",
-            "minimap", "{sample}.{ref}.{chrom}.cls.norm-paf.tsv.gz"
+            "minimap", "{sample}.t2t.{chrom}.cls.norm-paf.tsv.gz"
         ),
         ref_align = DIR_RES.joinpath(
             "extract_chrom", "renamed", "chrom_to_ref",
-            "minimap", "{sample}.{ref}.{chrom}.seq.norm-paf.tsv.gz"
+            "minimap", "{sample}.t2t.{chrom}.seq.norm-paf.tsv.gz"
         ),
         table = DIR_RES.joinpath(
             "extract_chrom", "renamed",
-            "{sample}.{ref}.{chrom}.rename-info.tsv"
+            "{sample}.t2t.{chrom}.rename-info.tsv"
         )
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")
@@ -56,7 +56,6 @@ rule run_all_rename_extracted_chrom:
         tables = expand(
             rules.rename_extracted_tigs.output.table,
             sample=MALE_SAMPLES,
-            ref=["t2t"],
             chrom=["chrY"]
         ),
         sed_txt = expand(
