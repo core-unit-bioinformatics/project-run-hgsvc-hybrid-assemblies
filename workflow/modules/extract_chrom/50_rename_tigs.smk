@@ -9,7 +9,8 @@ rule rename_extracted_tigs:
         ref_align = DIR_RES.joinpath(
             "extract_chrom", "chrom_to_ref",
             "minimap", "{sample}.t2t.{chrom}.seq.norm-paf.tsv.gz"
-        )
+        ),
+        sqcls_order = DIR_GLOBAL_REF.joinpath("T2T.chrY-seq-classes.tsv")
     output:
         fasta = DIR_RES.joinpath(
             "extract_chrom", "renamed",
@@ -32,7 +33,7 @@ rule rename_extracted_tigs:
     params:
         script = DIR_SCRIPTS.joinpath("extract_chrom", "rename_tigs.py")
     shell:
-        "{params.script} --min-align-total 25000 "
+        "{params.script} --min-align-total 25000 --input-class-order {input.sqcls_order} "
         "--fasta-in {input.fasta} --fasta-out {output.fasta} "
         "--class-align {input.sqcls_align} --out-class-align {output.sqcls_align} "
         "--seq-align {input.ref_align} --out-seq-align {output.ref_align} "
