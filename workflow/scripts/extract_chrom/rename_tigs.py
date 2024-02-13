@@ -234,7 +234,7 @@ def check_sequences_no_seq_class(fasta_input, name_lookup, seq_align_file, class
         raw_aln, sample = read_alignment_table(seq_align_file, 0)
         tig_order = determine_tig_relative_order(raw_aln, no_sqcls_hits)
         for tig, (rel_pos, start, end) in tig_order.items():
-            select_left = start > class_order_infos["start"]
+            select_left = start >= class_order_infos["start"]
             select_right = start < class_order_infos["end"]
             selector = select_left & select_right
             if not selector.any():
@@ -242,7 +242,7 @@ def check_sequences_no_seq_class(fasta_input, name_lookup, seq_align_file, class
             start_class, start_pad_order = class_order_infos.loc[selector, ["name", "padded"]].values[0]
 
             select_left = end > class_order_infos["start"]
-            select_right = end < class_order_infos["end"]
+            select_right = end <= class_order_infos["end"]
             selector = select_left & select_right
             if not selector.any():
                 raise ValueError(f"no end selectable: {sample} / {tig}")
