@@ -54,7 +54,7 @@ rule rename_dump_sed_file:
         df = pd.read_csv(input.table, sep="\t", header=0, comment="#")
         with open(output.txt, "w") as dump:
             for row in df.itertuples():
-                dump.write(f"'s/\\b{row.old_name}\\b/{row.new_name}/g\n')")
+                dump.write(f"'s/\\b{row.old_name}\\b/{row.new_name}/g\n'")
     # END OF RUN BLOCK
 
 
