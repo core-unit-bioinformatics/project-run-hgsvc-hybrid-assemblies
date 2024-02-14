@@ -22,17 +22,28 @@ rule run_all:
             rules.run_all_issue_tracks.input.stats,
             rules.extract_hla_sequences.output.table_comp,
             rules.extract_hla_sequences.output.all_seqs,
-            rules.run_all_ribotin.input.checkfiles
+            rules.run_all_ribotin.input.checkfiles,
+            rules.run_all_rename_extracted_chrom.input
         ]
 
 
+TARGET_DIR_SHARE_CHRY=pathlib.Path(
+    "/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/shares/globus/outgoing/hgsvc/sig_chry"
+)
 rule run_rsync_chry:
+    input:
+        all_files = rules.run_all_rename_extracted_chrom.input
     output:
         chk = DIR_PROC.joinpath("rsync_chrY_share.ok")
     params:
         source=DIR_RES.joinpath("extract_chrom"),
-        target="/gpfs/project/projects/medbioinf/data/00_RESTRUCTURE/shares/globus/outgoing/hgsvc/sig_chry"
+        target=TARGET_DIR_SHARE_CHRY,
+        ts_file=TARGET_DIR_SHARE_CHRY.joinpath("HGSVC3_SIG-chrY.timestamp")
+    resources:
+        time_hrs=lambda wildcards, attempt: attempt ** 3
     shell:
         "rsync --recursive --checksum {params.source}/ {params.target}"
+            " && "
+        "date > {params.ts_file}"
             " && "
         "date > {output.chk}"
