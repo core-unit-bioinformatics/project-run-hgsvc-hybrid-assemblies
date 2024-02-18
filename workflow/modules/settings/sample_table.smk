@@ -24,6 +24,13 @@ if all("vrk-ps" in s for s in SAMPLES):
     ASSEMBLER = "verkko"
     MAIN_ASSEMBLY_UNITS = ["hap1", "hap2", "unassigned"]
 
+elif all("CEPH" in s for s in SAMPLES):
+
+    # special setting for pedigree samples
+
+    ASSEMBLER = "verkko"
+    MAIN_ASSEMBLY_UNITS = ["hap1", "hap2", "unassigned"]
+
 elif all("hsm-ps" in s for s in SAMPLES):
 
     ASSEMBLER = "hifiasm"
