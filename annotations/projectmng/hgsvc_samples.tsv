@@ -1,7 +1,7 @@
 #20240131T1033
 order_num	phase	sample	family	member	population	supergroup	sex
 1	Yr1	NA19238	Y117	Mother	YRI	AFR	Female
-2	Yr1	NA19239	Y117	Father	YRI	YRI	Male
+2	Yr1	NA19239	Y117	Father	YRI	AFR	Male
 3	Yr1	NA19240	Y117	Daughter	YRI	AFR	Female
 4	Yr1	HG00731	PR05	Father	PUR	AMR	Male
 5	Yr1	HG00732	PR05	Mother	PUR	AMR	Female
