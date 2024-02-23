@@ -27,6 +27,15 @@ def parse_command_line():
     )
 
     parser.add_argument(
+        "--drop-alignments",
+        "-da",
+        type=int,
+        default=2,
+        dest="drop_alignments",
+        help="Drop alignments of type 1/-1/2 (primary/inverted/secondary). Default: 2"
+    )
+
+    parser.add_argument(
         "--motif-hits", "-m",
         type=lambda x: pl.Path(x).resolve(strict=True),
         nargs="+",
