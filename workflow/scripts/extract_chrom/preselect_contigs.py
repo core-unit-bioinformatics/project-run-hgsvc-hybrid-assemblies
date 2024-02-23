@@ -71,7 +71,7 @@ def summarize_alignments(aln_subset, query, query_length):
     return agg_aln
 
 
-def read_alignment_file(file_path, select_chrom):
+def read_alignment_file(file_path, select_chrom, drop_aln):
 
     aln = pd.read_csv(file_path, sep="\t", header=0, comment="#")
     aln.drop(
@@ -81,10 +81,11 @@ def read_alignment_file(file_path, select_chrom):
         ],
         axis=1, inplace=True
     )
-    # drop secondary alignments
-    aln = aln.loc[aln["tp_align_type"] != 2, :].copy()
-    # aggregate over query name, skip all w/o any alignment to select_chrom
+    if drop_aln != 0:
+    # if set: drop alignments, i.e. most commonly secondary
+        aln = aln.loc[aln["tp_align_type"] != drop_aln, :].copy()
 
+    # aggregate over query name, skip all w/o any alignment to select_chrom
     query_infos = []
     for query, aligns in aln.groupby("query_name"):
         if select_chrom not in aligns["target_name"].values:
@@ -148,7 +149,7 @@ def main():
 
     contig_infos = []
     for aln_file in args.alignments:
-        alignments = read_alignment_file(aln_file, args.select_chrom)
+        alignments = read_alignment_file(aln_file, args.select_chrom, args.drop_alignments)
         contig_infos.extend(alignments)
 
     for motif_file in args.motifs:
