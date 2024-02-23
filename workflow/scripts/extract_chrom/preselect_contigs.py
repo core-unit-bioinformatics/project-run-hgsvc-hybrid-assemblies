@@ -152,11 +152,12 @@ def main():
         alignments = read_alignment_file(aln_file, args.select_chrom, args.drop_alignments)
         contig_infos.extend(alignments)
 
-    for motif_file in args.motifs:
-        motif_hits = read_motif_hit_file(motif_file)
-        if motif_hits is None:
-            continue
-        contig_infos.extend(motif_hits)
+    if args.select_chrom == "chrY":
+        for motif_file in args.motifs:
+            motif_hits = read_motif_hit_file(motif_file)
+            if motif_hits is None:
+                continue
+            contig_infos.extend(motif_hits)
 
     df = pd.DataFrame.from_records(
         contig_infos,
