@@ -11,7 +11,9 @@ import pandas as pd
 Y_SPECIFIC_MOTIFS = ['DYZ1_Yq', 'DYZ18_Yq', 'DYZ3-sec_Ycentro']
 UNSPECIFIC_MOTIFS = ['DYZ2_Yq']
 UNSPECIFIC_THRESHOLD = 300
-PRIMARY_ALN_THRESHOLD_PCT = 90
+
+# see below: made script parameter
+#PRIMARY_ALN_THRESHOLD_PCT = 90
 
 
 def parse_command_line():
@@ -33,6 +35,14 @@ def parse_command_line():
         default=2,
         dest="drop_alignments",
         help="Drop alignments of type 1/-1/2 (primary/inverted/secondary). Default: 2"
+    )
+
+    parser.add_argument(
+        "--min-aln-threshold", "-maln",
+        type=int,
+        default=50,
+        dest="min_aln_t",
+        help="Min. alignments threshold. Default: 50"
     )
 
     parser.add_argument(
@@ -119,11 +129,10 @@ def read_motif_hit_file(file_path):
     return query_infos
 
 
-def check_alignment_ratio(contig_aln, select_chrom):
+def check_alignment_ratio(contig_aln, select_chrom, min_aln_t):
     """For all contig that have not enough specific
     motif hits, check if the alignment ratio is above
-    PRIMARY_ALN_THRESHOLD_PCT for the chromosome of
-    interest.
+    'min_aln_t' for the chromosome of interest.
 
     Args:
         contig_aln (_type_): _description_
@@ -133,14 +142,19 @@ def check_alignment_ratio(contig_aln, select_chrom):
     tig_lengths = dict((row.tig_name, row.tig_length) for row in contig_aln.itertuples())
 
     selected = set()
+    skipped = []
     for (tig, ref), tig_aln in aln_length.items():
         if ref != select_chrom:
             continue
         aln_ratio = round(tig_aln / tig_lengths[tig] * 100, 1)
-        if aln_ratio > PRIMARY_ALN_THRESHOLD_PCT:
+        if aln_ratio > min_aln_t:
             selected.add(tig)
+        else:
+            skipped.append(
+                f"# Skipped tig {tig} / {ref} - pct. aligned length: ~{aln_ratio}"
+            )
 
-    return selected
+    return selected, skipped
 
 
 def main():
@@ -172,7 +186,7 @@ def main():
     remaining_subset = df.loc[~df["tig_name"].isin(tigs_with_hits), :].copy()
     remaining_subset = remaining_subset.loc[remaining_subset["ref_seq"] == args.select_chrom, :].copy()
 
-    high_aln_ratio = check_alignment_ratio(remaining_subset, args.select_chrom)
+    high_aln_ratio, skipped_aln_ratio = check_alignment_ratio(remaining_subset, args.select_chrom, args.min_aln_t)
     select_high_aln = remaining_subset["tig_name"].isin(high_aln_ratio)
     aln_subset = remaining_subset.loc[select_high_aln, :].copy()
 
@@ -180,7 +194,9 @@ def main():
     selected_subset.sort_values(["tig_length", "num_bp_or_hits"], ascending=False, inplace=True)
 
     args.output.parent.mkdir(exist_ok=True, parents=True)
-    selected_subset.to_csv(args.output, sep="\t", header=True, index=False)
+    with open(args.output, "w") as table:
+        table.write("\n".join(skipped_aln_ratio) + "\n")
+        selected_subset.to_csv(table, sep="\t", header=True, index=False)
 
 
     return 0
