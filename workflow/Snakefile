@@ -23,7 +23,9 @@ rule run_all:
             rules.extract_hla_sequences.output.table_comp,
             rules.extract_hla_sequences.output.all_seqs,
             rules.run_all_ribotin.input.checkfiles,
-            rules.run_all_rename_extracted_chrom.input
+            rules.run_all_fetch_chrom_contigs.input,
+            rules.run_all_rename_extracted_chrom.input,
+            rules.run_all_minimap_alignments.input
         ]
 
 
@@ -33,7 +35,8 @@ TARGET_DIR_SHARE_CHRY=pathlib.Path(
 rule run_rsync_chry:
     input:
         all_fetched = rules.run_all_fetch_chrom_contigs.input,
-        all_renamed = rules.run_all_rename_extracted_chrom.input
+        all_renamed = rules.run_all_rename_extracted_chrom.input,
+        all_align = rules.run_all_minimap_alignments.input
     output:
         chk = DIR_PROC.joinpath("rsync_chrY_share.ok")
     params:

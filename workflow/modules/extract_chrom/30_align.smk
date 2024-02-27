@@ -105,7 +105,7 @@ rule run_all_minimap_alignments:
         paf_ref = expand(
             rules.minimap_chrom_to_ref_align.output.paf,
             sample=MALE_SAMPLES,
-            chrom=["chrY"],
+            chrom=["chrY", "chrX"],
             ref=["hg38", "t2t"]
         ),
         paf_cls = expand(
@@ -123,6 +123,6 @@ rule run_all_minimap_alignments:
         norm_seq = expand(
             rules.normalize_minimap_paf_seqtoref.output.tsv,
             sample=MALE_SAMPLES,
-            chrom=["chrY"],
+            chrom=["chrY", "chrX"],
             ref=["hg38", "t2t"],
         ),
