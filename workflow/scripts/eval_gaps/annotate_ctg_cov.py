@@ -91,8 +91,8 @@ def main():
 
     sample_name = "sample" if args.sample is None else args.sample
     assembly_sex = args.assembly_sex
-    if "|" in assembly_sex:
-        hap1_sex, hap2_sex = assembly_sex.split("|")
+    if "," in assembly_sex:
+        hap1_sex, hap2_sex = assembly_sex.split(",")
     else:
         hap1_sex, hap2_sex = assembly_sex, assembly_sex
     au_sex = []
