@@ -7,8 +7,9 @@ def load_assembly_unit_karyotypes(file_path):
 
     lut = dict()
     for sample, au_infos in df.groupby("sample"):
-        sex_hap1 = au_infos["asm-hap1"].iloc[0]
-        sex_hap2 = au_infos["asm-hap2"].iloc[0]
+        sex_hap1 = au_infos["karyotype"].iloc[0]
+        sex_hap2 = au_infos["karyotype"].iloc[1]
+        assert au_infos["asm_unit"].iloc[0] == "asm-hap1"
         sex_label = f"{sex_hap1}|{sex_hap2}"
         lut[sample] = sex_label
     return lut
