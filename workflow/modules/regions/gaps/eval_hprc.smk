@@ -52,10 +52,29 @@ rule annotate_gaps_contig_cov:
         "--out-agg {output.agg} --sample {wildcards.sample} --sample-sex {params.sex_label}"
 
 
+rule label_gaps_contig_cov:
+    input:
+        table = rules.annotate_gaps_contig_cov.output.agg
+    output:
+        table = DIR_RES.joinpath(
+            "regions", "gaps", "hprc",
+            "labeled_ctg_cov", "{sample}.ctg-cov.hprc-common.labeled.tsv"
+        )
+    conda:
+        DIR_ENVS.joinpath("pyseq.yaml")
+    resources:
+        time_hrs=0
+    params:
+        script=DIR_SCRIPTS.joinpath("eval_gaps", "label_gap_cov.py"),
+        aln_label="bplvl"
+    shell:
+        "{params.script} --input-table {input.table} --output-table {output.table} "
+        "--aln-label {params.aln_label}"
+
 
 rule run_all_hprc_gaps:
     input:
-        ctg_cov = expand(
-            rules.annotate_gaps_contig_cov.output.agg,
+        ctg_cov_label = expand(
+            rules.label_gaps_contig_cov.output.table,
             sample=SAMPLES
         )
