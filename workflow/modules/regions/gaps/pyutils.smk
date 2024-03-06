@@ -13,7 +13,9 @@ def load_assembly_unit_karyotypes(file_path):
         # this is a manual fix for sample HG00732 that
         # lacks a decent chrX assembly due to cell line
         # issues
-        if sample == "HG00732":
+        if sex_hap1 == sex_hap2:
+            sex_label = sex_hap1
+        elif sample == "HG00732":
             sex_label = "female,female"
         else:
             sex_label = f"{sex_hap1},{sex_hap2}"
