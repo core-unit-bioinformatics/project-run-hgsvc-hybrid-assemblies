@@ -80,7 +80,9 @@ def get_stage_two_labels():
         ('hap:closed', 'hap:covered', 'un:phase_hap'): "closed|asm_err",
         ('hap:closed', 'hap:covered'): "closed|covered",
         ('hap:open', 'un:phase_hap'): "asm_err|asm_err",
-        ('hap:open', ): "open|open"
+        ('hap:open', ): "open|open",
+        ('hap:covered', 'un:phase_hap'): "asm_err|asm_err",
+        ('hap:covered',): "covered|covered"
     }
 
     return relabels
