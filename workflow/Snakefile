@@ -9,6 +9,9 @@ include: "modules/rdna/ribotin.smk"
 
 include: "modules/regions/hla/extract.smk"
 
+include: "modules/regions/gaps/pyutils.smk"
+include: "modules/regions/gaps/eval_hprc.smk"
+
 include: "modules/extract_chrom/pyutils.smk"
 include: "modules/extract_chrom/10_preselect_tigs.smk"
 include: "modules/extract_chrom/20_annotate.smk"

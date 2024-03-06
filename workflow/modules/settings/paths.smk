@@ -13,6 +13,9 @@ BASE_SHARE_LOCATION = TOP_ROOT_DIR.joinpath("data/00_RESTRUCTURE/shares/globus/o
 DIR_SNAKEFILE = pathlib.Path(workflow.basedir).resolve(strict=True)
 assert DIR_SNAKEFILE.name == "workflow", DIR_SNAKEFILE
 
+# annotations folder
+DIR_ANNOTATIONS = DIR_SNAKEFILE.parent.joinpath("annotations").resolve(strict=True)
+
 DIR_SCRIPTS = DIR_SNAKEFILE.joinpath("scripts").resolve(strict=True)
 
 DIR_ENVS = DIR_SNAKEFILE.joinpath("envs").resolve(strict=True)
