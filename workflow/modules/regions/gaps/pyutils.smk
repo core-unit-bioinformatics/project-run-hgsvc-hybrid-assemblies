@@ -15,7 +15,7 @@ def load_assembly_unit_karyotypes(file_path):
         # issues
         if sex_hap1 == sex_hap2:
             sex_label = sex_hap1
-        elif sample == "HG00732":
+        elif sample.startswith("HG00732"):
             sex_label = "female,female"
         else:
             sex_label = f"{sex_hap1},{sex_hap2}"
