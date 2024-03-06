@@ -49,7 +49,7 @@ rule annotate_gaps_contig_cov:
         sex_label=lambda wildcards: ASM_UNIT_SEX[wildcards.sample]
     shell:
         "{params.script} --ctg-cov {input.ctg_cov} --gaps {input.gaps} "
-        "--out-agg {output.agg} --sample {wildcards.sample} --sample-sex {params.sex_label}"
+        "--out-agg {output.agg} --sample {wildcards.sample} --assembly-sex {params.sex_label}"
 
 
 rule label_gaps_contig_cov:
