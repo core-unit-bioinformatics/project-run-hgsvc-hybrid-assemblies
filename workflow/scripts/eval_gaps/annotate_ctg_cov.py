@@ -51,7 +51,7 @@ def parse_command_line():
     parser.add_argument(
         "--assembly-sex", "-x",
         type=str,
-        choices=["female", "female|male", "male|female", "unknown"],
+        choices=["female", "female,male", "male,female", "unknown"],
         default="unknown",
         dest="assembly_sex",
         help="Assembly sex. Default: unknown"
