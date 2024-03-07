@@ -1,3 +1,4 @@
+# DO NOT USE --- 2024-03-07
 # color scheme used in chrY paper, Hallast et al.
 continental_group	color_name	color_hex	rgb_red_rel	rgb_red_abs	rgb_green_rel	rgb_green_abs	rgb_blue_rel	rgb_blue_abs	rgb_rel	rgb_abs	cmyk_cyan	cmyk_magenta	cmyk_yellow	cmyk_black	cmyk
 AFR	goldenrod	D8A105	0.847	216	0.631	161	0.02	5	0.847,0.631,0.02	216,161,5	0	25	98	15	0,25,98,15
