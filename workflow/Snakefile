@@ -3,6 +3,8 @@ include: "modules/settings/paths.smk"
 include: "modules/settings/sample_table.smk"
 include: "modules/settings/constants.smk"
 
+include: "modules/debug_cov/align_hifi_batches.smk"
+
 include: "modules/coverage/contig_cov.smk"
 
 include: "modules/rdna/ribotin.smk"
@@ -28,7 +30,8 @@ rule run_all:
             rules.run_all_ribotin.input.checkfiles,
             rules.run_all_fetch_chrom_contigs.input,
             rules.run_all_rename_extracted_chrom.input,
-            rules.run_all_minimap_alignments.input
+            rules.run_all_minimap_alignments.input,
+            rules.run_all_debug_cov.input
         ]
 
 
