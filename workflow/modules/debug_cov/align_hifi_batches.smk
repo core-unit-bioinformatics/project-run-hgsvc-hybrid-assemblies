@@ -75,7 +75,7 @@ rule align_batches:
             "debug_cov/alns/{sample}/{sample}_{batch}.sort.bam.bai"
         )
     conda:
-        DIR_ENVS.joinpath("minimap2.yaml")
+        DIR_ENVS.joinpath("minimap.yaml")
     threads: 24
     resources:
         time_hrs=lambda wildcards, attempt: 23 * attempt,
@@ -101,7 +101,7 @@ rule compute_coverage:
             "debug_cov/{sample}/{sample}_{batch}.cov.txt"
         )
     conda:
-        DIR_ENVS.joinpath("minimap2.yaml")
+        DIR_ENVS.joinpath("minimap.yaml")
     resources:
         time_hrs=lambda wildcards, attempt: attempt,
         mem_mb=lambda wildcards, attempt: 4096 * attempt
