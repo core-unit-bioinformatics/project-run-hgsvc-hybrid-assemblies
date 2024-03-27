@@ -221,8 +221,9 @@ def read_alignment_file(file_path):
         if col_name not in paf.columns:
             continue
         if pd.isnull(paf[col_name]).any():
-            paf[col_name].fillna(column["missing"], inplace=True)
+            paf[col_name] = paf[col_name].fillna(column["missing"], inplace=False)
             paf[col_name] = paf[col_name].astype(column["dtype"])
+            assert not pd.isnull(paf[col_name]).any()
 
     return paf
 
