@@ -24,11 +24,12 @@ rule align_hifiasm_to_verkko:
         )
     conda:
         DIR_ENVS.joinpath("minimap.yaml")
+    threads: 12
     resources:
         mem_mb=lambda wildcards, attempt: 32768 * attempt,
         time_hrs=lambda wildcards, attempt: 4 * attempt
     shell:
-        "minimap2 -x asm5 --eqx --MD -c --secondary=no "
+        "minimap2 -t {threads} -x asm5 --eqx --MD -c --secondary=no "
         "{input.verkko} {input.hifiasm} | pigz > {output.paf}"
 
 
