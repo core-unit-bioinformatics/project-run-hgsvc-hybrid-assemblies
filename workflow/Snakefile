@@ -27,8 +27,7 @@ rule run_all:
     input:
         everything = [
             rules.run_all_issue_tracks.input.stats,
-            rules.extract_hla_sequences.output.table_comp,
-            rules.extract_hla_sequences.output.all_seqs,
+            rules.run_all_extract_hla.input,
             rules.run_all_ribotin.input.checkfiles,
             rules.run_all_fetch_chrom_contigs.input,
             rules.run_all_rename_extracted_chrom.input,

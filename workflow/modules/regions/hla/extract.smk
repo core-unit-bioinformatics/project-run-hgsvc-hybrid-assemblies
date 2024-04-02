@@ -7,11 +7,11 @@ rule build_hla_cut_table:
                     "{sample}.asm-{asm_unit}.t2tv2.norm-paf.tsv.gz"
                 ),
                 sample=SAMPLES,
-                asm_unit=["hap1", "hap2", "unassigned"]
+                asm_unit=MAIN_ASSEMBLY_UNITS
             )
     output:
         cut_table = DIR_RES.joinpath(
-            "regions", "hla", "assembly_cut_table.tsv"
+            "regions", "hla", "assembly_cut_table.{assembler}.tsv"
         )
     resources:
         mem_mb=lambda wildcards, attempt: 1024 * attempt
@@ -28,7 +28,7 @@ rule build_hla_cut_table:
             source_asm_unit = source_file.rsplit(".", 4)[0]
             sample = source_file.split(".asm-")[0]
 
-            df = pd.read_csv(paf, sep="\t", comment="#")
+            df = pd.read_csv(paf, sep="\t")
             df = df.loc[(df["target_name"] == "chr6") & (df["tp_align_type"] != 2), :]
             # contigs/alignments reaching less than 100 kbp into the window
             # are just ignored
@@ -106,15 +106,15 @@ rule extract_hla_sequences:
                     "{sample}.asm-{asm_unit}.fasta.gz"
                 ),
                 sample=SAMPLES,
-                asm_unit=["hap1", "hap2", "unassigned"]
+                asm_unit=MAIN_ASSEMBLY_UNITS
             ),
         cut_table = rules.build_hla_cut_table.output.cut_table
     output:
         table_comp = DIR_RES.joinpath(
-            "regions", "hla", "assembly_seq_composition.tsv"
+            "regions", "hla", "assembly_seq_composition.{assembler}.tsv"
         ),
         all_seqs = DIR_RES.joinpath(
-            "regions", "hla", "assembly_all_hla.fasta.gz"
+            "regions", "hla", "assembly_all_hla.{assembler}.fasta.gz"
         )
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")
@@ -163,7 +163,7 @@ rule blast_check_extracted_sequences:
         ref_seq = rules.extract_hla_reference_sequence.output.fasta,
         hla = DIR_GLOBAL_REF.joinpath("hla_coding_transcripts.nuc.fasta")
     output:
-        blast_all = DIR_PROC.joinpath("regions", "hla", "blast_out", "assembly_all_hla.blast.txt"),
+        blast_all = DIR_PROC.joinpath("regions", "hla", "blast_out", "assembly_all_hla.blast.{assembler}.txt"),
         blast_ref = DIR_PROC.joinpath("regions", "hla", "blast_out", "chm13v2.0_hla.blast.txt"),
     conda:
         DIR_ENVS.joinpath("seqtools.yaml")
@@ -195,10 +195,10 @@ rule summarize_blast_hits:
         blast_ref = rules.blast_check_extracted_sequences.output.blast_ref
     output:
         summary = DIR_RES.joinpath(
-            "regions", "hla", "blast_hits.summary.tsv.gz"
+            "regions", "hla", "blast_hits.{assembler}.summary.tsv.gz"
         ),
         table = DIR_RES.joinpath(
-            "regions", "hla", "blast_hits.tsv.gz"
+            "regions", "hla", "blast_hits.{assembler}.tsv.gz"
         )
     run:
         import pandas as pd
@@ -230,7 +230,7 @@ rule blast_summarize_hits_per_sequence:
         all_seqs = rules.extract_hla_sequences.output.all_seqs
     output:
         hit_count = DIR_RES.joinpath(
-            "regions", "hla", "blast_hits_per_seq.tsv"
+            "regions", "hla", "blast_hits_per_seq.{assembler}.tsv"
         )
     run:
         import pathlib as pl
@@ -265,30 +265,31 @@ rule blast_summarize_hits_per_sequence:
     # END OF RUN BLOCK
 
 
-rule produce_hla_msa:
-    input:
-        ref_fasta = rules.extract_hla_reference_sequence.output.fasta,
-        asm_fasta = rules.extract_hla_sequences.output.all_seqs,
-    output:
-        msa = DIR_RES.joinpath(
-            "regions", "hla", "assembly_all_hla.msa.fasta"
-        ),
-        distmat = DIR_RES.joinpath(
-            "regions", "hla", "assembly_all_hla.msa-distmat.txt"
-        )
-    log:
-        DIR_LOG.joinpath("regions", "hla", "extract", "clustalo.log")
-    conda:
-        DIR_ENVS.joinpath("msa.yaml")
-    threads: 12
-    resources:
-        mem_mb = lambda wildcards, attempt: 24576 * attempt,
-        time_hrs = lambda wildcards, attempt: 47 * attempt
-    shell:
-        "zcat {input} | clustalo --in - --seqtype=DNA --infmt=fasta "
-        "--percent-id --outfmt=fasta --threads {threads} --verbose "
-        "--full --distmat-out={output.distmat} "
-        "--out {output.msa} &> {log}"
+# Irrelevant rule - just kept for reference
+# rule produce_hla_msa:
+#     input:
+#         ref_fasta = rules.extract_hla_reference_sequence.output.fasta,
+#         asm_fasta = rules.extract_hla_sequences.output.all_seqs,
+#     output:
+#         msa = DIR_RES.joinpath(
+#             "regions", "hla", "assembly_all_hla.msa.fasta"
+#         ),
+#         distmat = DIR_RES.joinpath(
+#             "regions", "hla", "assembly_all_hla.msa-distmat.txt"
+#         )
+#     log:
+#         DIR_LOG.joinpath("regions", "hla", "extract", "clustalo.log")
+#     conda:
+#         DIR_ENVS.joinpath("msa.yaml")
+#     threads: 12
+#     resources:
+#         mem_mb = lambda wildcards, attempt: 24576 * attempt,
+#         time_hrs = lambda wildcards, attempt: 47 * attempt
+#     shell:
+#         "zcat {input} | clustalo --in - --seqtype=DNA --infmt=fasta "
+#         "--percent-id --outfmt=fasta --threads {threads} --verbose "
+#         "--full --distmat-out={output.distmat} "
+#         "--out {output.msa} &> {log}"
 
 
 rule run_blast_checks:
@@ -307,7 +308,7 @@ rule copy_files_to_share:
         blast_count = rules.blast_summarize_hits_per_sequence.output.hit_count
     output:
         file_listing = DIR_PROC.joinpath(
-            "regions", "hla", "files_shared.lst"
+            "regions", "hla", "files_shared.{assembler}.lst"
         )
     params:
         single_fasta=lambda wildcards, input: pathlib.Path(input.seq_comp).parent.joinpath("single_fasta")
@@ -350,3 +351,19 @@ rule copy_files_to_share:
             for src, trg in copied_files:
                 listing.write(f"{src}\t{trg}\n")
     # END OF RUN BLOCK
+
+
+rule run_all_extract_hla:
+    input:
+        seqs = expand(
+            rules.extract_hla_sequences.output.all_seqs,
+            assembler=ASSEMBLER
+        ),
+        blast = expand(
+            rules.blast_summarize_hits_per_sequence.output.hit_count,
+            assembler=ASSEMBLER
+        ),
+        file_listing = expand(
+            rules.copy_files_to_share.output.file_listing,
+            assembler=ASSEMBLER
+        )
