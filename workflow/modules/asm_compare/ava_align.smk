@@ -26,7 +26,7 @@ rule align_hifiasm_to_verkko:
         DIR_ENVS.joinpath("minimap.yaml")
     threads: 12
     resources:
-        mem_mb=lambda wildcards, attempt: 32768 * attempt,
+        mem_mb=lambda wildcards, attempt: 65536 * attempt,
         time_hrs=lambda wildcards, attempt: 4 * attempt
     shell:
         "minimap2 -t {threads} -x asm5 --eqx --MD -c --secondary=no "
