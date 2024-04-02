@@ -164,7 +164,7 @@ rule blast_check_extracted_sequences:
         hla = DIR_GLOBAL_REF.joinpath("hla_coding_transcripts.nuc.fasta")
     output:
         blast_all = DIR_PROC.joinpath("regions", "hla", "blast_out", "assembly_all_hla.blast.{assembler}.txt"),
-        blast_ref = DIR_PROC.joinpath("regions", "hla", "blast_out", "chm13v2.0_hla.blast.txt"),
+        blast_ref = DIR_PROC.joinpath("regions", "hla", "blast_out", "chm13v2.0_hla.blast.{assembler}.txt"),
     conda:
         DIR_ENVS.joinpath("seqtools.yaml")
     params:
