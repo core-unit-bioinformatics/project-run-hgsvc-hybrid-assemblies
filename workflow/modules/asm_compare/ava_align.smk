@@ -52,5 +52,5 @@ rule run_all_asm_ava_align:
     input:
         tsv = expand(
             rules.normalize_ava_align_paf.output.tsv,
-            sample=SAMPLES
+            sample=PLAIN_SAMPLES
         )

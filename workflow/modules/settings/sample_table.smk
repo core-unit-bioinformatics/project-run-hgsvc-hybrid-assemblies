@@ -9,6 +9,9 @@ SAMPLE_TABLE = pandas.read_csv(
 
 SAMPLES = sorted(SAMPLE_TABLE["sample"].unique())
 
+PLAIN_SAMPLES = [s.split(".")[0] for s in SAMPLES]
+assert len(PLAIN_SAMPLES) == len(SAMPLES)
+
 SAMPLE_SEX = None
 MALE_SAMPLES = None
 FEMALE_SAMPLES = None
