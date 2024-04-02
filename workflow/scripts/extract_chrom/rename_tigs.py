@@ -79,7 +79,7 @@ def parse_command_line():
 def read_alignment_table(file_path, min_align_size, keep_all=False):
 
     sample = file_path.name.split(".")[0]
-    df = pd.read_csv(file_path, sep="\t", header=0, comment="#")
+    df = pd.read_csv(file_path, sep="\t", header=0)
     df = df.loc[df["align_total"] > min_align_size, :].copy()
 
     if not keep_all:
@@ -92,7 +92,7 @@ def read_alignment_table(file_path, min_align_size, keep_all=False):
 
 def get_seqclass_order(file_path):
 
-    df = pd.read_csv(file_path, sep="\t", header=0, comment="#")
+    df = pd.read_csv(file_path, sep="\t", header=0)
 
     norm_names = {
         "other1": "OTH1",

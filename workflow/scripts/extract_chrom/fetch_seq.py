@@ -45,7 +45,7 @@ def reverse_complement_sequence(rc_table, sequence):
 
 def read_selected_contigs_file(table_file):
 
-    df = pd.read_csv(table_file, sep="\t", header=0, comment="#")
+    df = pd.read_csv(table_file, sep="\t", header=0)
     # the following: it is possible that a tig is identified solely
     # based on motif hits and has no alignments to chrY (although that
     # is a rare case)

@@ -83,7 +83,7 @@ def summarize_alignments(aln_subset, query, query_length):
 
 def read_alignment_file(file_path, select_chrom, drop_aln):
 
-    aln = pd.read_csv(file_path, sep="\t", header=0, comment="#")
+    aln = pd.read_csv(file_path, sep="\t", header=0)
     aln.drop(
         [
             "cg_cigar", "cs_tag_diffs", "s1_chaining_score", "s2_chaining_score",
@@ -109,7 +109,7 @@ def read_alignment_file(file_path, select_chrom, drop_aln):
 
 def read_motif_hit_file(file_path):
 
-    hits = pd.read_csv(file_path, sep="\t", header=0, comment="#")
+    hits = pd.read_csv(file_path, sep="\t", header=0)
     if hits.empty:
         return None
     if hits["query"].unique()[0] in Y_SPECIFIC_MOTIFS:
