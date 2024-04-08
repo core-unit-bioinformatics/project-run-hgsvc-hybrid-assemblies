@@ -48,7 +48,7 @@ def get_asm_unit_fasta_files(wildcards):
         )
     else:
         fasta_columns = [f"asm_{au}" for au in MAIN_ASSEMBLY_UNITS]
-        fasta_files = SAMPLE_TABLE.loc[SAMPLE_TABLE["sample"] == wildcards.sample, fasta_columns].values
+        fasta_files = SAMPLE_TABLE.loc[SAMPLE_TABLE["sample"] == wildcards.sample, fasta_columns].values[0]
         fasta_files = [pathlib.Path(f).resolve(strict=True) for f in fasta_files]
         return fasta_files
 
