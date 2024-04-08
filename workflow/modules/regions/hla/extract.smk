@@ -100,14 +100,7 @@ rule build_hla_cut_table:
 
 rule extract_hla_sequences:
     input:
-        fasta = expand(
-                WORKDIR_EVAL.joinpath(
-                    "results/assemblies", "{sample}",
-                    "{sample}.asm-{asm_unit}.fasta.gz"
-                ),
-                sample=SAMPLES,
-                asm_unit=MAIN_ASSEMBLY_UNITS
-            ),
+        fasta = get_asm_unit_fasta_files,
         cut_table = rules.build_hla_cut_table.output.cut_table
     output:
         table_comp = DIR_RES.joinpath(
