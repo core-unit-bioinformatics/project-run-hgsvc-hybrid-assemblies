@@ -35,16 +35,28 @@ rule preselect_chrom_contigs:
             "--min-aln-threshold {params.min_aln_t} --output {output.contig_list}"
 
 
-rule fetch_tigs_from_sequence_files:
-    input:
-        listing = rules.preselect_chrom_contigs.output.contig_list,
-        fastas = expand(
+def get_asm_unit_fasta_files(wildcards):
+
+    assert ASSEMBLER in ["verkko", "hifiasm"]
+    if ASSEMBLER == "verkko":
+        return expand(
             WORKDIR_EVAL.joinpath(
                 "results/assemblies/", "{{sample}}",
                 "{{sample}}.asm-{asm_unit}.fasta.gz"
             ),
             asm_unit=MAIN_ASSEMBLY_UNITS
         )
+    else:
+        fasta_columns = [f"asm_{au}" for au in MAIN_ASSEMBLY_UNITS]
+        fasta_files = SAMPLE_TABLE.loc[SAMPLE_TABLE["sample"] == wildcards.sample, fasta_columns].values
+        fasta_files = [pathlib.Path(f).resolve(strict=True) for f in fasta_files]
+        return fasta_files
+
+
+rule fetch_tigs_from_sequence_files:
+    input:
+        listing = rules.preselect_chrom_contigs.output.contig_list,
+        fastas = get_asm_unit_fasta_files
     output:
         fasta = DIR_PROC.joinpath(
             "extract_chrom", "fasta_seqs",
