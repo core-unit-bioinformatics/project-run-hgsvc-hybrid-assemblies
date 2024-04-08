@@ -50,7 +50,7 @@ def get_asm_unit_fasta_files(wildcards):
     """
     assert ASSEMBLER in ["verkko", "hifiasm"]
     if ASSEMBLER == "verkko":
-        if hasattr("sample", wildcards):
+        if hasattr(wildcards, "sample"):
             # used in chrY / extract
             return expand(
                 WORKDIR_EVAL.joinpath(
@@ -71,7 +71,7 @@ def get_asm_unit_fasta_files(wildcards):
             )
     else:
         fasta_columns = [f"asm_{au}" for au in MAIN_ASSEMBLY_UNITS]
-        if hasattr("sample", wildcards):
+        if hasattr(wildcards, "sample"):
             fasta_files = SAMPLE_TABLE.loc[SAMPLE_TABLE["sample"] == wildcards.sample, fasta_columns].values[0]
             fasta_files = [pathlib.Path(f).resolve(strict=True) for f in fasta_files]
         else:
