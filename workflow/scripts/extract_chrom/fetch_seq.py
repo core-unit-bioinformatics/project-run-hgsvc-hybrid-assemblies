@@ -2,6 +2,7 @@
 
 import argparse as argp
 import functools as fnt
+import io
 import pathlib as pl
 
 import dnaio
@@ -45,7 +46,15 @@ def reverse_complement_sequence(rc_table, sequence):
 
 def read_selected_contigs_file(table_file):
 
-    df = pd.read_csv(table_file, sep="\t", header=0)
+    assert table_file.suffix == ".tsv"
+    table_buffer = io.StringIO()
+    with open(table_file, "r") as table:
+        for line in table:
+            if line.startswith("#"):
+                continue
+            table_buffer.write(line)
+    table_buffer.seek(0)
+    df = pd.read_csv(table_buffer, sep="\t", header=0)
     # the following: it is possible that a tig is identified solely
     # based on motif hits and has no alignments to chrY (although that
     # is a rare case)
