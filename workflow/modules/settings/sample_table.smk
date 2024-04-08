@@ -75,6 +75,14 @@ def get_asm_unit_fasta_files(wildcards):
             fasta_files = SAMPLE_TABLE.loc[SAMPLE_TABLE["sample"] == wildcards.sample, fasta_columns].values[0]
             fasta_files = [pathlib.Path(f).resolve(strict=True) for f in fasta_files]
         else:
-            fasta_files = SAMPLE_TABLE[:, fasta_columns].values
-            fasta_files = [*fastas for fastas in fasta_files]
+            sub = SAMPLE_TABLE[:, fasta_columns].values
+            fasta_files = []
+            for pair in sub:
+                f1, f2 = pair
+                fasta_files.append(
+                    pathlib.Path(f1).resolve(strict=True)
+                )
+                fasta_files.append(
+                    pathlib.Path(f2).resolve(strict=True)
+                )
         return fasta_files
