@@ -1,10 +1,12 @@
 # 1000 Genomes Project - color scheme phase 3
 # color/population ASK added for HG002/NA24385
+# color/population MKK added for NA21487
 population	continental_group	rgb_red_abs	rgb_green_abs	rgb_blue_abs	rgb_abs	rgb_red_rel	rgb_green_rel	rgb_blue_rel	rgb_rel	hex_value	cmyk	cmyk_cyan	cmyk_magenta	cyan_yellow	cyan_black
 AFR	AFR	255	205	51	255,205,51	1.0	0.804	0.2	1.0,0.804,0.2	#FFCD33	0,20,80,0	0	20	80	0
 ESN	AFR	255	205	0	255,205,0	1.0	0.804	0.0	1.0,0.804,0.0	#FFCD00	0,20,100,0	0	20	100	0
 GWD	AFR	255	185	0	255,185,0	1.0	0.725	0.0	1.0,0.725,0.0	#FFB900	0,28,100,0	0	28	100	0
 LWK	AFR	204	153	51	204,153,51	0.8	0.6	0.2	0.8,0.6,0.2	#CC9933	0,25,75,20	0	25	75	20
+MKK	AFR	239	183	25	239,183,25	0.937	0.718	0.098	0.937,0.718,0.098	#EFB719	0,23,90,6	0	23	90	6
 MSL	AFR	225	185	25	225,185,25	0.882	0.725	0.098	0.882,0.725,0.098	#E1B919	0,18,89,12	0	18	89	12
 YRI	AFR	255	185	51	255,185,51	1.0	0.725	0.2	1.0,0.725,0.2	#FFB933	0,28,80,0	0	28	80	0
 ACB	AFR|AMR	255	153	0	255,153,0	1.0	0.6	0.0	1.0,0.6,0.0	#FF9900	0,40,100,0	0	40	100	0
