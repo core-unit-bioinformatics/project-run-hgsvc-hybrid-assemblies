@@ -29,6 +29,8 @@ def find_merqury_output_file(sample, which):
         selected_file.append(candidate)
     elif which == "qv_detail":
         candidates = list(search_folder.glob("*hap*.qv"))
+        if ASSEMBLER == "hifiasm":
+            candidates = [c for c in candidates if "-hifiasm-" in c.name]
         if len(candidates) == 2:
             selected_file = candidates
     elif which == "qv_summary":

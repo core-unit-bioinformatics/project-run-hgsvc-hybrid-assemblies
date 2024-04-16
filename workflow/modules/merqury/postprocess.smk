@@ -154,7 +154,7 @@ rule merge_merqury_normalized_kmer_completeness:
             df = pd.read_csv(table, sep="\t", header=0, comment="#")
             merge.append(df)
         merge = pd.concat(merge, axis=0, ignore_index=False)
-        merge.sort_value(["sample", "asm_unit"], inplace=True)
+        merge.sort_values(["sample", "asm_unit"], inplace=True)
         merge.to_csv(output.tsv, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
 
