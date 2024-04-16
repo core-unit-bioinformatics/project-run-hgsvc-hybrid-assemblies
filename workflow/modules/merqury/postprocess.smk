@@ -19,7 +19,7 @@ rule normalize_merqury_qv_estimates:
             input.summary_file[0], sep="\t", header=None,
             names=["entity", "error_bp", "total_bp", "qv_est", "err_rate"]
         )
-        processed_files.append(shorten_merqury_file_path(input.summary_file))
+        processed_files.append(shorten_merqury_file_path(input.summary_file[0]))
         assert summary.shape[0] == 3
         summary["sample"] = wildcards.sample
         summary["asm_unit"] = "na"
