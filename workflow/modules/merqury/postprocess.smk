@@ -38,9 +38,9 @@ rule normalize_merqury_qv_estimates:
 
         for hap_file in input.detail_file:
             asm_unit = None
-            if "hap1" in hap_file.name:
+            if "hap1" in hap_file:
                 asm_unit = "hap1"
-            elif "hap2" in hap_file.name:
+            elif "hap2" in hap_file:
                 asm_unit = "hap2"
             else:
                 raise ValueError(hap_file)
