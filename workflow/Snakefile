@@ -9,6 +9,9 @@ include: "modules/asm_compare/ava_align.smk"
 
 include: "modules/coverage/contig_cov.smk"
 
+include: "modules/merqury/pyutils.smk"
+include: "modules/merqury/postprocess.smk"
+
 include: "modules/rdna/ribotin.smk"
 
 include: "modules/regions/hla/extract.smk"
@@ -33,7 +36,8 @@ rule run_all:
             rules.run_all_rename_extracted_chrom.input,
             rules.run_all_minimap_alignments.input,
             rules.run_all_debug_cov.input,
-            rules.run_all_asm_ava_align.input
+            rules.run_all_asm_ava_align.input,
+            rules.run_all_merqury_postprocess.input
         ]
 
 

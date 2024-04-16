@@ -9,6 +9,10 @@ WORKDIR_ASSEMBLY = TOP_ROOT_DIR.joinpath("projects/assemblies/hybrids/verkko/wd"
 
 BASE_SHARE_LOCATION = TOP_ROOT_DIR.joinpath("data/00_RESTRUCTURE/shares/globus/outgoing/hgsvc")
 
+MERQURY_RESULT_ROOT = TOP_ROOT_DIR.joinpath(
+    "data/00_RESTRUCTURE/project-centric/hgsvc/processed/20240415_merqury_results/merqury"
+)
+
 # project repo
 DIR_SNAKEFILE = pathlib.Path(workflow.basedir).resolve(strict=True)
 assert DIR_SNAKEFILE.name == "workflow", DIR_SNAKEFILE
