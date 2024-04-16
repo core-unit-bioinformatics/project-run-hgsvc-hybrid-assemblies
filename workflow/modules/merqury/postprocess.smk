@@ -17,7 +17,7 @@ rule normalize_merqury_qv_estimates:
 
         summary = pd.read_csv(
             input.summary_file[0], sep="\t", header=None,
-            columns=["entity", "error_bp", "total_bp", "qv_est", "err_rate"]
+            names=["entity", "error_bp", "total_bp", "qv_est", "err_rate"]
         )
         processed_files.append(shorten_merqury_file_path(input.summary_file))
         assert summary.shape[0] == 3
@@ -46,7 +46,7 @@ rule normalize_merqury_qv_estimates:
                 raise ValueError(hap_file)
             detail = pd.read_csv(
                 hap_file, sep="\t", header=None,
-                columns=["sequence", "error_bp", "total_bp", "qv_est", "err_rate"]
+                names=["sequence", "error_bp", "total_bp", "qv_est", "err_rate"]
             )
             processed_files.append(shorten_merqury_file_path(hap_file))
             detail["sample"] = wildcards.sample
