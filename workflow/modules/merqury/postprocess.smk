@@ -79,7 +79,7 @@ rule merge_merqury_normalized_qv_estimates:
         merge = []
         for table_file in input.tables:
             table_buffer = io.StringIO()
-            with open(table, "r") as table:
+            with open(table_file, "r") as table:
                 for line in table:
                     if line.startswith("#"):
                         continue
