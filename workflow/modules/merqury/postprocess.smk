@@ -36,7 +36,7 @@ rule normalize_merqury_qv_estimates:
                 raise ValueError(row)
         summary["asm_unit"] = au
 
-        for hap_file in input.detail:
+        for hap_file in input.detail_file:
             asm_unit = None
             if "hap1" in hap_file.name:
                 asm_unit = "hap1"
