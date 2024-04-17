@@ -159,6 +159,37 @@ rule merge_merqury_normalized_kmer_completeness:
     # END OF RUN BLOCK
 
 
+rule merge_merqury_asm_only_kmers:
+    input:
+        bed_files = lambda wildcards: find_merqury_output_file(wildcards.sample, "errors")
+    output:
+        bed_hap1 = DIR_RES.joinpath(
+            "merqury", "{assembler}", "{sample}",
+            "{sample}.asm-hap1.asm-only-kmer.bed.gz"
+        ),
+        bed_hap2 = DIR_RES.joinpath(
+            "merqury", "{assembler}", "{sample}",
+            "{sample}.asm-hap2.asm-only-kmer.bed.gz"
+        ),
+        tbi_hap1 = DIR_RES.joinpath(
+            "merqury", "{assembler}", "{sample}",
+            "{sample}.asm-hap1.asm-only-kmer.bed.gz.tbi"
+        ),
+        tbi_hap2 = DIR_RES.joinpath(
+            "merqury", "{assembler}", "{sample}",
+            "{sample}.asm-hap2.asm-only-kmer.bed.gz.tbi"
+        )
+    conda:
+        DIR_ENVS.joinpath("bedtools.yaml")
+    params:
+        bed_hap1 = lambda wildcards, input: input.bed_files[0],
+        bed_hap2 = lambda wildcards, input: input.bed_files[1]
+    shell:
+        "bedtools merge -i {params.bed_hap1} | bgzip > {output.bed_hap1} && tabix -p bed {output.bed_hap1}"
+            " && "
+        "bedtools merge -i {params.bed_hap2} | bgzip > {output.bed_hap2} && tabix -p bed {output.bed_hap2}"
+
+
 rule run_all_merqury_postprocess:
     input:
         qv_est = expand(
@@ -168,4 +199,9 @@ rule run_all_merqury_postprocess:
         kmer_completeness = expand(
             rules.merge_merqury_normalized_kmer_completeness.output.tsv,
             assembler=[ASSEMBLER]
+        ),
+        bed_files = expand(
+            rules.merge_merqury_asm_only_kmers.output,
+            sample=SAMPLES,
+            ASSEMBLER=[ASSEMBLER]
         )

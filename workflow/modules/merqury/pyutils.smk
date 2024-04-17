@@ -43,14 +43,20 @@ def find_merqury_output_file(sample, which):
             selected_file.append(file_candidate)
             break
     elif which == "errors":
-        pass
+        candidates = list(search_folder.glob("*_only.bed"))
+        if ASSEMBLER == "verkko":
+            candidates = [c for c in candidates if ".vrk-ps-sseq.asm-" in c.name]
+        if ASSEMBLER == "hifiasm":
+            candidates = [c for c in candidates if "-hifiasm-" in c.name]
+        if len(candidates) == 2:
+            selected_file = candidates
     else:
         raise NotImplementedError(which)
 
     if len(selected_file) < 1:
         raise FileNotFoundError(f"{sample} / {which}")
     assert isinstance(selected_file, list)
-    return selected_file
+    return sorted(selected_file)
 
 
 # to keep track of which input file was used
