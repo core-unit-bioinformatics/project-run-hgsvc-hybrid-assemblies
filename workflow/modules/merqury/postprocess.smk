@@ -203,5 +203,5 @@ rule run_all_merqury_postprocess:
         bed_files = expand(
             rules.merge_merqury_asm_only_kmers.output,
             sample=SAMPLES,
-            ASSEMBLER=[ASSEMBLER]
+            assembler=[ASSEMBLER]
         )
