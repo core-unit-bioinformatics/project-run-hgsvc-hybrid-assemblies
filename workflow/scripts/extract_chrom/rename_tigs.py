@@ -76,18 +76,38 @@ def parse_command_line():
     return args
 
 
-def read_alignment_table(file_path, min_align_size, keep_all=False):
+def read_alignment_table(file_path, min_align_size, keep_all=False, report_lost_contigs=None):
+    """
+    2024-05-06: added parameter report_lost_contigs for one edge case (CEPH/platinum pedegree)
+    where one hifiasm assembly (sample: 200105-CEPH) has a Yq12/HET contig (~50 kbp, h1tg000857l.rev)
+    that is end-to-end aligned in the sequence class to assembly alignment, but gap-aligned
+    in the contig to sequence class case (for unclear reasons). Hence, this parameter is used
+    to report contigs that are entirely lost after size thresholding in one of the two alignments
+    and thus need to be removed in the other alignment table as well.
+    """
 
     sample = file_path.name.split(".")[0]
     df = pd.read_csv(file_path, sep="\t", header=0)
+
+    input_contigs = set()
+    if report_lost_contigs is not None:
+        input_contigs = set(df[report_lost_contigs].values)
+    # this filtering step is the critical one; it virtually all cases
+    # but the one described above in the doc string, this just gets rid
+    # of spurious alignments
     df = df.loc[df["align_total"] > min_align_size, :].copy()
+    retained_contigs = set()
+    if report_lost_contigs is not None:
+        retained_contigs = set(df[report_lost_contigs].values)
+
+    lost_contigs = input_contigs - retained_contigs
 
     if not keep_all:
         # drop all "tag" headers
         drop_columns = [c for c in df.columns if len(c.split("_")[0]) == 2]
         df.drop(drop_columns, inplace=True, axis=1)
 
-    return df, sample
+    return df, sample, lost_contigs
 
 
 def get_seqclass_order(file_path):
@@ -231,7 +251,7 @@ def check_sequences_no_seq_class(fasta_input, name_lookup, seq_align_file, class
         # assembled sequences that were not hit during the sequence class
         # alignment are commonly short-ish, and potentially garbage. Check
         # if they can be localized using an unfiltered alignment.
-        raw_aln, sample = read_alignment_table(seq_align_file, 0)
+        raw_aln, sample, _ = read_alignment_table(seq_align_file, 0)
         tig_order = determine_tig_relative_order(raw_aln, no_sqcls_hits)
         for tig, (rel_pos, start, end) in tig_order.items():
             select_left = start >= class_order_infos["start"]
@@ -254,6 +274,7 @@ def check_sequences_no_seq_class(fasta_input, name_lookup, seq_align_file, class
                 new_name = f"chrY|{start_pad_order}.{end_pad_order}|{rel_pos}|{start_class}.{end_class}|2|{tig}|{pp_len}|{sample}"
                 assert tig not in name_lookup
                 name_lookup[tig] = new_name
+                # NB: no hit OR hits that are too short/noisy
                 table_out.append((tig, new_name, "NO-SEQCLASS-HIT"))
                 break
 
@@ -276,7 +297,7 @@ def check_sequences_no_seq_class(fasta_input, name_lookup, seq_align_file, class
 
 def dump_renamed_alignment_file(input_file, rename_lookup, column, output_file):
 
-    df, _ = read_alignment_table(input_file, 0, True)
+    df, _, _ = read_alignment_table(input_file, 0, True)
     df[column] = df[column].replace(rename_lookup)
 
     output_file.parent.mkdir(exist_ok=True, parents=True)
@@ -289,9 +310,14 @@ def main():
 
     args = parse_command_line()
 
-    cls_align, sample = read_alignment_table(args.cls_align, args.min_align_total)
-    seq_align, sample2 = read_alignment_table(args.seq_align, args.min_align_total)
+    cls_align, sample, lost_cls_contigs = read_alignment_table(args.cls_align, args.min_align_total, report_lost_contigs="target_name")
+    seq_align, sample2, lost_seq_contigs = read_alignment_table(args.seq_align, args.min_align_total, report_lost_contigs="query_name")
     assert sample == sample2
+
+    lost_contigs = lost_cls_contigs.union(lost_seq_contigs)
+
+    cls_align = cls_align.loc[~cls_align["target_name"].isin(lost_contigs), :].copy()
+    seq_align = seq_align.loc[~seq_align["query_name"].isin(lost_contigs), :].copy()
 
     class_order, class_order_infos = get_seqclass_order(args.class_order)
 
