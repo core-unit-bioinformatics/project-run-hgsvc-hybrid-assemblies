@@ -94,7 +94,7 @@ rule compute_global_merqury_qv_estimates:
 rule merge_merqury_normalized_qv_estimates:
     input:
         tables = expand(
-            rules.normalize_merqury_qv_estimates.output.tsv,
+            rules.compute_global_merqury_qv_estimates.output.tsv,
             sample=SAMPLES,
             allow_missing=True
         )
