@@ -193,12 +193,12 @@ rule normalize_merqury_kmer_completeness_verkko:
     run:
         import pandas as pd
 
-        with open(input.phased, "r") as listing:
+        with open(input.phased[0], "r") as listing:
             asm_hap1, _, hap1_present, hap1_total, hap1_pct = listing.readline().strip().split()
             asm_hap2, _, hap2_present, hap2_total, hap2_pct = listing.readline().strip().split()
             asm_phased, _, phased_present, phased_total, phased_pct = listing.readline().strip().split()
 
-        with open(input.all_incl, "r") as listing:
+        with open(input.all_incl[0], "r") as listing:
             asm_incl, _, incl_present, incl_total, incl_pct = listing.readline().strip().split()
             _ = listing.readline()
             wg, _, wg_present, wg_total, wg_pct = listing.readline().strip().split()
