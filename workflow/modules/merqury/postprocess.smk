@@ -6,7 +6,9 @@ rule normalize_merqury_qv_estimates:
     in rule downstream
     """
     input:
-        detail_file = lambda wildcards: find_merqury_output_file(wildcards.sample, "qv_detail", phased_only=False)
+        detail_file = lambda wildcards: find_merqury_output_file(
+            wildcards.sample, "qv_detail", phased_only=(wildcards.assembler != "verkko")
+        )
     output:
         tsv = DIR_PROC.joinpath(
             "merqury", "{assembler}", "{sample}",
