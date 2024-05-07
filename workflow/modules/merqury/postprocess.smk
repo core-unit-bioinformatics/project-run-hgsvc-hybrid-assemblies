@@ -215,7 +215,7 @@ rule normalize_merqury_kmer_completeness_verkko:
             [wildcards.sample, "phased", int(phased_present), int(phased_total), float(phased_pct)],
             [wildcards.sample, "hap1", int(hap1_present), int(hap1_total), float(hap1_pct)],
             [wildcards.sample, "hap2", int(hap2_present), int(hap2_total), float(hap2_pct)],
-            [wildcards.sample, "unassigned", int(unassigned_present), int(unassigned_total), float(unassigned_pct)]
+            [wildcards.sample, "unassigned", int(unassigned_present), int(unassigned_total), round(float(unassigned_pct), 4)]
         ]
 
         df = pd.DataFrame.from_records(rows, columns=columns)
