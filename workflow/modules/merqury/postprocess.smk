@@ -362,13 +362,12 @@ rule run_all_merqury_postprocess:
             rules.merge_merqury_normalized_kmer_completeness.output.tsv,
             assembler=[ASSEMBLER]
         ),
-        bed1_files = expand(
-            rules.merge_merqury_asm_only_kmers.output.bed_hap1,
+        bed_files = expand(
+            DIR_RES.joinpath(
+                "merqury", "{assembler}", "{sample}",
+                "{sample}.asm-{asm_unit}.asm-only-kmer.bed.gz"
+            ),
             sample=SAMPLES,
-            assembler=[ASSEMBLER]
-        ),
-        bed2_files = expand(
-            rules.merge_merqury_asm_only_kmers.output.bed_hap2,
-            sample=SAMPLES,
-            assembler=[ASSEMBLER]
+            assembler=[ASSEMBLER],
+            asm_unit=MAIN_ASSEMBLY_UNITS
         )
