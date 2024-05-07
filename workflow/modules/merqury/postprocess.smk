@@ -125,8 +125,14 @@ rule merge_merqury_normalized_qv_estimates:
     # END OF RUN BLOCK
 
 
-localrules: normalize_merqury_kmer_completeness
-rule normalize_merqury_kmer_completeness:
+################################
+### ABOVE: QV ESTIMATES
+################################
+### BELOW: K-MER COMPLETENESS
+################################
+
+localrules: normalize_merqury_kmer_completeness_hifiasm
+rule normalize_merqury_kmer_completeness_hifiasm:
     input:
         table = lambda wildcards: find_merqury_output_file(wildcards.sample, "completeness")
     output:
@@ -134,6 +140,8 @@ rule normalize_merqury_kmer_completeness:
             "merqury", "{assembler}", "{sample}",
             "{sample}.merqury-kmer-completeness.tsv"
         )
+    wildcard_constraints:
+        assembler="hifiasm"
     run:
         import pandas as pd
 
@@ -158,11 +166,62 @@ rule normalize_merqury_kmer_completeness:
                 rows.append(
                     (wildcards.sample, asm_unit, kmer_found, kmer_total, pct_complete)
                 )
+                if asm_unit == "wg":
+                    rows.append(
+                        (wildcards.sample, "phased", kmer_found, kmer_total, pct_complete)
+                    )
         df = pd.DataFrame.from_records(
             rows, columns=["sample", "asm_unit", "kmer_present", "kmer_total", "kmer_present_pct"]
         )
         with open(output.tsv, "w") as dump:
-            _ = dump.write(f"# {shorten_merqury_file_path(input.table[0])}\n")
+            df.to_csv(dump, sep="\t", header=True, index=False)
+    # END OF RUN BLOCK
+
+
+localrules: normalize_merqury_kmer_completeness_verkko
+rule normalize_merqury_kmer_completeness_verkko:
+    input:
+        phased = lambda wildcards: find_merqury_output_file(wildcards.sample, "completeness", phased_only=True),
+        all_incl = lambda wildcards: find_merqury_output_file(wildcards.sample, "completeness", phased_only=False)
+    output:
+        tsv = DIR_RES.joinpath(
+            "merqury", "{assembler}", "{sample}",
+            "{sample}.merqury-kmer-completeness.tsv"
+        )
+    wildcard_constraints:
+        assembler="verkko"
+    run:
+        import pandas as pd
+
+        with open(input.phased, "r") as listing:
+            asm_hap1, _, hap1_present, hap1_total, hap1_pct = listing.readline().strip().split()
+            asm_hap2, _, hap2_present, hap2_total, hap2_pct = listing.readline().strip().split()
+            asm_phased, _, phased_present, phased_total, phased_pct = listing.readline().strip().split()
+
+        with open(input.all_incl, "r") as listing:
+            asm_incl, _, incl_present, incl_total, incl_pct = listing.readline().strip().split()
+            _ = listing.readline()
+            wg, _, wg_present, wg_total, wg_pct = listing.readline().strip().split()
+
+        assert int(hap1_total) == int(incl_total)  # check same k-mer db
+        unassigned_present = int(incl_present) - int(hap1_present)
+        unassigned_total = int(incl_total)
+        unassigned_pct = float(unassigned_present / unassigned_total)
+
+        columns=["sample", "asm_unit", "kmer_present", "kmer_total", "kmer_present_pct"]
+
+        rows = [
+            [wildcards.sample, "wg", int(wg_present), int(wg_total), float(wg_pct)],
+            [wildcards.sample, "phased", int(phased_present), int(phased_total), float(phased_pct)],
+            [wildcards.sample, "hap1", int(hap1_present), int(hap1_total), float(hap1_pct)],
+            [wildcards.sample, "hap2", int(hap2_present), int(hap2_total), float(hap2_pct)],
+            [wildcards.sample, "unassigned", int(unassigned_present), int(unassigned_total), float(unassigned_pct)]
+        ]
+
+        df = pd.DataFrame.from_records(rows, columns=columns)
+
+        with open(output.tsv, "w") as dump:
+            #_ = dump.write(f"# {shorten_merqury_file_path(input.table[0])}\n")
             df.to_csv(dump, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
 
@@ -170,9 +229,10 @@ rule normalize_merqury_kmer_completeness:
 rule merge_merqury_normalized_kmer_completeness:
     input:
         tables = expand(
-            rules.normalize_merqury_kmer_completeness.output.tsv,
-            sample=SAMPLES,
-            allow_missing=True
+            DIR_RES.joinpath(
+                "merqury", "{assembler}", "{sample}",
+                "{sample}.merqury-kmer-completeness.tsv"
+            ), sample=SAMPLES, allow_missing=True
         )
     output:
         tsv = DIR_RES.joinpath(
@@ -189,6 +249,13 @@ rule merge_merqury_normalized_kmer_completeness:
         merge.sort_values(["sample", "asm_unit"], inplace=True)
         merge.to_csv(output.tsv, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
+
+
+################################
+### ABOVE: K-MER COMPLETENESS
+################################
+### BELOW: K-MER BED TRACKS
+################################
 
 
 rule merge_merqury_asm_only_kmers:
@@ -228,10 +295,10 @@ rule run_all_merqury_postprocess:
             rules.merge_merqury_normalized_qv_estimates.output.tsv,
             assembler=[ASSEMBLER]
         ),
-        # kmer_completeness = expand(
-        #     rules.merge_merqury_normalized_kmer_completeness.output.tsv,
-        #     assembler=[ASSEMBLER]
-        # ),
+        kmer_completeness = expand(
+            rules.merge_merqury_normalized_kmer_completeness.output.tsv,
+            assembler=[ASSEMBLER]
+        ),
         # bed_files = expand(
         #     rules.merge_merqury_asm_only_kmers.output,
         #     sample=SAMPLES,
