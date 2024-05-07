@@ -29,7 +29,10 @@ def find_merqury_output_file(sample, which, phased_only=True):
 
     selected_file = []
     if which == "completeness":
-        candidate = search_folder.joinpath("completeness.stats").resolve(strict=True)
+        if phased_only:
+            candidate = search_folder.joinpath("completeness.stats").resolve(strict=True)
+        else:
+            candidate = search_folder.joinpath(f"{sample_id}-verkko.completeness.stats").resolve(strict=True)
         selected_file.append(candidate)
     elif which == "qv_detail":
         candidates = list(search_folder.glob("*hap*.qv"))
