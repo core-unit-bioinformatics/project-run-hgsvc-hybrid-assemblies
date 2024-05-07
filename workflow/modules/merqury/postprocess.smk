@@ -200,12 +200,18 @@ rule normalize_merqury_kmer_completeness_verkko:
 
         with open(input.all_incl[0], "r") as listing:
             asm_incl, _, incl_present, incl_total, incl_pct = listing.readline().strip().split()
-            _ = listing.readline()
+            assert "unassigned" in asm_incl.lower()
+            asm_hap2, _, hap2_present, hap2_total, hap2_pct = listing.readline().strip().split()
             wg, _, wg_present, wg_total, wg_pct = listing.readline().strip().split()
 
         # DEBUG: waiting for William H. to shed light on this / mismatch for HG00733
         if wildcards.sample != "HG00733.vrk-ps-sseq":
             assert int(hap1_total) == int(incl_total)  # check same k-mer db
+        else:
+            # resolve / confirm this
+            hap1_total = int(incl_total)
+            hap2_total = int(incl_total)
+            phased_total = int(incl_total)
         unassigned_present = int(incl_present) - int(hap1_present)
         unassigned_total = int(incl_total)
         unassigned_pct = float(unassigned_present / unassigned_total)
