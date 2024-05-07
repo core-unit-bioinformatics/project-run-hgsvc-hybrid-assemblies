@@ -266,7 +266,7 @@ rule merge_merqury_normalized_kmer_completeness:
 ################################
 
 
-rule merge_merqury_asm_only_kmers:
+rule merge_merqury_asm_only_kmers_hifiasm:
     input:
         bed_files = lambda wildcards: find_merqury_output_file(wildcards.sample, "errors")
     output:
@@ -286,6 +286,8 @@ rule merge_merqury_asm_only_kmers:
             "merqury", "{assembler}", "{sample}",
             "{sample}.asm-hap2.asm-only-kmer.bed.gz.tbi"
         )
+    wildcard_constraints:
+        assembler="hifiasm"
     conda:
         DIR_ENVS.joinpath("bedtools.yaml")
     params:
@@ -293,6 +295,59 @@ rule merge_merqury_asm_only_kmers:
         bed_hap2 = lambda wildcards, input: input.bed_files[1]
     shell:
         "bedtools merge -i {params.bed_hap1} | bgzip > {output.bed_hap1} && tabix -p bed {output.bed_hap1}"
+            " && "
+        "bedtools merge -i {params.bed_hap2} | bgzip > {output.bed_hap2} && tabix -p bed {output.bed_hap2}"
+
+
+rule merge_merqury_asm_only_kmers_verkko:
+    input:
+        bed_files = lambda wildcards: find_merqury_output_file(wildcards.sample, "errors")
+    output:
+        tmp_hap1 = temp(
+            DIR_PROC.joinpath("merqury", "{assembler}", "{sample}.asm-hap1.kmer-tmp.bed")
+        ),
+        tmp_unassign = temp(
+            DIR_PROC.joinpath("merqury", "{assembler}", "{sample}.asm-unassign.kmer-tmp.bed")
+        ),
+        bed_hap1 = DIR_RES.joinpath(
+            "merqury", "{assembler}", "{sample}",
+            "{sample}.asm-hap1.asm-only-kmer.bed.gz"
+        ),
+        bed_hap2 = DIR_RES.joinpath(
+            "merqury", "{assembler}", "{sample}",
+            "{sample}.asm-hap2.asm-only-kmer.bed.gz"
+        ),
+        bed_unassign = DIR_RES.joinpath(
+            "merqury", "{assembler}", "{sample}",
+            "{sample}.asm-unassigned.asm-only-kmer.bed.gz"
+        ),
+        tbi_hap1 = DIR_RES.joinpath(
+            "merqury", "{assembler}", "{sample}",
+            "{sample}.asm-hap1.asm-only-kmer.bed.gz.tbi"
+        ),
+        tbi_hap2 = DIR_RES.joinpath(
+            "merqury", "{assembler}", "{sample}",
+            "{sample}.asm-hap2.asm-only-kmer.bed.gz.tbi"
+        ),
+        tbi_unassign = DIR_RES.joinpath(
+            "merqury", "{assembler}", "{sample}",
+            "{sample}.asm-unassigned.asm-only-kmer.bed.gz.tbi"
+        )
+    wildcard_constraints:
+        assembler="verkko"
+    conda:
+        DIR_ENVS.joinpath("bedtools.yaml")
+    params:
+        bed_hap1 = lambda wildcards, input: input.bed_files[0],
+        bed_hap2 = lambda wildcards, input: input.bed_files[1]
+    shell:
+        "grep -F haplotype1 {params.bed_hap1} > {output.tmp_hap1}"
+            " && "
+        "bedtools merge -i {output.tmp_hap1} | bgzip > {output.bed_hap1} && tabix -p bed {output.bed_hap1}"
+            " && "
+        "grep -F unassigned {params.bed_hap1} > {output.tmp_unassign}"
+            " && "
+        "bedtools merge -i {params.tmp_unassign} | bgzip > {output.bed_unassign} && tabix -p bed {output.bed_unassign}"
             " && "
         "bedtools merge -i {params.bed_hap2} | bgzip > {output.bed_hap2} && tabix -p bed {output.bed_hap2}"
 
@@ -307,8 +362,13 @@ rule run_all_merqury_postprocess:
             rules.merge_merqury_normalized_kmer_completeness.output.tsv,
             assembler=[ASSEMBLER]
         ),
-        # bed_files = expand(
-        #     rules.merge_merqury_asm_only_kmers.output,
-        #     sample=SAMPLES,
-        #     assembler=[ASSEMBLER]
-        # )
+        bed1_files = expand(
+            rules.merge_merqury_asm_only_kmers.output.bed_hap1,
+            sample=SAMPLES,
+            assembler=[ASSEMBLER]
+        ),
+        bed2_files = expand(
+            rules.merge_merqury_asm_only_kmers.output.bed_hap2,
+            sample=SAMPLES,
+            assembler=[ASSEMBLER]
+        )
