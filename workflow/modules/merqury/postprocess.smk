@@ -347,7 +347,7 @@ rule merge_merqury_asm_only_kmers_verkko:
             " && "
         "grep -F unassigned {params.bed_hap1} > {output.tmp_unassign}"
             " && "
-        "bedtools merge -i {params.tmp_unassign} | bgzip > {output.bed_unassign} && tabix -p bed {output.bed_unassign}"
+        "bedtools merge -i {output.tmp_unassign} | bgzip > {output.bed_unassign} && tabix -p bed {output.bed_unassign}"
             " && "
         "bedtools merge -i {params.bed_hap2} | bgzip > {output.bed_hap2} && tabix -p bed {output.bed_hap2}"
 
