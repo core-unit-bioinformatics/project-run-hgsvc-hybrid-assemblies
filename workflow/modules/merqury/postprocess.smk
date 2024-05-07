@@ -301,7 +301,7 @@ rule merge_merqury_asm_only_kmers_hifiasm:
 
 rule merge_merqury_asm_only_kmers_verkko:
     input:
-        bed_files = lambda wildcards: find_merqury_output_file(wildcards.sample, "errors")
+        bed_files = lambda wildcards: find_merqury_output_file(wildcards.sample, "errors", phased_only=False)
     output:
         tmp_hap1 = temp(
             DIR_PROC.joinpath("merqury", "{assembler}", "{sample}.asm-hap1.kmer-tmp.bed")
