@@ -1,10 +1,55 @@
 
-
 localrules: normalize_merqury_qv_estimates
 rule normalize_merqury_qv_estimates:
+    """Change behavior: compute global / whole-genome
+    estimates as weighted averages over per-sequence estimates
+    in rule downstream
+    """
     input:
-        summary_file = lambda wildcards: find_merqury_output_file(wildcards.sample, "qv_summary"),
-        detail_file = lambda wildcards: find_merqury_output_file(wildcards.sample, "qv_detail")
+        detail_file = lambda wildcards: find_merqury_output_file(wildcards.sample, "qv_detail", phased_only=False)
+    output:
+        tsv = DIR_PROC.joinpath(
+            "merqury", "{assembler}", "{sample}",
+            "{sample}.merqury-qv-est.per-seq.tsv"
+        )
+    run:
+        import pandas as pd
+        import numpy as np
+
+        def assign_asm_unit(seqname):
+
+            if any(h in seqname for h in ["h1", "hap1", "haplotype1"]):
+                return "hap1"
+            elif any(h in seqname for h in ["h2", "hap2", "haplotype2"]):
+                return "hap2"
+            elif "unassigned" in seqname:
+                return "unassigned"
+            else:
+                raise ValueError(seqname)
+
+        concat = []
+        for hap_file in input.detail_file:
+            detail = pd.read_csv(
+                hap_file, sep="\t", header=None,
+                names=["sequence", "error_bp", "total_adj_bp", "qv_est", "error_rate"]
+            )
+            detail["sample"] = wildcards.sample
+            detail["asm_unit"] = detail["sequence"].apply(assign_asm_unit)
+            no_error = np.isinf(detail["qv_est"].values)
+            detail.loc[no_error, "qv_est"] = 99
+            concat.append(detail)
+        concat = pd.concat(concat, axis=0, ignore_index=False)
+
+        concat = concat[["sample", "asm_unit", "sequence", "error_bp", "total_adj_bp", "qv_est", "error_rate"]]
+        with open(output.tsv, "w") as table:
+            concat.to_csv(table, sep="\t", header=True, index=False)
+    # END OF RUN BLOCK
+
+
+localrules: compute_global_merqury_qv_estimates
+rule compute_global_merqury_qv_estimates:
+    input:
+        table = rules.normalize_merqury_qv_estimates.output.tsv
     output:
         tsv = DIR_RES.joinpath(
             "merqury", "{assembler}", "{sample}",
@@ -12,52 +57,37 @@ rule normalize_merqury_qv_estimates:
         )
     run:
         import pandas as pd
+        import numpy as np
 
-        processed_files = []
+        df = pd.read_csv(input.table, sep="\t", header=0)
 
-        summary = pd.read_csv(
-            input.summary_file[0], sep="\t", header=None,
-            names=["entity", "error_bp", "total_bp", "qv_est", "err_rate"]
-        )
-        processed_files.append(shorten_merqury_file_path(input.summary_file[0]))
-        assert summary.shape[0] == 3
-        summary["sample"] = wildcards.sample
-        summary["asm_unit"] = "na"
-        summary["sequence"] = "total"
-        au = []
-        for row in summary.itertuples():
-            if "hap1" in row.entity or "h1" in row.entity:
-                au.append("hap1")
-            elif "hap2" in row.entity or "h2" in row.entity:
-                au.append("hap2")
-            elif "both" in row.entity.lower():
-                au.append("wg")
-            else:
-                raise ValueError(row)
-        summary["asm_unit"] = au
+        combinations = [
+            ("hap1",), ("hap2",), ("hap1", "hap2"),
+            ("hap1", "hap2", "unassigned"), ("unassigned",)
+        ]
+        labels = ["hap1", "hap2", "phased", "wg", "unassigned"]
 
-        for hap_file in input.detail_file:
-            asm_unit = None
-            if "hap1" in hap_file:
-                asm_unit = "hap1"
-            elif "hap2" in hap_file:
-                asm_unit = "hap2"
-            else:
-                raise ValueError(hap_file)
-            detail = pd.read_csv(
-                hap_file, sep="\t", header=None,
-                names=["sequence", "error_bp", "total_bp", "qv_est", "err_rate"]
+        summary_df = []
+        for comb, label in zip(combinations, labels):
+            subset = df.loc[df["asm_unit"].isin(comb), :]
+            if subset.empty:
+                continue
+            total_error = subset["error_bp"].sum()
+            total_adj_len = subset["total_adj_bp"].sum()
+            qv_est = np.average(subset["qv_est"].values, weights=subset["total_adj_bp"].values)
+            error_rate = np.average(subset["error_rate"].values, weights=subset["total_adj_bp"].values)
+            summary_df.append(
+                [subset["sample"].iloc[0], label, "total", total_error, total_adj_len, qv_est, error_rate]
             )
-            processed_files.append(shorten_merqury_file_path(hap_file))
-            detail["sample"] = wildcards.sample
-            detail["asm_unit"] = asm_unit
-            summary = pd.concat([summary, detail], axis=0, ignore_index=False)
+        summary_df = pd.DataFrame(
+            summary_df,
+            names=["sample", "asm_unit", "sequence", "error_bp", "total_adj_bp", "qv_est", "error_rate"]
+        )
 
-        summary = summary[["sample", "asm_unit", "sequence", "error_bp", "total_bp", "qv_est", "err_rate"]]
-        with open(output.tsv, "w") as table:
-            for f in processed_files:
-                table.write(f"# {f}\n")
-            summary.to_csv(table, sep="\t", header=True, index=False)
+        df = pd.concat([df, summary_df], axis=0, ignore_index=False)
+        df.sort_values(["asm_unit", "total_adj_bp"], ascending=[True, False], inplace=True)
+
+        df.to_csv(output.tsv, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
 
 
@@ -196,12 +226,12 @@ rule run_all_merqury_postprocess:
             rules.merge_merqury_normalized_qv_estimates.output.tsv,
             assembler=[ASSEMBLER]
         ),
-        kmer_completeness = expand(
-            rules.merge_merqury_normalized_kmer_completeness.output.tsv,
-            assembler=[ASSEMBLER]
-        ),
-        bed_files = expand(
-            rules.merge_merqury_asm_only_kmers.output,
-            sample=SAMPLES,
-            assembler=[ASSEMBLER]
-        )
+        # kmer_completeness = expand(
+        #     rules.merge_merqury_normalized_kmer_completeness.output.tsv,
+        #     assembler=[ASSEMBLER]
+        # ),
+        # bed_files = expand(
+        #     rules.merge_merqury_asm_only_kmers.output,
+        #     sample=SAMPLES,
+        #     assembler=[ASSEMBLER]
+        # )

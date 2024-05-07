@@ -9,8 +9,14 @@ WORKDIR_ASSEMBLY = TOP_ROOT_DIR.joinpath("projects/assemblies/hybrids/verkko/wd"
 
 BASE_SHARE_LOCATION = TOP_ROOT_DIR.joinpath("data/00_RESTRUCTURE/shares/globus/outgoing/hgsvc")
 
-MERQURY_RESULT_ROOT = TOP_ROOT_DIR.joinpath(
+MERQURY_RESULT_ROOT_PHASED = TOP_ROOT_DIR.joinpath(
     "data/00_RESTRUCTURE/project-centric/hgsvc/processed/20240415_merqury_results/merqury"
+)
+
+# this Merqury output folder includes the stats for the Verkko unassigned
+# sequences as a concatenation with hap1 --- to ignore for hifiasm!
+MERQURY_RESULT_ROOT_ALL = TOP_ROOT_DIR.joinpath(
+    "data/00_RESTRUCTURE/project-centric/hgsvc/processed/20240502_merqury_results/merqury"
 )
 
 # project repo

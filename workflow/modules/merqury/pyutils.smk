@@ -1,7 +1,7 @@
 import pathlib
 
 
-def find_merqury_output_file(sample, which):
+def find_merqury_output_file(sample, which, phased_only=True):
 
     sample_id = sample.split(".")[0]
     if "vrk" in sample:
@@ -21,7 +21,11 @@ def find_merqury_output_file(sample, which):
     else:
         raise NotImplementedError(sample)
 
-    search_folder = MERQURY_RESULT_ROOT.joinpath(subfolder).resolve(strict=True)
+    if not phased_only:
+        assert ASSEMBLER == "verkko"
+        search_folder = MERQURY_RESULT_ROOT_ALL.joinpath(subfolder).resolve(strict=True)
+    else:
+        search_folder = MERQURY_RESULT_ROOT_PHASED.joinpath(subfolder).resolve(strict=True)
 
     selected_file = []
     if which == "completeness":
