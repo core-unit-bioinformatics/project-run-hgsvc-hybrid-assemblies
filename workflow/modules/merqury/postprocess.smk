@@ -81,7 +81,7 @@ rule compute_global_merqury_qv_estimates:
             )
         summary_df = pd.DataFrame(
             summary_df,
-            names=["sample", "asm_unit", "sequence", "error_bp", "total_adj_bp", "qv_est", "error_rate"]
+            columns=["sample", "asm_unit", "sequence", "error_bp", "total_adj_bp", "qv_est", "error_rate"]
         )
 
         df = pd.concat([df, summary_df], axis=0, ignore_index=False)
