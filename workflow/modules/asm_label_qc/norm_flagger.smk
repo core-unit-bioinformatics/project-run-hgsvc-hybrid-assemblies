@@ -29,7 +29,7 @@ rule normalize_flagger_annotation:
                     raise FileNotFoundError(flagger_file)
         table_header = ["chrom", "start", "end", "name", "score", "strand", "start2", "end2", "rgb"]
         use_header = table_header[:4]
-        df = pd.read_csv(flagger_file, skiprows=1, header=None, names=table_header, usecols=use_header)
+        df = pd.read_csv(flagger_file, sep="\t", skiprows=1, header=None, names=table_header, usecols=use_header)
         df["score"] = df["name"].replace(label_map)
         df["score"] = df["score"].astype(int)
         df.to_csv(output.bed_like, sep="\t", header=True, index=False)

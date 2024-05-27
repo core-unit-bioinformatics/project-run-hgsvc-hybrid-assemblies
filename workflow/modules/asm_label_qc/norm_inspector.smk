@@ -17,7 +17,7 @@ rule normalize_inspector_output:
         assembler = {"vrk-ps-sseq": "Verkko", "hsm-ps-sseq": "hifiasm"}[assm]
         error_files = pl.Path(input.folder).joinpath(
             f"{assembler}", f"{id_only}"
-        ).glob(f"{id_only}_{read_type}*.bed")
+        ).glob(f"{id_only}*.bed")
 
         def norm_coordinate(coordinate, start):
             try:

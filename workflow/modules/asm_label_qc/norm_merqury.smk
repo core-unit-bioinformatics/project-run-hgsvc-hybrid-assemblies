@@ -29,7 +29,7 @@ rule normalize_merqury_kmer_tracks:
         mem_mb=lambda wildcards, attempt: 2048 * attempt
     run:
         import pandas as pd
-        df = pd.read_csv(input.bed_like, header=None, names=["chrom", "start", "end"])
+        df = pd.read_csv(input.bed_like, sep="\t", header=None, names=["chrom", "start", "end"])
         df["name"] = "merqury_asmonly_kmer"
         df.to_csv(output.bed_like, sep="\t", header=True, index=False)
 
