@@ -3,7 +3,7 @@ def collect_merqury_kmer_tracks(wildcards):
 
     sample_id, assm = wildcards.sample.split(".")
     assembler = {"vrk-ps-sseq": "verkko", "hsm-ps-sseq": "hifiasm"}[assm]
-    kmer_tracks = pl.Path(input.folder).joinpath(
+    kmer_tracks = MERQURY_RESULT_ROOT_ALL.joinpath(
         f"{sample_id}-{assembler}"
     ).glob("**/*only.bed")
 
