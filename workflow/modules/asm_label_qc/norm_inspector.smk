@@ -53,5 +53,6 @@ rule run_normalize_inspector_results:
     input:
         tables = expand(
             rules.normalize_inspector_output.output.bed_like,
-            sample=SAMPLES
+            sample=SAMPLES,
+            read_type=["hifi", "ont"]
         )
