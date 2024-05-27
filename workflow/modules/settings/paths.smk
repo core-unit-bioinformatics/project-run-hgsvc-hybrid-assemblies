@@ -14,10 +14,22 @@ MERQURY_RESULT_ROOT_PHASED = TOP_ROOT_DIR.joinpath(
 )
 
 # this Merqury output folder includes the stats for the Verkko unassigned
-# sequences as a concatenation with hap1 --- to ignore for hifiasm!
+# as a separate output run; main output is for hap1/hap2 only
 MERQURY_RESULT_ROOT_ALL = TOP_ROOT_DIR.joinpath(
-    "data/00_RESTRUCTURE/project-centric/hgsvc/processed/20240502_merqury_results/merqury"
+    "data/00_RESTRUCTURE/project-centric/hgsvc/processed/20240509_UW_merqury_flagger_complete/assembly_annotations/merqury/merqury"
 )
+
+# Inspector results for both Verkko and hifiasm in subfolders
+INSPECTOR_ROOT_FOLDER = BASE_SHARE_LOCATION.joinpath(
+    "ebi_upload/20230926_assembly_annotations/Inspector"
+).resolve(strict=True)
+
+# Flagger results - only in assembly coordinates
+FLAGGER_ROOT_FOLDER = TOP_ROOT_DIR.joinpath(
+    "data/00_RESTRUCTURE/project-centric/hgsvc/processed",
+    "20240509_UW_merqury_flagger_complete/assembly_annotations/flagger"
+)
+FLAGGER_ROOT_FOLDER.resolve(strict=True)
 
 # project repo
 DIR_SNAKEFILE = pathlib.Path(workflow.basedir).resolve(strict=True)
