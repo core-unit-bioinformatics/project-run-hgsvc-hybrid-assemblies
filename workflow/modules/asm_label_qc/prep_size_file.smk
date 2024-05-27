@@ -8,7 +8,9 @@ if ASSEMBLER == "verkko":
                 WORKDIR_EVAL.joinpath(
                     "results/assemblies/{sample}",
                     "{sample}.asm-{asm_unit}.fasta.gz.fai"
-                )
+                ),
+                asm_unit=MAIN_ASSEMBLY_UNITS,
+                allow_missing=True
             )
         output:
             sizes = DIR_PROC.joinpath(
