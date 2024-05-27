@@ -9,7 +9,7 @@ def collect_merqury_kmer_tracks(wildcards):
 
     files = []
     for kmer_track in kmer_tracks:
-        assert assembler in kmer_track.name, kmer_tracks
+        assert assembler in kmer_track.name, sorted([p.name for p in kmer_tracks])
         files.append(kmer_track)
     if assembler == "verkko":
         if not len(files) == 3:
