@@ -3,10 +3,16 @@ def collect_merqury_kmer_tracks(wildcards):
 
     sample_id, assm = wildcards.sample.split(".")
     assembler = {"vrk-ps-sseq": "verkko", "hsm-ps-sseq": "hifiasm"}[assm]
-    kmer_tracks = MERQURY_RESULT_ROOT_ALL.joinpath(
+
+    kmer_tracks = sorted(MERQURY_RESULT_ROOT_ALL.joinpath(
         f"{sample_id}-{assembler}"
-    ).glob("**/*only.bed")
-    kmer_tracks = sorted(kmer_tracks)
+        ).glob("**/*only.bed")
+    )
+    if assembler == "verkko":
+        kmer_tracks += sorted(MERQURY_RESULT_ROOT_ALL.joinpath(
+            f"{sample_id}-{assembler}-unassigned"
+            ).glob("**/*only.bed")
+        )
 
     files = []
     for kmer_track in kmer_tracks:
