@@ -236,6 +236,11 @@ def prepare_track_file_regions(track_file, score_column, offset_map, cat_thresho
         (old_name, new_name) for old_name, new_name in zip(load_columns, new_names)
     )
     regions.rename(rename_columns, axis=1, inplace=True)
+
+    # filter for regions that are in the offset_map
+    # to ensure common set of regions across all annotations
+    regions = regions.loc[regions["seq"].isin(offset_map), :].copy()
+
     regions["score"] = regions["score"].clip(
         lower=_CLIP_RANGE[0], upper=_CLIP_RANGE[1], inplace=False
     ).astype(_INT_SIZE)

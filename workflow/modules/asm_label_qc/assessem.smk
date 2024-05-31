@@ -38,7 +38,7 @@ rule prepare_region_cache:
     conda:
         DIR_ENVS.joinpath("assessem.yaml")
     resources:
-        mem_mb=lambda wildcards, attempt: 2048 * attempt
+        mem_mb=lambda wildcards, attempt: 4096 * attempt
     params:
         script=DIR_SCRIPTS.joinpath("asm_label_qc", "assessem-cache.py"),
         track_files = lambda wildcards, input: get_assessem_cli_parameters(input, "files"),
