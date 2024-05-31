@@ -25,3 +25,8 @@ def collect_merqury_kmer_tracks(wildcards):
         if not len(files) == 2:
             raise RuntimeError(f"Merqury hifiasm error: {wildcards}")
     return sorted(files)
+
+
+def get_assessem_cli_parameters(input_files):
+    print(input_files)
+    raise

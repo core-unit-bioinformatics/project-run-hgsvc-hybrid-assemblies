@@ -12,6 +12,8 @@ include: "modules/asm_label_qc/prep_size_file.smk"
 include: "modules/asm_label_qc/norm_flagger.smk"
 include: "modules/asm_label_qc/norm_inspector.smk"
 include: "modules/asm_label_qc/norm_merqury.smk"
+include: "modules/asm_label_qc/norm_read_depth.smk"
+include: "modules/asm_label_qc/assessem.smk"
 
 include: "modules/coverage/contig_cov.smk"
 
