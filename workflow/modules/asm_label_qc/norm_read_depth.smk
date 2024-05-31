@@ -11,7 +11,7 @@ rule filter_mosdepth_regions:
             "read_depth", "{sample}.{read_type}.{mapq}.mosdepth-windowed.tsv.gz"
         )
     resources:
-        mem_mb=lambda wildcards, attempt: 2048 * attempt
+        mem_mb=lambda wildcards, attempt: 4096 * attempt
     run:
         import pandas as pd
 
