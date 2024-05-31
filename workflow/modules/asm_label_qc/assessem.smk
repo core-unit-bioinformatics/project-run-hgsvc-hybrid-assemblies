@@ -41,9 +41,9 @@ rule prepare_region_cache:
         mem_mb=lambda wildcards, attempt: 2048 * attempt
     params:
         script=DIR_SCRIPTS.joinpath("asm_label_qc", "assessem-cache.py"),
-        track_files = lambda wildcards, input: get_assessem_cli_parameters(input_files, "files"),
-        track_labels = lambda wildcards, input: get_assessem_cli_parameters(input_files, "labels"),
-        score_columns = lambda wildcards, input: get_assessem_cli_parameters(input_files, "columns"),
+        track_files = lambda wildcards, input: get_assessem_cli_parameters(input, "files"),
+        track_labels = lambda wildcards, input: get_assessem_cli_parameters(input, "labels"),
+        score_columns = lambda wildcards, input: get_assessem_cli_parameters(input, "columns"),
     shell:
         "{params.script} --verbose --data-cache {output.hdf} --genome-size {input.sizes} "
         " --track-files {params.track_files} --track-labels {params.track_labels} "
