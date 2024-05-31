@@ -11,7 +11,7 @@ rule filter_mosdepth_regions:
             "read_depth", "{sample}.{read_type}.{mapq}.mosdepth-windowed.tsv.gz"
         )
     resources:
-        mem_mb=lambda wildcards, attempt: 1024 * attempt
+        mem_mb=lambda wildcards, attempt: 2048 * attempt
     run:
         import pandas as pd
 
@@ -20,7 +20,7 @@ rule filter_mosdepth_regions:
         )
         df[["seqname", "tag"]] = df["seq"].str.rsplit(".", 1, expand=True)
         df = df.loc[df["tag"].isin(["hap1", "hap2", "unassigned"]), :].copy()
-        df[["seqname", "start", "env", "cov"]].to_csv(
+        df[["seqname", "start", "end", "cov"]].to_csv(
             output.bed_like, sep="\t", header=True, index=False
         )
     # END OF RUN BLOCK
