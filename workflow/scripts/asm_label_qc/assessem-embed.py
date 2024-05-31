@@ -33,7 +33,7 @@ def parse_command_line():
     )
 
     parser.add_argument(
-        "--binned-data", "-ob", "-out-binned",
+        "--binned-data", "-ob", "--out-binned",
         type=lambda x: pl.Path(x).resolve(strict=False),
         dest="binned_data",
         help="Path to output file holding the binned data."
@@ -41,7 +41,7 @@ def parse_command_line():
     )
 
     parser.add_argument(
-        "--transformed-data", "-ot", "-out-trans",
+        "--transformed-data", "-ot", "--out-trans",
         type=lambda x: pl.Path(x).resolve(strict=False),
         dest="transformed_data",
         help="Path to output file holding the transformed data."
