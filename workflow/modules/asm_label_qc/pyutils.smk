@@ -74,4 +74,38 @@ def get_assessem_cli_parameters(input_files, get_list):
     return out_list
 
 
+def binsize_to_int(bin_size):
 
+    if bin_size.endswith("k"):
+        factor = int(1e3)
+        base_number = int(bin_size.strip("k"))
+    else:
+        raise ValueError(f"Cannot normalize bin size: {bin_size}")
+    num_bin_size = int(base_number * factor)
+    return num_bin_size
+
+
+def get_assessem_mem(bin_size):
+
+    num_bin_size = binsize_to_int(bin_size)
+
+    if num_bin_size > int(5e4):
+        mem_est = 16384
+    elif num_bin_size > int(9e3):
+        mem_est = 24576
+    else:
+        mem_est = 32768
+    return mem_est
+
+
+def get_assessem_hrs(bin_size):
+
+    num_bin_size = binsize_to_int(bin_size)
+
+    if num_bin_size > int(5e4):
+        hrs_est = 4
+    elif num_bin_size > int(9e3):
+        hrs_est = 24
+    else:
+        hrs_est = 48
+    return hrs_est

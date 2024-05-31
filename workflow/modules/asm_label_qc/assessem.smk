@@ -50,10 +50,48 @@ rule prepare_region_cache:
         " --score-columns {params.score_columns} > {log}"
 
 
+rule compute_embedding:
+    input:
+        cache = rules.prepare_region_cache.output.hdf
+    output:
+        embed = DIR_RES.joinpath(
+            "asm_label_qc", "embedding",
+            "{sample}.{bin_size}.embed-dataset.npy"
+        ),
+        dataset = DIR_RES.joinpath(
+            "asm_label_qc", "embedding",
+            "{sample}.{bin_size}.binned-dataset.tsv.gz"
+        )
+    benchmark:
+        DIR_RSRC.joinpath(
+            "asm_label_qc", "embedding", "{sample}.{bin_size}.assessem-embed.rsrc"
+        )
+    log:
+        DIR_LOG.joinpath(
+            "asm_label_qc", "embedding", "{sample}.{bin_size}.assessem-embed.log"
+        )
+    conda:
+        DIR_ENVS.joinpath("assessem.yaml")
+    resources:
+        mem_mb=lambda wildcards, attempt: get_assessem_mem(wildcards.bin_size) * attempt,
+        time_hrs=lambda wildcards, attempt: get_assessem_hrs(wildcards.bin_size) * attempt,
+    params:
+        script=DIR_SCRIPTS.joinpath("asm_label_qc", "assessem-embed.py"),
+        bin_size=lambda wildcards: binsize_to_int(wildcards.bin_size)
+    shell:
+        "{params.script} --verbose --data-cache {input.cache} "
+        "--bin-size {params.bin_size} --out-binned {output.dataset} "
+        "--out-trans {output.embed} > {log}"
+
+
 rule run_all_assessem_jobs:
     input:
         cache = expand(
             rules.prepare_region_cache.output.hdf,
             sample=SAMPLES
+        ),
+        embeds = expand(
+            rules.compute_embedding.output,
+            sample=SAMPLES,
+            bin_size=["100k", "20k", "10k", "5k", "1k"]
         )
-
