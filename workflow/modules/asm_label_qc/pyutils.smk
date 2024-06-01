@@ -90,11 +90,11 @@ def get_assessem_mem(bin_size):
     num_bin_size = binsize_to_int(bin_size)
 
     if num_bin_size > int(5e4):
-        mem_est = 16384
+        mem_est = 8192
     elif num_bin_size > int(9e3):
-        mem_est = 24576
+        mem_est = 12288
     else:
-        mem_est = 32768
+        mem_est = 16384
     return mem_est
 
 
