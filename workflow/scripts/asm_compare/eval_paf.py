@@ -7,6 +7,7 @@ import functools as fnt
 import math
 import pathlib as pl
 import re
+import sys
 
 import pandas as pd
 
@@ -99,6 +100,14 @@ def parse_command_line():
         default=None
     )
 
+    parser.add_argument(
+        "--verbose", "-vb",
+        action="store_true",
+        default=False,
+        dest="verbose",
+        help="Write process log to stdout. Default: False"
+    )
+
     args = parser.parse_args()
 
     return args
@@ -122,32 +131,66 @@ def compute_qv(num_errors, ref_size):
     return int(round(q, 0))
 
 
-def read_genome_sizes(file_path):
+def read_genome_sizes(file_path, size_lower_bound):
 
     genome_sizes = dict()
+    discard_log = []
     with open(file_path, "r") as listing:
         for line in listing:
             columns = line.strip().split()
             seq_name, seq_length = columns[:2]
+            seq_length = int(seq_length)
+            if seq_length <= size_lower_bound:
+                discard_log.append(
+                    (
+                        "read_genome_sizes\tdiscard\t"
+                        f"{seq_name}\t{seq_length}<={size_lower_bound}"
+                    )
+                )
             genome_sizes[seq_name] = int(seq_length)
-    return genome_sizes
+    return genome_sizes, discard_log
 
 
-def create_discard_report(alignments, mapq_bound, size_bound):
+def filter_alignments(alignments, mapq_bound, size_bound):
 
+    discard_log = []
     discard = alignments["mapq"] <= mapq_bound
     if discard.sum() > 0:
-        mapq_subset = alignments.loc[discard, :].copy()
+        discard_log.append(
+            (
+                "filter_alignments\tdiscard\t"
+                f"{discard.sum()}-aln-rows\tMAPQ<={mapq_bound}"
+            )
+        )
+        # not sure what to record here ...
+        #mapq_subset = alignments.loc[discard, :].copy()
         alignments = alignments.loc[~discard, :].copy()
     discard = (alignments["query_length"] <= size_bound) | (alignments["target_length"] <= size_bound)
     if discard.sum() > 0:
-        print(alignments.shape)
+        discard_log.append(
+            (
+                "filter_alignments\tdiscard\t"
+                f"{discard.sum()}-aln-rows\t[QRY|TRG]LEN<={size_bound}"
+            )
+        )
         size_subset = alignments.loc[discard, :].copy()
-        print(size_subset.shape)
+        queries_dropped = size_subset["query_name"].nunique()
+        targets_dropped = size_subset["target_name"].nunique()
+        discard_log.append(
+            (
+                "filter_alignments\tdiscard\t"
+                f"{queries_dropped}-num-seq\tQRYLEN<={size_bound}"
+            )
+        )
+        discard_log.append(
+            (
+                "filter_alignments\tdiscard\t"
+                f"{targets_dropped}-num-seq\tTRGLEN<={size_bound}"
+            )
+        )
         alignments = alignments.loc[~discard, :].copy()
-        print(alignments.shape)
 
-    return alignments
+    return alignments, discard_log
 
 
 def get_cigar_op_sets(precision):
@@ -257,16 +300,26 @@ def compute_sequence_statistics(seq_sizes, supported_regions):
     return seq_stats
 
 
+def log_process(log_lines, verbose):
+
+    if log_lines and verbose:
+        msg = "\n".join(log_lines) + "\n"
+        sys.stdout.write(msg)
+    return
+
+
 def main():
 
     args = parse_command_line()
 
-    gsize = read_genome_sizes(args.genome_size)
+    gsize, log_lines = read_genome_sizes(args.genome_size)
+    log_process(log_lines, args.verbose)
 
     paf_aln = pd.read_csv(args.paf_file, sep="\t", header=0)
     paf_aln = paf_aln.loc[paf_aln["tp_align_type"] != 2, :].copy()
 
-    paf_aln = create_discard_report(paf_aln, args.mapq_lower_bound, args.size_lower_bound)
+    paf_aln, log_lines = filter_alignments(paf_aln, args.mapq_lower_bound, args.size_lower_bound)
+    log_process(log_lines, args.verbose)
 
     _, supported_regions = process_alignment_file(paf_aln, args.precision)
 
