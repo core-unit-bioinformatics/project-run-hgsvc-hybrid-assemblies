@@ -134,8 +134,7 @@ rule evaluate_normalized_pafs:
             "{sample}.{qry_to_trg}.mapq-{min_mapq}.seq-{min_seq_len}.aln-{min_aln_len}.{precision}.aln-filter.log"
         )
     wildcard_constraints:
-        qry_to_trg="(vrk-to-hsm|hsm-to-vrk)",
-        precision="(exact|struct)"
+        qry_to_trg="(vrk-to-hsm|hsm-to-vrk)"
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")
     params:
