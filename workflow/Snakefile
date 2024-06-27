@@ -5,6 +5,7 @@ include: "modules/settings/constants.smk"
 
 include: "modules/debug_cov/align_hifi_batches.smk"
 
+include: "modules/asm_compare/pyutils.smk"
 include: "modules/asm_compare/ava_align.smk"
 
 include: "modules/asm_label_qc/pyutils.smk"
