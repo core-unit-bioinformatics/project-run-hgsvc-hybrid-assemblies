@@ -356,7 +356,7 @@ def walk_cigar_ops(good_ops, bad_ops, static_ops, aln_start, aln_end, op_series)
     return
 
 
-def process_alignment_file(alignments, precision, struct_len_threshold):
+def process_alignment_file(alignments, precision, struct_err_threshold):
 
     CigNorm = CigarNormalizer()
     cigar_op_sizes = col.defaultdict(list)
@@ -369,7 +369,7 @@ def process_alignment_file(alignments, precision, struct_len_threshold):
 
     split_cigar = fnt.partial(
         split_cigar_string,
-        CigNorm, cigar_op_sizes, CIGAR_OP_RE, precision, struct_len_threshold
+        CigNorm, cigar_op_sizes, CIGAR_OP_RE, precision, struct_err_threshold
     )
     walk_cigar = fnt.partial(walk_cigar_ops, good_ops, bad_ops, static_ops)
 
@@ -524,7 +524,7 @@ def main():
     )
     log_process(log_lines, args.verbose)
 
-    cgop_size_dist, supported_regions, aln_regions = process_alignment_file(paf_aln, args.precision, args.struct_len_threshold)
+    cgop_size_dist, supported_regions, aln_regions = process_alignment_file(paf_aln, args.precision, args.struct_err_geq)
     seq_stats, merged_regions = compute_sequence_statistics(gsize, discarded, supported_regions, args.split_seq_tag)
 
     if args.out_seq_stats is not None:
