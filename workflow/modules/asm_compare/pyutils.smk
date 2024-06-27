@@ -17,8 +17,14 @@ def to_int(number):
 
 def parse_precision_param(settings, get):
 
-    setting, threshold = settings.split("-")
-    threshold = to_int(threshold)
+    try:
+        setting, threshold = settings.split("-")
+        threshold = to_int(threshold)
+    except ValueError:
+        assert settings == "exact"
+        setting = "exact"
+        threshold = 50
+
     if get == "setting":
         return setting
     elif get == "threshold":
