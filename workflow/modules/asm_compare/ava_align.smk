@@ -139,7 +139,7 @@ rule evaluate_normalized_pafs:
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")
     params:
-        script=DIR_SCRIPTS.joinpath("eval_paf.py").resolve(strict=True),
+        script=DIR_SCRIPTS.joinpath("asm_compare", "eval_paf.py").resolve(strict=True),
         min_aln_len=lambda wildcards: to_int(wildcards.min_aln_len),
         min_seq_len=lambda wildcards: to_int(wildcards.min_seq_len),
         precision=lambda wildcards: parse_precision_param(wildcards.precision, "setting"),
