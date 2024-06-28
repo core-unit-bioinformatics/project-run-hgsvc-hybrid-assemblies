@@ -137,6 +137,8 @@ rule evaluate_normalized_pafs:
         qry_to_trg="(vrk-to-hsm|hsm-to-vrk)"
     conda:
         DIR_ENVS.joinpath("pyseq.yaml")
+    resources:
+        mem_mb=lambda wildcards, attempt: 1024 * attempt * attempt
     params:
         script=DIR_SCRIPTS.joinpath("asm_compare", "eval_paf.py").resolve(strict=True),
         min_aln_len=lambda wildcards: to_int(wildcards.min_aln_len),
