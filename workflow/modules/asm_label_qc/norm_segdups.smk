@@ -50,10 +50,12 @@ rule split_segdup_annotation:
 
         sd95 = pd.concat(sd95, axis=0, ignore_index=False)
         sd95.sort_values(["seq", "start"], inplace=True)
+        sd95.drop_duplicates(inplace=True)
         sd95.to_csv(output.sd95, header=True, index=False, sep="\t")
 
         sd98 = pd.concat(sd98, axis=0, ignore_index=False)
         sd98.sort_values(["seq", "start"], inplace=True)
+        sd98.drop_duplicates(inplace=True)
         sd98.to_csv(output.sd98, header=True, index=False, sep="\t")
 
     # END OF RUN BLOCK
