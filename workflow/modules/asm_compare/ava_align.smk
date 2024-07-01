@@ -255,7 +255,7 @@ rule concat_merged_region_stats:
         concat = pd.concat(concat, axis=0, ignore_index=False)
         concat.sort_values(["sample", "precision"], inplace=True)
 
-        concat.to_csv(output.summary, sep="\t", header=0, index=False)
+        concat.to_csv(output.summary, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
 
 
