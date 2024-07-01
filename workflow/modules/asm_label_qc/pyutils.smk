@@ -62,6 +62,12 @@ def get_assessem_cli_parameters(input_files, get_list):
         elif file_name.endswith(".nucfreq-flagged.bed.gz"):
             track_labels.append("nucfreq")
             score_columns.append("num_hets")
+        elif file_name.endswith(".sd-095.tsv.gz"):
+            track_labels.append("sd95")
+            score_columns.append("binary")
+        elif file_name.endswith(".sd-098.tsv.gz"):
+            track_labels.append("sd98")
+            score_columns.append("binary")
         else:
             raise ValueError(f"Cannot process filename: {file_name}")
     if get_list == "files":
@@ -80,7 +86,11 @@ def binsize_to_int(bin_size):
         factor = int(1e3)
         base_number = int(bin_size.strip("k"))
     else:
-        raise ValueError(f"Cannot normalize bin size: {bin_size}")
+        try:
+            base_number = int(bin_size)
+            factor = 1
+        except ValueError:
+            raise ValueError(f"Cannot normalize bin size: {bin_size}")
     num_bin_size = int(base_number * factor)
     return num_bin_size
 

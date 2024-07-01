@@ -31,6 +31,11 @@ FLAGGER_ROOT_FOLDER = TOP_ROOT_DIR.joinpath(
 )
 FLAGGER_ROOT_FOLDER.resolve(strict=True)
 
+SEGDUP_ROOT_FOLDER = BASE_SHARE_LOCATION.joinpath(
+    "ebi_upload/20230926_assembly_annotations/uwash/segdups"
+)
+SEGDUP_ROOT_FOLDER.resolve(strict=True)
+
 # project repo
 DIR_SNAKEFILE = pathlib.Path(workflow.basedir).resolve(strict=True)
 assert DIR_SNAKEFILE.name == "workflow", DIR_SNAKEFILE

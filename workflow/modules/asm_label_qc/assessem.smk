@@ -25,7 +25,9 @@ rule prepare_region_cache:
         nucfreq = WORKDIR_EVAL.joinpath(
             "results/regions/{sample}",
             "{sample}.nucfreq-flagged.bed.gz"
-        )
+        ),
+        sd95 = rules.split_segdup_annotation.output.sd95,
+        sd98 = rules.split_segdup_annotation.output.sd98
     output:
         hdf = DIR_RES.joinpath(
             "asm_label_qc", "region_cache",
@@ -93,5 +95,5 @@ rule run_all_assessem_jobs:
         embeds = expand(
             rules.compute_embedding.output,
             sample=SAMPLES,
-            bin_size=["100k", "20k", "10k", "5k", "1k"]
+            bin_size=["100k", "20k", "10k", "5k", "1k", "100"]
         )
