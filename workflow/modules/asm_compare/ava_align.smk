@@ -202,7 +202,7 @@ rule postprocess_merged_regions:
             inplace=True
         )
         num_seqs = df["seq_name"].nunique()
-        known_seqs = set(df["seq_name"].unique)
+        known_seqs = set(df["seq_name"].unique())
         total_length = sum(seq_lens[sn] for sn in known_seqs)
         support_length = df["length"].sum()
         support_pct = round(support_length/total_length * 100, 2)
