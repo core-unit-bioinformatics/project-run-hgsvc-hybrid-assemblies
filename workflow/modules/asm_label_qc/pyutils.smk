@@ -103,8 +103,10 @@ def get_assessem_mem(bin_size):
         mem_est = 8192
     elif num_bin_size > int(9e3):
         mem_est = 12288
+    elif num_bin_size > int(5e2):
+        mem_est = 24576
     else:
-        mem_est = 16384
+        mem_est = 65536
     return mem_est
 
 
