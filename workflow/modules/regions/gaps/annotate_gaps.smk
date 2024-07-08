@@ -51,18 +51,18 @@ rule annotate_gaps_with_segdups:
     input:
         qry_view = WORKDIR_EVAL.joinpath(
             "results", "regions", "{sample}",
-            "{sample}.{asm_unit}.{refgenome}.ctg-aln-gap.asm-coord.bed"
+            "{sample}.asm-{asm_unit}.{refgenome}.ctg-aln-gap.asm-coord.bed"
         ),
         trg_view = DIR_RES.joinpath(
             "results", "regions", "{sample}",
-            "{sample}.{asm_unit}.{refgenome}.ctg-aln-gap.ref-coord.bed"
+            "{sample}.asm-{asm_unit}.{refgenome}.ctg-aln-gap.ref-coord.bed"
         ),
         segdups = rules.merge_overlapping_segdups.output.bed
     output:
         isect = DIR_PROC.joinpath(
             "regions", "gaps", "intersections",
             "{sample}",
-            "{sample}.{asm_unit}.{refgenome}.isect-sd{pct_id}.tsv"
+            "{sample}.asm-{asm_unit}.{refgenome}.isect-sd{pct_id}.tsv"
         )
     conda:
         DIR_ENVS.joinpath("bedtools.yaml")
