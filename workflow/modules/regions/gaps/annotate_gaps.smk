@@ -53,7 +53,7 @@ rule annotate_gaps_with_segdups:
             "results", "regions", "{sample}",
             "{sample}.asm-{asm_unit}.{refgenome}.ctg-aln-gap.asm-coord.bed"
         ),
-        trg_view = DIR_RES.joinpath(
+        trg_view = WORKDIR_EVAL.joinpath(
             "results", "regions", "{sample}",
             "{sample}.asm-{asm_unit}.{refgenome}.ctg-aln-gap.ref-coord.bed"
         ),
