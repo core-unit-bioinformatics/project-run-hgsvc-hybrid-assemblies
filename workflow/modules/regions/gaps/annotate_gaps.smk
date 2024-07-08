@@ -13,7 +13,7 @@ rule segdups_to_bed:
             "{sample}.sd-098.bed"
         ))
     run:
-        import pandas
+        import pandas as pd
 
         for input_file, output_file, region_label in zip(input, output, ["SD95", "SD98"]):
             df = pd.read_csv(file_path, sep="\t", header=0)
