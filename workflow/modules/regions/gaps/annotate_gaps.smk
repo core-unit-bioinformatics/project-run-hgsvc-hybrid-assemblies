@@ -1,7 +1,7 @@
 
 rule segdups_to_bed:
     input:
-        sd95 = rules.split_segdup_annotation.output.sd95
+        sd95 = rules.split_segdup_annotation.output.sd95,
         sd98 = rules.split_segdup_annotation.output.sd98
     output:
         bed_95 = temp(DIR_PROC.joinpath(
