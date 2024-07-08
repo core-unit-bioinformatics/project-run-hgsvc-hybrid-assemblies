@@ -78,5 +78,6 @@ rule run_all_annotate_gaps:
             rules.annotate_gaps_with_segdups.output.isect,
             sample=SAMPLES,
             asm_unit=MAIN_ASSEMBLY_UNITS,
-            refgenome=["hg38", "t2tv2"]
+            refgenome=["hg38", "t2tv2"],
+            pct_id=["095", "098"]
         )
