@@ -72,6 +72,51 @@ rule annotate_gaps_with_segdups:
         "bedtools intersect -wao -a {input.qry_view} -b {input.segdups} > {output.isect}"
 
 
+localrules: hprc_gaps_to_bed
+rule hprc_gaps_to_bed:
+    input:
+        tsv = HPRC_COMMON_GAPS
+    output:
+        bed = DIR_PROC.joinpath(
+            "regions", "gaps", "norm_tables",
+            "hprc_common_gaps.bed"
+        )
+    run:
+        import pandas as pd
+        df = pd.read_csv(tsv, sep="\t", header=0)
+        df.sort_values(["chrom", "start", "end"], inplace=True)
+        df.rename({"chrom": "#chrom"}, axis=1, inplace=True)
+        df.to_csv(output.bed, sep="\t", header=True, index=False)
+    # END OF RUN BLOCK
+
+
+rule annotate_gaps_with_hprc_gaps:
+    """NB: HPRC gaps only exist in T2T space
+    """
+    input:
+        qry_view = WORKDIR_EVAL.joinpath(
+            "results", "regions", "{sample}",
+            "{sample}.asm-{asm_unit}.{refgenome}.ctg-aln-gap.asm-coord.bed"
+        ),
+        trg_view = WORKDIR_EVAL.joinpath(
+            "results", "regions", "{sample}",
+            "{sample}.asm-{asm_unit}.{refgenome}.ctg-aln-gap.ref-coord.bed"
+        ),
+        gaps = rules.hprc_gaps_to_bed.output.bed
+    output:
+        isect = DIR_PROC.joinpath(
+            "regions", "gaps", "intersections",
+            "{sample}",
+            "{sample}.asm-{asm_unit}.{refgenome}.isect-hprcgaps.tsv"
+        )
+    conda:
+        DIR_ENVS.joinpath("bedtools.yaml")
+    resources:
+        mem_mb = lambda wildcards, attempt: 1024 * attempt
+    shell:
+        "bedtools intersect -wao -a {input.trg_view} -b {input.gaps} > {output.isect}"
+
+
 rule run_all_annotate_gaps:
     input:
         tables = expand(
@@ -80,4 +125,10 @@ rule run_all_annotate_gaps:
             asm_unit=MAIN_ASSEMBLY_UNITS,
             refgenome=["hg38", "t2tv2"],
             pct_id=["095", "098"]
+        ),
+        gaps = expand(
+            rules.annotate_gaps_with_hprc_gaps.output.isect,
+            sample=SAMPLES,
+            asm_unit=MAIN_ASSEMBLY_UNITS,
+            refgenome=["t2tv2"]
         )
