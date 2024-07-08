@@ -16,7 +16,7 @@ rule segdups_to_bed:
         import pandas as pd
 
         for input_file, output_file, region_label in zip(input, output, ["SD95", "SD98"]):
-            df = pd.read_csv(file_path, sep="\t", header=0)
+            df = pd.read_csv(input_file, sep="\t", header=0)
             df.rename({"seq": "#contig"}, axis=1, inplace=True)
             df["name"] = region_label
             df.sort_values(["#contig", "start", "end"], inplace=True)
