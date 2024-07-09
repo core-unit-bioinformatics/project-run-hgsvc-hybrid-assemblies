@@ -20,6 +20,8 @@ rule segdups_to_bed:
 
             row_hash = hl.md5(f"{row.seq}{row.start}{row.end}".encode("utf-8")).hexdigest()
             row_name = f"{row_hash}|{row.label}"
+            return row_name
+
 
         for input_file, output_file, region_label in zip(input, output, ["SD95", "SD98"]):
             df = pd.read_csv(input_file, sep="\t", header=0)
