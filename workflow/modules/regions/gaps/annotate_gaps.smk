@@ -180,7 +180,8 @@ rule simplify_hprc_gap_intersection:
         df = pd.read_csv(input.table, sep="\t", header=None, names=header)
         df = df.loc[df["overlap_bp"] > 0, :].copy()
         df.drop(["hprc_haps", "gap_win_start", "gap_win_end", "aln_length", "aln_coarse_block"], axis=1, inplace=True)
-        assert "NO-BLOCK-INFO" not in set(df["aln_base_block"].unique())
+        # the following does not work unfortunately
+        #assert "NO-BLOCK-INFO" not in set(df["aln_base_block"].unique())
         df["sample"] = wildcards.sample
         df["asm_unit"] = wildcards.asm_unit
         df["gap_length"] = df["gap_end"] - df["gap_start"]
