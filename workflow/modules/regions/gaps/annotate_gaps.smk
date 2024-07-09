@@ -146,7 +146,7 @@ rule simplify_hprc_gap_intersection:
         df["sample"] = wildcards.sample
         df["asm_unit"] = wildcards.asm_unit
         df["gap_length"] = df["gap_end"] - df["gap_start"]
-        df["overlap_pct"] = (df["gap_length"] / df["overlap_bp"] * 100).round(2)
+        df["overlap_pct"] = (df["overlap_bp"] / df["gap_length"] * 100).round(2)
         df.sort_values(["aln_seq", "aln_start", "aln_end"], inplace=True)
         df.to_csv(output.tsv, sep="\t", header=True, index=False)
     # END OR RUN BLOCK
