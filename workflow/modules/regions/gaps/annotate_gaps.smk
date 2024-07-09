@@ -79,6 +79,40 @@ rule annotate_gaps_with_segdups:
         "bedtools intersect -wao -a {input.qry_view} -b {input.segdups} > {output.isect}"
 
 
+rule simplify_segdup_gap_intersection:
+    input:
+        table = rules.annotate_gaps_with_segdups.output.isect
+    output:
+        tsv = DIR_RES.joinpath(
+            "regions", "gaps", "norm_tables",
+            "{sample}",
+            "{sample}.asm-{asm_unit}.{refgenome}.asm-coord.segdup-{pct_id}.tsv"
+        )
+    run:
+        import pandas as pd
+        header = ["aln_seq", "aln_start", "aln_end", "aln_label", "aln_length", "aln_info"]
+        header += ["aln_base_block", "aln_coarse_block"]
+        header += ["sd_seq", "sd_start", "sd_end", "sd_label"]
+        header += ["overlap_bp"]
+
+        df = pd.read_csv(input.table, sep="\t", header=None, names=header)
+        df = df.loc[df["overlap_bp"] > 0, :].copy()
+        df["sd_length"] = df["sd_start"] - df["sd_end"]
+        df["overlap_pct"] = (df["overlap_bp"] / df["sd_length"] * 100).round(2)
+        # drop all SDs that are inside an aligned block - not interesting
+        is_aligned = df["aln_label"] == "ALN"
+        is_complete = df["overlap_pct"] > 99.9
+        select = is_aligned & is_complete
+        df = df.loc[~select, :].copy()
+        df.drop(["aln_length", "aln_coarse_block"], axis=1, inplace=True)
+        df["sample"] = wildcards.sample
+        df["asm_unit"] = wildcards.asm_unit
+        assert "NO-BLOCK-INFO" not in set(df["aln_base_block"].unique())
+        df.sort_values(["aln_seq", "aln_start", "aln_end"], inplace=True)
+        df.to_csv(output.tsv, sep="\t", header=True, index=False)
+    # END OF RUN BLOCK
+
+
 localrules: hprc_gaps_to_bed
 rule hprc_gaps_to_bed:
     input:
@@ -142,7 +176,8 @@ rule simplify_hprc_gap_intersection:
 
         df = pd.read_csv(input.table, sep="\t", header=None, names=header)
         df = df.loc[df["overlap_bp"] > 0, :].copy()
-        df.drop(["hprc_haps", "gap_win_start", "gap_win_end", "aln_length", "aln_base_block", "aln_coarse_block"], axis=1, inplace=True)
+        df.drop(["hprc_haps", "gap_win_start", "gap_win_end", "aln_length", "aln_coarse_block"], axis=1, inplace=True)
+        assert "NO-BLOCK-INFO" not in set(df["aln_base_block"].unique())
         df["sample"] = wildcards.sample
         df["asm_unit"] = wildcards.asm_unit
         df["gap_length"] = df["gap_end"] - df["gap_start"]
@@ -155,7 +190,7 @@ rule simplify_hprc_gap_intersection:
 rule run_all_annotate_gaps:
     input:
         tables = expand(
-            rules.annotate_gaps_with_segdups.output.isect,
+            rules.simplify_segdup_gap_intersection.output.tsv,
             sample=SAMPLES,
             asm_unit=MAIN_ASSEMBLY_UNITS,
             refgenome=["hg38", "t2tv2"],
