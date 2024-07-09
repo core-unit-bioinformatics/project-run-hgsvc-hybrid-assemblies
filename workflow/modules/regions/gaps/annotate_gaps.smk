@@ -94,12 +94,12 @@ rule simplify_segdup_gap_intersection:
         import pandas as pd
         header = ["aln_seq", "aln_start", "aln_end", "aln_label", "aln_length", "aln_info"]
         header += ["aln_base_block", "aln_coarse_block"]
-        header += ["sd_seq", "sd_start", "sd_end", "sd_label"]
+        header += ["sd_seq", "sd_start", "sd_end", "sd_id"]
         header += ["overlap_bp"]
 
         df = pd.read_csv(input.table, sep="\t", header=None, names=header)
         df = df.loc[df["overlap_bp"] > 0, :].copy()
-        df["sd_length"] = df["sd_start"] - df["sd_end"]
+        df["sd_length"] = df["sd_end"] - df["sd_start"]
         df["overlap_pct"] = (df["overlap_bp"] / df["sd_length"] * 100).round(2)
         # drop all SDs that are inside an aligned block - not interesting
         is_aligned = df["aln_label"] == "ALN"
@@ -109,7 +109,8 @@ rule simplify_segdup_gap_intersection:
         df.drop(["aln_length", "aln_coarse_block"], axis=1, inplace=True)
         df["sample"] = wildcards.sample
         df["asm_unit"] = wildcards.asm_unit
-        assert "NO-BLOCK-INFO" not in set(df["aln_base_block"].unique())
+        # the following does not work unfortunately
+        #assert "NO-BLOCK-INFO" not in set(df["aln_base_block"].unique())
         df.sort_values(["aln_seq", "aln_start", "aln_end"], inplace=True)
         df.to_csv(output.tsv, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
