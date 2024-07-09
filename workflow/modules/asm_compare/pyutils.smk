@@ -35,11 +35,15 @@ def parse_precision_param(settings, get):
 
 def select_genome_size_file(wildcards):
 
-    assert hasattr(wildcards, "qry_to_trg")
-    if wildcards.qry_to_trg == "vrk-to-hsm":
-        fai = rules.align_verkko_to_hifiasm.input.hsm_idx
-    elif wildcards.qry_to_trg == "hsm-to-vrk":
-        fai = rules.align_hifiasm_to_verkko.input.vrk_idx
+    if hasattr(wildcards, "qry_to_trg"):
+        if wildcards.qry_to_trg == "vrk-to-hsm":
+            fai = rules.align_verkko_to_hifiasm.input.hsm_idx
+        elif wildcards.qry_to_trg == "hsm-to-vrk":
+            fai = rules.align_hifiasm_to_verkko.input.vrk_idx
+        else:
+            raise ValueError(wildcards)
+    elif hasattr(wildcards, "child"):
+        fai = rules.align_verkko_parent_to_child.input.chl_idx
     else:
         raise ValueError(wildcards)
     return fai
