@@ -14,11 +14,18 @@ rule segdups_to_bed:
         ))
     run:
         import pandas as pd
+        import hashlib as hl
+
+        def compute_row_id(row):
+
+            row_hash = hl.md5(f"{row.seq}{row.start}{row.end}".encode("utf-8")).hexdigest()
+            row_name = f"{row_hash}|{row.label}"
 
         for input_file, output_file, region_label in zip(input, output, ["SD95", "SD98"]):
             df = pd.read_csv(input_file, sep="\t", header=0)
+            df["label"] = region_label
+            df["name"] = df.apply(compute_row_id, axis=1)
             df.rename({"seq": "#contig"}, axis=1, inplace=True)
-            df["name"] = region_label
             df.sort_values(["#contig", "start", "end"], inplace=True)
             df.to_csv(output_file, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
@@ -40,7 +47,7 @@ rule merge_overlapping_segdups:
     conda:
         DIR_ENVS.joinpath("bedtools.yaml")
     shell:
-        "bedtools merge -c 4 -o distinct -i {input.bed} > {output.bed}"
+        "bedtools merge -c 5 -o first -i {input.bed} > {output.bed}"
 
 
 rule annotate_gaps_with_segdups:
@@ -117,6 +124,34 @@ rule annotate_gaps_with_hprc_gaps:
         "bedtools intersect -wao -a {input.trg_view} -b {input.gaps} > {output.isect}"
 
 
+rule simplify_hprc_gap_intersection:
+    input:
+        table = rules.annotate_gaps_with_hprc_gaps.output.isect
+    output:
+        tsv = DIR_RES.joinpath(
+            "regions", "gaps", "norm_tables",
+            "{sample}",
+            "{sample}.asm-{asm_unit}.{refgenome}.ref-coord.hprc-gaps.tsv"
+        )
+    run:
+        import pandas as pd
+        header = ["aln_seq", "aln_start", "aln_end", "aln_label", "aln_length", "aln_info"]
+        header += ["aln_base_block", "aln_coarse_block"]
+        header += ["gap_chrom", "gap_start", "gap_end", "gap_id", "hprc_haps"]
+        header += ["gap_sd_assoc", "gap_cov_drop", "gap_win_start", "gap_win_end", "overlap_bp"]
+
+        df = pd.read_csv(input.table, sep="\t", header=None, names=header)
+        df = df.loc[df["overlap_bp"] > 0, :].copy()
+        df.drop(["hprc_haps", "gap_win_start", "gap_win_end", "aln_length", "aln_base_block", "aln_coarse_block"], axis=1, inplace=True)
+        df["sample"] = wildcards.sample
+        df["asm_unit"] = wildcards.asm_unit
+        df["gap_length"] = df["gap_end"] - df["gap_start"]
+        df["overlap_pct"] = (df["gap_length"] / df["overlap_bp"] * 100).round(2)
+        df.sort_values(["aln_seq", "aln_start", "aln_end"], inplace=True)
+        df.to_csv(output.tsv, sep="\t", header=True, index=False)
+    # END OR RUN BLOCK
+
+
 rule run_all_annotate_gaps:
     input:
         tables = expand(
@@ -127,7 +162,7 @@ rule run_all_annotate_gaps:
             pct_id=["095", "098"]
         ),
         gaps = expand(
-            rules.annotate_gaps_with_hprc_gaps.output.isect,
+            rules.simplify_hprc_gap_intersection.output.tsv,
             sample=SAMPLES,
             asm_unit=MAIN_ASSEMBLY_UNITS,
             refgenome=["t2tv2"]
