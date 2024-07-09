@@ -83,7 +83,7 @@ rule hprc_gaps_to_bed:
         )
     run:
         import pandas as pd
-        df = pd.read_csv(tsv, sep="\t", header=0)
+        df = pd.read_csv(input.tsv, sep="\t", header=0)
         df.sort_values(["chrom", "start", "end"], inplace=True)
         df.rename({"chrom": "#chrom"}, axis=1, inplace=True)
         df.to_csv(output.bed, sep="\t", header=True, index=False)
