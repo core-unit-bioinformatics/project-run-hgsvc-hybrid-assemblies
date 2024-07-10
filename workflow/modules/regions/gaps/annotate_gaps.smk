@@ -191,6 +191,88 @@ rule simplify_hprc_gap_intersection:
     # END OR RUN BLOCK
 
 
+rule filter_nucfreq_regions_to_bed:
+    input:
+        tsv = WORKDIR_EVAL.joinpath(
+            "results", "regions",
+            "{sample}",
+            "{sample}.nucfreq.covann.tsv.gz"
+        )
+    output:
+        hap1 = DIR_PROC.joinpath(
+            "regions", "gaps", "norm_tables",
+            "{sample}",
+            "{sample}.asm-hap1.nucfreq.covann-filtered.bed"
+        ),
+        hap2 = DIR_PROC.joinpath(
+            "regions", "gaps", "norm_tables",
+            "{sample}",
+            "{sample}.asm-hap2.nucfreq.covann-filtered.bed"
+        ),
+    run:
+        import pandas as pd
+
+        df = pd.read_csv(input.tsv, sep="\t", header=0)
+        threshold = 125
+        df = df.loc[df["hifi_pct_median_cov"] > threshold, :].copy()
+        df.rename({"contig": "#contig"}, axis=1, inplace=True)
+
+        hap1 = df.loc[df["asm_unit"] == "hap1", :].copy()
+        hap2 = df.loc[df["asm_unit"] == "hap2", :].copy()
+
+        hap1.to_csv(output.hap1, sep="\t", header=True, index=False)
+        hap2.to_csv(output.hap2, sep="\t", header=True, index=False)
+    # END OF RUN BLOCK
+
+
+rule split_normalized_flagger:
+    input:
+        tsv = rules.normalize_flagger_annotation.output.bed_like
+    output:
+        hap1 = DIR_PROC.joinpath(
+            "regions", "gaps", "norm_tables",
+            "{sample}",
+            "{sample}.asm-hap1.flagger-regions.bed"
+        ),
+        hap2 = DIR_PROC.joinpath(
+            "regions", "gaps", "norm_tables",
+            "{sample}",
+            "{sample}.asm-hap2.flagger-regions.bed"
+        ),
+        un = DIR_PROC.joinpath(
+            "regions", "gaps", "norm_tables",
+            "{sample}",
+            "{sample}.asm-unassigned.flagger-regions.bed"
+        ),
+    run:
+        import pandas as pd
+
+        df = pd.read_csv(input.tsv, sep="\t", header=0)
+
+        def assign_unit(contig_name):
+            if "haplotype1" in contig_name:
+                return "hap1"
+            elif "haplotype2" in contig_name:
+                return "hap2"
+            elif "unassigned" in contig_name:
+                return "unassigned"
+            else:
+                raise
+
+        df["asm_unit"] = df["chrom"].apply(assign_unit)
+        df.rename({"chrom": "#contig"}, axis=1, inplace=True)
+        hap1 = df.loc[df["asm_unit"] == "hap1", :].copy()
+        hap1.to_csv(output.hap1, sep="\t", header=True, index=False)
+
+        hap2 = df.loc[df["asm_unit"] == "hap2", :].copy()
+        hap2.to_csv(output.hap2, sep="\t", header=True, index=False)
+
+        un = df.loc[df["asm_unit"] == "unassigned", :].copy()
+        un.to_csv(output.un, sep="\t", header=True, index=False)
+    # END OR RUN BLOCK
+
+
+
 rule run_all_annotate_gaps:
     input:
         tables = expand(
@@ -205,4 +287,12 @@ rule run_all_annotate_gaps:
             sample=SAMPLES,
             asm_unit=MAIN_ASSEMBLY_UNITS,
             refgenome=["t2tv2"]
+        ),
+        norm_nf = expand(
+            rules.filter_nucfreq_regions_to_bed.output,
+            sample=SAMPLES
+        ),
+        split_flag = expand(
+            rules.split_normalized_flagger.output,
+            sample=SAMPLES
         )
