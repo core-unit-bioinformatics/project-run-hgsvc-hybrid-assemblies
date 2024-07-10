@@ -106,7 +106,7 @@ rule simplify_segdup_gap_intersection:
         is_complete = df["overlap_pct"] > 99.9
         select = is_aligned & is_complete
         df = df.loc[~select, :].copy()
-        df.drop(["aln_length", "aln_coarse_block"], axis=1, inplace=True)
+        df.drop("aln_length", axis=1, inplace=True)
         df["sample"] = wildcards.sample
         df["asm_unit"] = wildcards.asm_unit
         # the following does not work unfortunately
@@ -179,7 +179,7 @@ rule simplify_hprc_gap_intersection:
 
         df = pd.read_csv(input.table, sep="\t", header=None, names=header)
         df = df.loc[df["overlap_bp"] > 0, :].copy()
-        df.drop(["hprc_haps", "gap_win_start", "gap_win_end", "aln_length", "aln_coarse_block"], axis=1, inplace=True)
+        df.drop(["hprc_haps", "gap_sd_assoc", "gap_cov_drop", "gap_win_start", "gap_win_end", "aln_length"], axis=1, inplace=True)
         # the following does not work unfortunately
         #assert "NO-BLOCK-INFO" not in set(df["aln_base_block"].unique())
         df["sample"] = wildcards.sample
