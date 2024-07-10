@@ -156,7 +156,7 @@ rule postprocess_merged_trio_regions:
         support_pct = round(support_length/total_length * 100, 2)
 
         stats_row = [
-            wildcards.sample, wildcards.precision,
+            wildcards.parent, wildcards.child, wildcards.precision,
             num_seqs, total_length, support_length, support_pct,
             int(pct_stats["num_regions"]), int(round(pct_stats["length_mean"], 0)),
             int(round(pct_stats["length_pct_25"],0)), int(round(pct_stats["length_pct_50"],0)),
@@ -165,7 +165,7 @@ rule postprocess_merged_trio_regions:
         ]
 
         header = [
-            "sample", "precision",
+            "parent", "child", "precision",
             "num_contigs", "total_length", "supported_length", "supported_pct",
             "num_support_regions", "region_length_mean", "region_length_pct25",
             "region_length_pct50", "region_length_pct75", "region_length_pct95",
@@ -208,7 +208,7 @@ rule concat_merged_trio_region_stats:
             df = pd.read_csv(table_file, header=0, sep="\t")
             concat.append(df)
         concat = pd.concat(concat, axis=0, ignore_index=False)
-        concat.sort_values(["sample", "precision"], inplace=True)
+        concat.sort_values(["parent", "precision"], inplace=True)
 
         concat.to_csv(output.summary, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
