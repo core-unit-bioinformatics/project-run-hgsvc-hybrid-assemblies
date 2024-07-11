@@ -184,6 +184,12 @@ TRIO_MAP = {
     "NA19240": ["NA19238", "NA19239"]
 }
 
+FAMILY_MAP = {
+    "HG00514": "SH032-CHS",
+    "HG00733": "PR05-PUR",
+    "NA19240": "Y117-YRI"
+}
+
 
 rule concat_merged_trio_region_stats:
     input:
@@ -324,19 +330,30 @@ rule merge_parental_summaries:
     run:
         import pandas as pd
         import statistics
+        import pathlib as pl
+        import io
 
         support_values = []
+        family_medians = io.StringIO()
         for table in input.tables:
+            family_values = []
+            child = pl.Path(table).name.split(".")[0]
+            family = FAMILY_MAP[child]
             df = pd.read_csv(table, sep="\t", header=0)
             for parent, stats in df.groupby("parent_haplotype"):
                 try:
                     values = stats[f"{parent}_support_pct"].values
                     support_values.extend(list(values))
+                    family_values.extend(list(values))
                 except KeyError:
                     support_values.extend([0] * stats.shape[0])
+                    family_values.extend([0] * stats.shape[0])
+            fam_med = round(statistics.median(family_medians), 2)
+            family_medians.write(f"{family}_median_parental_support\t{fam_med}\n")
         median = round(statistics.median(support_values), 2)
         with open(output.reported_number, "w") as dump:
-            dump.write(f"median_parental_support\t{median}\n")
+            dump.write(family_medians.getvalue())
+            dump.write(f"trio_median_parental_support\t{median}\n")
 
         concat = []
         for summary in input.minimals:
