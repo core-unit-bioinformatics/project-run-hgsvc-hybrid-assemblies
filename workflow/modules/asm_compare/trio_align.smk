@@ -326,7 +326,7 @@ rule merge_parental_summaries:
         import math
 
         support_values = []
-        for table in input_tables:
+        for table in input.tables:
             df = pd.read_csv(table, sep="\t", header=0)
             for parent, stats in df.groupby("parental_haplotype"):
                 try:
@@ -339,7 +339,7 @@ rule merge_parental_summaries:
             dump.write("median_parental_support\t{median}\n")
 
         concat = []
-        for summary in input.minimal:
+        for summary in input.minimals:
             df = pd.read_csv(summary, sep="\t", header=0)
             concat.append(df)
 
