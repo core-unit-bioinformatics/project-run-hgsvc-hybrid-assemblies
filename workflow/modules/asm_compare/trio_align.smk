@@ -336,7 +336,7 @@ rule merge_parental_summaries:
                     support_values.extend([0] * stats.shape[0])
         median = round(statistics.median(support_values), 2)
         with open(output.reported_number, "w") as dump:
-            dump.write("median_parental_support\t{median}\n")
+            dump.write(f"median_parental_support\t{median}\n")
 
         concat = []
         for summary in input.minimals:
