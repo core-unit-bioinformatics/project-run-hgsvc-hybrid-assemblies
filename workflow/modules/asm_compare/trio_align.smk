@@ -348,7 +348,7 @@ rule merge_parental_summaries:
                 except KeyError:
                     support_values.extend([0] * stats.shape[0])
                     family_values.extend([0] * stats.shape[0])
-            fam_med = round(statistics.median(family_medians), 2)
+            fam_med = round(statistics.median(family_values), 2)
             family_medians.write(f"{family}_median_parental_support\t{fam_med}\n")
         median = round(statistics.median(support_values), 2)
         with open(output.reported_number, "w") as dump:
