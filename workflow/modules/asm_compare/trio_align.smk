@@ -323,7 +323,7 @@ rule merge_parental_summaries:
         )
     run:
         import pandas as pd
-        import math
+        import statistics
 
         support_values = []
         for table in input.tables:
@@ -334,7 +334,7 @@ rule merge_parental_summaries:
                     support_values.extend(list(values))
                 except KeyError:
                     support_values.extend([0] * stats.shape[0])
-        median = round(math.median(support_values), 2)
+        median = round(statistics.median(support_values), 2)
         with open(output.reported_number, "w") as dump:
             dump.write("median_parental_support\t{median}\n")
 
