@@ -297,6 +297,59 @@ rule create_parental_summary:
     # END OF RUN BLOCK
 
 
+localrules: merge_parental_summaries
+rule merge_parental_summaries:
+    input:
+        tables = lambda wildcards: expand(
+            rules.create_parental_summary.output.table,
+            child=list(TRIO_MAP.keys()),
+            allow_missing=True
+        ),
+        minimals = lambda wildcards: expand(
+            rules.create_parental_summary.output.min_summ,
+            child=list(TRIO_MAP.keys()),
+            allow_missing=True
+        )
+    output:
+        minimal = DIR_RES.joinpath(
+            "asm_compare", "trio",
+            "statistics", "merged",
+            "TRIOS.vrk-ps-sseq.mapq-{min_mapq}.seq-{min_seq_len}.aln-{min_aln_len}.{precision}.hap-support-{size_cutoff}.summary.tsv"
+        ),
+        reported_number = DIR_RES.joinpath(
+            "asm_compare", "trio",
+            "statistics", "merged",
+            "TRIOS.vrk-ps-sseq.mapq-{min_mapq}.seq-{min_seq_len}.aln-{min_aln_len}.{precision}.hap-support-{size_cutoff}.median.txt"
+        )
+    run:
+        import pandas as pd
+        import math
+
+        support_values = []
+        for table in input_tables:
+            df = pd.read_csv(table, sep="\t", header=0)
+            for parent, stats in df.groupby("parental_haplotype"):
+                try:
+                    values = stats[f"{parent}_support_pct"].values
+                    support_values.extend(list(values))
+                except KeyError:
+                    support_values.extend([0] * stats.shape[0])
+        median = round(math.median(support_values), 2)
+        with open(output.reported_number, "w") as dump:
+            dump.write("median_parental_support\t{median}\n")
+
+        concat = []
+        for summary in input.minimal:
+            df = pd.read_csv(summary, sep="\t", header=0)
+            concat.append(df)
+
+        concat = pd.concat(concat, axis=0, ignore_index=False)
+        concat.sort_values(["child", "parent_haplotype"], inplace=True)
+
+        concat.to_csv(output.minimal, sep="\t", header=True, index=False)
+    # END OF RUN BLOCK
+
+
 rule run_all_asm_trio_align:
     input:
         summary = expand(
@@ -309,6 +362,14 @@ rule run_all_asm_trio_align:
         min_summ = expand(
             rules.create_parental_summary.output.table,
             child=["HG00733", "HG00514", "NA19240"],
+            min_mapq=[1],
+            min_seq_len=["100k"],
+            min_aln_len=["10k"],
+            precision=EVAL_ALIGN_PRECISION,
+            size_cutoff=["1M"]
+        ),
+        number = expand(
+            rules.merge_parental_summaries.output.reported_number,
             min_mapq=[1],
             min_seq_len=["100k"],
             min_aln_len=["10k"],
