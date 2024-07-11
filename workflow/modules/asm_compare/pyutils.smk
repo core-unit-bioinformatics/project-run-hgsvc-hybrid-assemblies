@@ -8,9 +8,11 @@ def to_int(number):
         suffix = number[-1]
         numeric = int(number[:-1])
         if suffix.lower() == "k":
-            factor = 1000
+            factor = 1e3
+        elif suffix.lower() == "m":
+            factor = 1e6
         else:
-            raise
+            raise ValueError(number)
         integer = int(numeric * factor)
     return integer
 

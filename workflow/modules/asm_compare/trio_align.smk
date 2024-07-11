@@ -214,6 +214,65 @@ rule concat_merged_trio_region_stats:
     # END OF RUN BLOCK
 
 
+localrules: create_parental_summary
+rule create_parental_summary:
+    input:
+        parents = lambda wildcards: expand(
+            rules.postprocess_merged_trio_regions.output.mrg_stats,
+            parent=TRIO_MAP[wildcards.child],
+            allow_missing=True
+        )
+    output:
+        table = DIR_RES.joinpath(
+            "asm_compare", "trio",
+            "statistics", "summary",
+            "{child}.vrk-ps-sseq.mapq-{min_mapq}.seq-{min_seq_len}.aln-{min_aln_len}.hap-support-{size_cutoff}.tsv"
+        )
+    params:
+        size_cutoff = lambda wildcards: to_int(wildcards.size_cutoff)
+    run:
+        import pandas as pd
+        import pathlib as pl
+
+        size_lower_bound = params.size_cutoff
+        merged = None
+        parent1 = None
+        parent2 = None
+        for table_file in sorted(input.parents):
+            parent = pl.Path(table_file).name.split("-")[0]
+            df = pd.read_csv(table_file, sep="\t", header=0)
+            df = df.loc[df["seq_size"] > size_lower_bound, :].copy()
+            df = df[["seq_name", "seq_tag", "seq_size", "merged_sup_length", "merged_sup_pct"]].copy()
+            df.rename(
+                {
+                    "merged_sup_length": f"{parent}_support_bp", "merged_sup_pct": f"{parent}_support_pct"
+                }, axis=1, inplace=True
+            )
+            if parent1 is None:
+                parent1 = parent
+                p1_column = f"{parent}_support_pct"
+            else:
+                parent2 = parent
+                p2_column = f"{parent}_support_pct"
+            df["child"] = wildcards.child
+            if merged is None:
+                merged = df.copy()
+            else:
+                merged = merged.merge(df, on=["child", "seq_name", "seq_tag", "seq_size"], how="outer")
+        merged.sort_values(["seq_name", "seq_size"], inplace=True)
+
+        merged["parent_haplotype"] = "nobody"
+        merged.loc[merged[p1_column] > merged[p2_column], "parent_haplotype"] = parent1
+        merged.loc[merged[p1_column] < merged[p2_column], "parent_haplotype"] = parent2
+
+        minimal_summary = merged.groupby("parent_haplotype").agg(
+            haplotype_seq=pd.NamedAgg(column="seq_name", aggfunc="nunique"),
+            haplotype_length=pd.NamedAgg(column="seq_size", aggfunc="sum"),
+        )
+        print(minimal_summary)
+    # END OF RUN BLOCK
+
+
 rule run_all_asm_trio_align:
     input:
         summary = expand(
@@ -222,4 +281,12 @@ rule run_all_asm_trio_align:
             min_mapq=[1],
             min_seq_len=["0", "100k"],
             min_aln_len=["0", "10k"]
+        ),
+        min_summ = expand(
+            rules.create_parental_summary.output.table,
+            child=["HG00733", "HG00514", "NA19240"],
+            min_mapq=[1],
+            min_seq_len=["100k"],
+            min_aln_len=["10k"],
+            size_cutoff=["1M"]
         )
