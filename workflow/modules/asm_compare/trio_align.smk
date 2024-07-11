@@ -283,7 +283,6 @@ rule create_parental_summary:
         merged.to_csv(output.table, sep="\t", header=True, index=False)
 
         minimal_summary = merged.groupby("parent_haplotype").agg(
-            child=pd.NamedAgg(column="child", aggfunc="unique"),
             haplotype_seq=pd.NamedAgg(column="seq_name", aggfunc="nunique"),
             haplotype_length=pd.NamedAgg(column="seq_size", aggfunc="sum"),
             parent1_pct_support_median=pd.NamedAgg(column=p1_column, aggfunc="median"),
@@ -293,6 +292,7 @@ rule create_parental_summary:
             parent2_pct_support_min=pd.NamedAgg(column=p2_column, aggfunc="min"),
             parent2_pct_support_max=pd.NamedAgg(column=p2_column, aggfunc="max"),
         )
+        minimal_summary.insert(1, "child", wildcards.child)
         minimal_summary.to_csv(output.min_summ, sep="\t", header=True, index=True, index_label="parent_haplotype")
     # END OF RUN BLOCK
 
