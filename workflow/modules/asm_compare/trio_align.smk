@@ -218,7 +218,7 @@ localrules: create_parental_summary
 rule create_parental_summary:
     input:
         parents = lambda wildcards: expand(
-            rules.postprocess_merged_trio_regions.output.mrg_stats,
+            rules.evaluate_normalized_trio_pafs.output.stats,
             parent=TRIO_MAP[wildcards.child],
             allow_missing=True
         )
