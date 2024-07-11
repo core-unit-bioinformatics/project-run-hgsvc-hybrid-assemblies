@@ -292,7 +292,7 @@ rule create_parental_summary:
             parent2_pct_support_min=pd.NamedAgg(column=p2_column, aggfunc="min"),
             parent2_pct_support_max=pd.NamedAgg(column=p2_column, aggfunc="max"),
         )
-        minimal_summary.insert(1, "child", wildcards.child)
+        minimal_summary.insert(0, "child", wildcards.child)
         minimal_summary.to_csv(output.min_summ, sep="\t", header=True, index=True, index_label="parent_haplotype")
     # END OF RUN BLOCK
 
