@@ -226,7 +226,7 @@ rule create_parental_summary:
         table = DIR_RES.joinpath(
             "asm_compare", "trio",
             "statistics", "summary",
-            "{child}.vrk-ps-sseq.mapq-{min_mapq}.seq-{min_seq_len}.aln-{min_aln_len}.hap-support-{size_cutoff}.tsv"
+            "{child}.vrk-ps-sseq.mapq-{min_mapq}.seq-{min_seq_len}.aln-{min_aln_len}.{precision}.hap-support-{size_cutoff}.tsv"
         )
     params:
         size_cutoff = lambda wildcards: to_int(wildcards.size_cutoff)
@@ -288,5 +288,6 @@ rule run_all_asm_trio_align:
             min_mapq=[1],
             min_seq_len=["100k"],
             min_aln_len=["10k"],
+            precision=EVAL_ALIGN_PRECISION,
             size_cutoff=["1M"]
         )
