@@ -261,13 +261,22 @@ rule create_parental_summary:
                 merged = merged.merge(df, on=["child", "seq_name", "seq_tag", "seq_size"], how="outer")
         merged.sort_values(["seq_name", "seq_size"], inplace=True)
 
-        merged["parent_haplotype"] = "nobody"
+        merged["parent_haplotype"] = "undetermined"
+        is_unassigned = merged["seq_tag"] == "unassigned"
+        if is_unassigned.any():
+            merged.loc[is_unassigned, "parent_haplotype"] = "unphased"
         merged.loc[merged[p1_column] > merged[p2_column], "parent_haplotype"] = parent1
         merged.loc[merged[p1_column] < merged[p2_column], "parent_haplotype"] = parent2
 
         minimal_summary = merged.groupby("parent_haplotype").agg(
             haplotype_seq=pd.NamedAgg(column="seq_name", aggfunc="nunique"),
             haplotype_length=pd.NamedAgg(column="seq_size", aggfunc="sum"),
+            parent1_pct_support_median=pd.NamedAgg(column=p1_column, aggfunc="median"),
+            parent1_pct_support_min=pd.NamedAgg(column=p1_column, aggfunc="min"),
+            parent1_pct_support_min=pd.NamedAgg(column=p1_column, aggfunc="max"),
+            parent2_pct_support_median=pd.NamedAgg(column=p2_column, aggfunc="median"),
+            parent2_pct_support_min=pd.NamedAgg(column=p2_column, aggfunc="min"),
+            parent2_pct_support_min=pd.NamedAgg(column=p2_column, aggfunc="max"),
         )
         print(minimal_summary)
     # END OF RUN BLOCK
