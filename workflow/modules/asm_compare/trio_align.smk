@@ -227,6 +227,11 @@ rule create_parental_summary:
             "asm_compare", "trio",
             "statistics", "summary",
             "{child}.vrk-ps-sseq.mapq-{min_mapq}.seq-{min_seq_len}.aln-{min_aln_len}.{precision}.hap-support-{size_cutoff}.tsv"
+        ),
+        min_summ = DIR_RES.joinpath(
+            "asm_compare", "trio",
+            "statistics", "summary",
+            "{child}.vrk-ps-sseq.mapq-{min_mapq}.seq-{min_seq_len}.aln-{min_aln_len}.{precision}.hap-support-{size_cutoff}.summary.tsv"
         )
     params:
         size_cutoff = lambda wildcards: to_int(wildcards.size_cutoff)
@@ -268,7 +273,17 @@ rule create_parental_summary:
         merged.loc[merged[p1_column] > merged[p2_column], "parent_haplotype"] = parent1
         merged.loc[merged[p1_column] < merged[p2_column], "parent_haplotype"] = parent2
 
+        merged = merged[
+            [
+                "child", "seq_name", "seq_tag", "seq_size", "parent_haplotype",
+                f"{parent1}_support_bp", f"{parent1}_support_pct",
+                f"{parent2}_support_bp", f"{parent2}_support_pct"
+            ]
+        ].copy()
+        merged.to_csv(output.table, sep="\t", header=True, index=False)
+
         minimal_summary = merged.groupby("parent_haplotype").agg(
+            child=pd.NamedAgg(column="child", aggfunc="unique"),
             haplotype_seq=pd.NamedAgg(column="seq_name", aggfunc="nunique"),
             haplotype_length=pd.NamedAgg(column="seq_size", aggfunc="sum"),
             parent1_pct_support_median=pd.NamedAgg(column=p1_column, aggfunc="median"),
@@ -278,7 +293,7 @@ rule create_parental_summary:
             parent2_pct_support_min=pd.NamedAgg(column=p2_column, aggfunc="min"),
             parent2_pct_support_max=pd.NamedAgg(column=p2_column, aggfunc="max"),
         )
-        print(minimal_summary)
+        minimal_summary.to_csv(output.min_summ, sep="\t", header=True, index=True, index_label="parent_haplotype")
     # END OF RUN BLOCK
 
 
