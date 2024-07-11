@@ -273,10 +273,10 @@ rule create_parental_summary:
             haplotype_length=pd.NamedAgg(column="seq_size", aggfunc="sum"),
             parent1_pct_support_median=pd.NamedAgg(column=p1_column, aggfunc="median"),
             parent1_pct_support_min=pd.NamedAgg(column=p1_column, aggfunc="min"),
-            parent1_pct_support_min=pd.NamedAgg(column=p1_column, aggfunc="max"),
+            parent1_pct_support_max=pd.NamedAgg(column=p1_column, aggfunc="max"),
             parent2_pct_support_median=pd.NamedAgg(column=p2_column, aggfunc="median"),
             parent2_pct_support_min=pd.NamedAgg(column=p2_column, aggfunc="min"),
-            parent2_pct_support_min=pd.NamedAgg(column=p2_column, aggfunc="max"),
+            parent2_pct_support_max=pd.NamedAgg(column=p2_column, aggfunc="max"),
         )
         print(minimal_summary)
     # END OF RUN BLOCK
