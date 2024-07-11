@@ -328,7 +328,7 @@ rule merge_parental_summaries:
         support_values = []
         for table in input.tables:
             df = pd.read_csv(table, sep="\t", header=0)
-            for parent, stats in df.groupby("parental_haplotype"):
+            for parent, stats in df.groupby("parent_haplotype"):
                 try:
                     values = stats[f"{parent}_support_pct"].values
                     support_values.extend(list(values))
