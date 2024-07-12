@@ -4,6 +4,7 @@ import argparse as argp
 import collections as col
 import pathlib as pl
 import functools
+import sys
 
 import pandas as pd
 
@@ -42,12 +43,44 @@ def parse_command_line():
         dest="chrom_assign"
     )
 
+    parser.add_argument(
+        "--karyotype", "-k",
+        type=str,
+        dest="karyotype"
+    )
+
+    parser.add_argument(
+        "--sample", "-s",
+        type=str,
+        dest="sample"
+    )
+
+    parser.add_argument(
+        "--assembly", "-a",
+        type=str,
+        dest="assembly"
+    )
+
+    parser.add_argument(
+        "--out-table", "-ot",
+        type=lambda x: pl.Path(x).resolve(strict=False),
+        dest="out_table",
+        default=None
+    )
+
+    parser.add_argument(
+        "--out-summary", "-os",
+        type=lambda x: pl.Path(x).resolve(strict=False),
+        dest="out_summary",
+        default=None
+    )
+
     args = parser.parse_args()
 
     return args
 
 
-def load_gap_ids(file_path):
+def load_gap_ids(file_path, karyotype):
 
     with open(file_path) as listing:
         header = listing.readline().strip().split()
@@ -63,16 +96,21 @@ def load_gap_ids(file_path):
         header=None, names=header,
         usecols=header[:-2]
     )
+
+    # sanitize inputs
+    drop_rows = gaps["gap_start"] == gaps["gap_end"]
+    if drop_rows.any():
+        sys.stderr.write(f"\nWARNING:\nDropping invalid rows / gaps of size 0 (start == end): {drop_rows.sum()}\n\n")
+        gaps = gaps.loc[~drop_rows, :].copy()
+        gaps.reset_index(inplace=True, drop=True)
+
     gaps = gaps[["chrom", "gap_start", "gap_end", "gap_id"]].copy()
+    if karyotype == "female":
+        gaps = gaps.loc[gaps["chrom"] != "chrY", :].copy()
+    if karyotype == "male":
+        gaps = gaps.loc[gaps["chrom"] != "chrX", :].copy()
 
-    count_stats = {
-        "total_gaps": gaps["gap_id"].nunique(),
-        "autosome_gaps": (~gaps["chrom"].isin(["chrX", "chrY"])).sum(),
-        "female_gaps": (gaps["chrom"].isin(["chrX"])).sum(),
-        "male_gaps": (gaps["chrom"].isin(["chrY"])).sum(),
-    }
-
-    return gaps, count_stats
+    return gaps
 
 
 def load_chrom_assign(file_path):
@@ -140,12 +178,9 @@ def split_aln_context(align_context):
 
 
 
-def process_gap_alnblock_table(file_path, flagger_file, nucfreq_file, gaps, chrom_assign):
+def process_gap_alnblock_table(sample, asm_unit, file_path, flagger_file, nucfreq_file, gaps, chrom_assign):
 
     df = pd.read_csv(file_path, sep="\t", header=0)
-    file_parts = file_path.name.split(".")
-    sample = file_parts[0] + "." + file_parts[1]
-    asm_unit = file_parts[2]
     df.drop(["aln_base_block", "aln_coarse_block"], axis=1, inplace=True)
 
     flagger = read_flagger_regions(flagger_file)
@@ -155,11 +190,13 @@ def process_gap_alnblock_table(file_path, flagger_file, nucfreq_file, gaps, chro
 
     for row in gaps.itertuples():
         gap_id = row.gap_id
+        gap_length = row.gap_end - row.gap_start
+        assert gap_length > 0, row
         gap_chrom = row.chrom
         sub = df.loc[df["gap_id"] == gap_id, :]
         if sub.empty or (sub["aln_label"] == "ASMGAP").all():
             status_info = {
-                "gap_id": gap_id,
+                "gap_id": gap_id, "gap_length": gap_length,
                 "sample": sample, "asm_unit": asm_unit,
                 "seq": "unknown", "start": -1, "end": -1,
                 "overlap_pct": 0,
@@ -179,7 +216,7 @@ def process_gap_alnblock_table(file_path, flagger_file, nucfreq_file, gaps, chro
                 flagger_summary = summarize_regions(flagger, ctg, start, end)
                 nucfreq_summary = summarize_regions(nucfreq, ctg, start, end)
                 status_info = {
-                    "gap_id": gap_id,
+                    "gap_id": gap_id, "gap_length": gap_length,
                     "sample": sample, "asm_unit": asm_unit,
                     "seq": ctg, "start": start, "end": end,
                     "overlap_pct": row.overlap_pct,
@@ -192,7 +229,7 @@ def process_gap_alnblock_table(file_path, flagger_file, nucfreq_file, gaps, chro
 
             if not match_found:
                 status_info = {
-                    "gap_id": gap_id,
+                    "gap_id": gap_id, "gap_length": gap_length,
                     "sample": sample, "asm_unit": asm_unit,
                     "seq": "unknown", "start": -1, "end": -1,
                     "overlap_pct": 0,
@@ -218,7 +255,7 @@ def process_gap_alnblock_table(file_path, flagger_file, nucfreq_file, gaps, chro
                     if row.overlap_pct > 99.9:
                         status_label = "covered"
                     status_info = {
-                        "gap_id": gap_id,
+                        "gap_id": gap_id, "gap_length": gap_length,
                         "sample": sample, "asm_unit": asm_unit,
                         "seq": ctg, "start": start, "end": end,
                         "overlap_pct": row.overlap_pct,
@@ -231,7 +268,7 @@ def process_gap_alnblock_table(file_path, flagger_file, nucfreq_file, gaps, chro
 
                 if not match_found:
                     status_info = {
-                        "gap_id": gap_id,
+                        "gap_id": gap_id, "gap_length": gap_length,
                         "sample": sample, "asm_unit": asm_unit,
                         "seq": "unknown", "start": -1, "end": -1,
                         "overlap_pct": 0,
@@ -243,7 +280,7 @@ def process_gap_alnblock_table(file_path, flagger_file, nucfreq_file, gaps, chro
 
             else:
                 status_info = {
-                    "gap_id": gap_id,
+                    "gap_id": gap_id, "gap_length": gap_length,
                     "sample": sample, "asm_unit": asm_unit,
                     "seq": "unknown", "start": -1, "end": -1,
                     "overlap_pct": sub["overlap_pct"].sum(),
@@ -260,7 +297,7 @@ def process_gap_alnblock_table(file_path, flagger_file, nucfreq_file, gaps, chro
 def summarize_status(gap_table):
 
     thresholds = [101, 10, 1, 0.1]
-    labels = ["closed_at_any", "closed_at_pct-10", "closed_at_pct-1", "closed_at_pct-01"]
+    labels = ["closed_at_err_any", "closed_at_err_lst_10pct", "closed_at_err_lst_1pct", "closed_at_err_lst_01pct"]
     assert len(thresholds) == len(labels)
 
     summary = []
@@ -277,7 +314,7 @@ def summarize_status(gap_table):
             summary.append(
                 (
                     gap_id, gap_status["sample"].iloc[0], gap_status["asm_unit"].iloc[0],
-                    seqs, aln_label, "not_closed"
+                    seqs, aln_label, "not_closed", gap_status["gap_length"].iloc[0]
                 )
             )
             stats[aln_label] += 1
@@ -295,7 +332,8 @@ def summarize_status(gap_table):
                 summary.append(
                     (
                         gap_id, gap_status["sample"].iloc[0], gap_status["asm_unit"].iloc[0],
-                        gap_status["seq"].iloc[0], gap_status["align_status"].iloc[0], last_label
+                        gap_status["seq"].iloc[0], gap_status["align_status"].iloc[0], last_label,
+                        gap_status["gap_length"].iloc[0]
                     )
                 )
 
@@ -303,25 +341,58 @@ def summarize_status(gap_table):
                 summary.append(
                 (
                     gap_id, gap_status["sample"].iloc[0], gap_status["asm_unit"].iloc[0],
-                    gap_status["seq"].iloc[0], gap_status["align_status"].iloc[0], "not_closed"
+                    gap_status["seq"].iloc[0], gap_status["align_status"].iloc[0], "not_closed",
+                    gap_status["gap_length"].iloc[0]
                 )
             )
 
     summary = pd.DataFrame.from_records(
-        summary, columns=["gap_id", "sample", "asm_unit", "asm_seq", "aln_status", "stringency"]
+        summary, columns=["gap_id", "sample", "asm_unit", "asm_seq", "aln_status", "stringency", "gap_length"]
     )
 
     return summary
+
+
+def load_assembly_karyotype(karyotype, sample, assembly):
+
+    norm_karyo = {
+        "f": "female",
+        "female": "female",
+        "m": "male",
+        "male": "male",
+        "any": "any",
+        "unknown": "any",
+        "undefined": "any"
+    }
+    try:
+        assm_karyotype = norm_karyo[karyotype.lower()]
+    except KeyError:
+        karyotype_file = pl.Path(karyotype).resolve(strict=True)
+        karyotypes = pd.read_csv(karyotype_file, sep="\t", header=0, comment="#")
+        get_sample = karyotypes["sample"] == sample
+        get_assm = karyotypes["asm_unit"] == assembly
+        get_karyo = get_sample & get_assm
+        if not get_karyo.any():
+            sys.stderr.write(f"\nWARNING:\nNo karyotype found for {sample} / {assembly}, using 'any'...\n\n")
+            assm_karyotype = "any"
+        else:
+            assm_karyotype = karyotypes.loc[get_karyo, "karyotype"].iloc[0]
+            assert assm_karyotype in norm_karyo
+    return assm_karyotype
 
 
 def main():
 
     args = parse_command_line()
 
-    gaps, gap_stats = load_gap_ids(args.gap_file)
+    karyotype = load_assembly_karyotype(args.karyotype, args.sample, args.assembly)
+
+    gaps = load_gap_ids(args.gap_file, karyotype)
     chrom_assign = load_chrom_assign(args.chrom_assign)
 
     gap_table = process_gap_alnblock_table(
+        args.sample,
+        args.assembly,
         args.block_intersect,
         args.flagger_regions,
         args.nucfreq_regions,
@@ -331,16 +402,48 @@ def main():
 
     summary = summarize_status(gap_table)
     summary = gaps.merge(summary, on="gap_id", how="outer")
-    count_stats = summary.groupby(["chrom", "aln_status", "stringency"]).size().reset_index()
-    count_stats.rename({0: "count"}, inplace=True)
-    print(count_stats)
-    # count_stats.update(gap_stats)
-    # print(count_stats)
-    # print(summary.head())
+    chrom_count_stats = summary.groupby(["chrom", "aln_status", "stringency"]).size().reset_index()
+    chrom_count_stats.rename({0: "count"}, axis=1, inplace=True)
+    chrom_size_stats = summary.groupby(["chrom", "aln_status", "stringency"])["gap_length"].median().reset_index()
+    chrom_size_stats.rename({"gap_length": "median_gap_length"}, axis=1, inplace=True)
+    chrom_size_stats["median_gap_length"] = chrom_size_stats["median_gap_length"].round(0).astype(int)
+    chrom_count_stats = chrom_count_stats.merge(chrom_size_stats, on=["chrom", "aln_status", "stringency"], how="outer")
+
+    genome_count_stats = summary.groupby(["aln_status", "stringency"]).size().reset_index()
+    genome_count_stats.rename({0: "count"}, axis=1, inplace=True)
+    genome_size_stats = summary.groupby(["aln_status", "stringency"])["gap_length"].median().reset_index()
+    genome_size_stats.rename({"gap_length": "median_gap_length"}, axis=1, inplace=True)
+    genome_size_stats["median_gap_length"] = genome_size_stats["median_gap_length"].round(0).astype(int)
+    genome_count_stats = genome_count_stats.merge(genome_size_stats, on=["aln_status", "stringency"], how="outer")
+    genome_count_stats["chrom"] = "genome"
+
+    genome_stats = pd.concat([genome_count_stats, chrom_count_stats], axis=0, ignore_index=False)
+    genome_stats["sample"] = args.sample
+    genome_stats["asm_unit"] = args.assembly
+    genome_stats["sex"] = karyotype
+    genome_stats.sort_values(["chrom", "aln_status", "stringency"], inplace=True)
+    genome_stats = genome_stats[[
+        "sample", "asm_unit", "sex",
+        "chrom", "aln_status", "stringency",
+        "count", "median_gap_length"
+    ]].copy()
+
+    if args.out_summary is not None:
+        args.out_summary.parent.mkdir(exist_ok=True, parents=True)
+        genome_stats.to_csv(args.out_summary, sep="\t", header=True, index=False)
 
     gaps = gaps.merge(gap_table, on="gap_id")
+    gaps["sex"] = karyotype
+    gaps.sort_values(["chrom", "gap_start", "gap_end"], inplace=True)
+    gaps = gaps[[
+        "chrom", "gap_start", "gap_end", "gap_id", "gap_length",
+        "sample", "asm_unit", "sex", "seq", "start", "end", "overlap_pct",
+        "align_status", "flagger_bp", "flagger_pct", "nucfreq_bp", "nucfreq_pct"
+    ]].copy()
 
-
+    if args.out_table is not None:
+        args.out_table.parent.mkdir(exist_ok=True, parents=True)
+        gaps.to_csv(args.out_table, sep="\t", header=True, index=False)
 
     return 0
 

@@ -129,6 +129,10 @@ rule hprc_gaps_to_bed:
         import pandas as pd
         df = pd.read_csv(input.tsv, sep="\t", header=0)
         df.sort_values(["chrom", "start", "end"], inplace=True)
+        if (df["start"] == df["end"]).any():
+            # assume 1-based coordinates
+            df["start"] -= 1
+            assert (df["start"] >= 0).all()
         df.rename({"chrom": "#chrom"}, axis=1, inplace=True)
         df.to_csv(output.bed, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
@@ -260,6 +264,9 @@ rule split_normalized_flagger:
                 raise
 
         df["asm_unit"] = df["chrom"].apply(assign_unit)
+        # for gap / QC annotation, keep only labels that
+        # indicate any type of error
+        df = df.loc[df["name"] != "Hap", :].copy()
         df.rename({"chrom": "#contig"}, axis=1, inplace=True)
         hap1 = df.loc[df["asm_unit"] == "hap1", :].copy()
         hap1.to_csv(output.hap1, sep="\t", header=True, index=False)
@@ -270,6 +277,54 @@ rule split_normalized_flagger:
         un = df.loc[df["asm_unit"] == "unassigned", :].copy()
         un.to_csv(output.un, sep="\t", header=True, index=False)
     # END OR RUN BLOCK
+
+
+rule annotate_gaps_with_qc_info:
+    input:
+        gap = rules.hprc_gaps_to_bed.output.bed,
+        isect_table = rules.simplify_hprc_gap_intersection.output.tsv,
+        flagger = DIR_PROC.joinpath(
+            "regions", "gaps", "norm_tables",
+            "{sample}",
+            "{sample}.asm-{asm_unit}.flagger-regions.bed"
+        ),
+        nucfreq = DIR_PROC.joinpath(
+            "regions", "gaps", "norm_tables",
+            "{sample}",
+            "{sample}.asm-{asm_unit}.nucfreq.covann-filtered.bed"
+        ),
+        karyotypes = WORKDIR_EVAL.joinpath(
+            "results/reports/ref_chrom_assign",
+            "karyo-est.hgsvc3-verkko.tsv"
+        ),
+        chrom_assign = WORKDIR_EVAL.joinpath(
+            "results/reports/ref_chrom_assign",
+            "{sample}.asm-{asm_unit}.{refgenome}.chrom-assign-by-query.tsv"
+        )
+    output:
+        table = DIR_RES.joinpath(
+            "regions", "gaps", "annotated",
+            "{sample}",
+            "{sample}.asm-{asm_unit}.{refgenome}.hprc-gaps.details.tsv"
+        ),
+        summary = DIR_RES.joinpath(
+            "regions", "gaps", "annotated",
+            "{sample}",
+            "{sample}.asm-{asm_unit}.{refgenome}.hprc-gaps.summary.tsv"
+        )
+    conda:
+        DIR_ENVS.joinpath("pyseq.yaml")
+    resources:
+        mem_mb=lambda wildcards, attempt: 1024 * attempt
+    params:
+        script=DIR_SCRIPTS.joinpath("eval_gaps", "add_qc_info.py"),
+        asm_unit=lambda wildcards: f"asm-{wildcards.asm_unit}"
+    shell:
+        "{params.script} -g {input.gaps} -b {input.isect_table} "
+        "-f {input.flagger} -n {input.nucfreq} "
+        "-k {input.karyotypes} -c {input.chrom_assign} "
+        "-s {wildcards.sample} -a {params.asm_unit} "
+        "--out-table {output.table} --out-summary {output.summary}"
 
 
 
@@ -295,4 +350,10 @@ rule run_all_annotate_gaps:
         split_flag = expand(
             rules.split_normalized_flagger.output,
             sample=SAMPLES
+        ),
+        gap_summaries = expand(
+            rules.annotate_gaps_with_qc_info.output.summary,
+            sample=SAMPLES,
+            asm_unit=["hap1", "hap2"],
+            refgenome=["t2tv2"]
         )
