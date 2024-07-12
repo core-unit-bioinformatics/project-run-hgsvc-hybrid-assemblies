@@ -156,6 +156,9 @@ def summarize_regions(regions, contig, start, end):
         sub = regions.loc[selector, :].copy()
         first = sub.index[0]
         last = sub.index[-1]
+        # the following ensures that only the aligned
+        # region is considered and not flagged regions
+        # beyond its limits
         sub.loc[first, "start"] = max(start, sub.at[first, "start"])
         assert sub.at[first, "end"] > start
         sub.loc[last, "end"] = min(end, sub.at[last, "end"])
@@ -306,15 +309,21 @@ def summarize_status(gap_table):
     for gap_id, gap_status in gap_table.groupby("gap_id"):
         if gap_status.shape[0] > 1:
             if gap_status["align_status"].nunique() > 1:
-                raise RuntimeError(gap_status)
-            seqs = ";".join(sorted(gap_status["seq"].values))
-            aln_label = gap_status["align_status"].iloc[0]
-            if aln_label == "covered":
-                raise RuntimeError(gap_status)
+                if (gap_status["align_status"] == "covered").any():
+                    clean_status = gap_status.loc[gap_status["align_status"] == "covered", :].copy()
+                    assert clean_status.shape[0] == 1
+                else:
+                    raise RuntimeError(gap_status)
+            else:
+                clean_status = gap_status.copy()
+            seqs = ";".join(sorted(clean_status["seq"].values))
+            aln_label = clean_status["align_status"].iloc[0]
+            #if aln_label == "covered":
+            #    raise RuntimeError(gap_status)
             summary.append(
                 (
-                    gap_id, gap_status["sample"].iloc[0], gap_status["asm_unit"].iloc[0],
-                    seqs, aln_label, "not_closed", gap_status["gap_length"].iloc[0]
+                    gap_id, clean_status["sample"].iloc[0], clean_status["asm_unit"].iloc[0],
+                    seqs, aln_label, "not_closed", clean_status["gap_length"].iloc[0]
                 )
             )
             stats[aln_label] += 1
