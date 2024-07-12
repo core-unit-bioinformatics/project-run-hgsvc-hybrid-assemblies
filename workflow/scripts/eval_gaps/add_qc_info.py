@@ -318,6 +318,7 @@ def summarize_status(gap_table):
     assert len(thresholds) == len(labels)
 
     summary = []
+    # TODO: these count stats are discarded
     stats = col.Counter()
 
     for gap_id, gap_status in gap_table.groupby("gap_id"):
@@ -332,12 +333,21 @@ def summarize_status(gap_table):
                 clean_status = gap_status.copy()
             seqs = ";".join(sorted(clean_status["seq"].values))
             aln_label = clean_status["align_status"].iloc[0]
-            #if aln_label == "covered":
-            #    raise RuntimeError(gap_status)
+            if aln_label == "covered":
+                flagger_pct = clean_status["flagger_pct"].iloc[0]
+                nucfreq_pct = clean_status["nucfreq_pct"].iloc[0]
+
+                last_label = None
+                for t, l in zip(thresholds, labels):
+                    if flagger_pct < t and nucfreq_pct < t:
+                        stats[l] += 1
+                        last_label = l
+            else:
+                last_label = "not_closed"
             summary.append(
                 (
                     gap_id, clean_status["sample"].iloc[0], clean_status["asm_unit"].iloc[0],
-                    seqs, aln_label, "not_closed", clean_status["gap_length"].iloc[0]
+                    seqs, aln_label, last_label, clean_status["gap_length"].iloc[0]
                 )
             )
             stats[aln_label] += 1
@@ -370,7 +380,7 @@ def summarize_status(gap_table):
             )
 
     summary = pd.DataFrame.from_records(
-        summary, columns=["gap_id", "sample", "asm_unit", "asm_seq", "aln_status", "stringency", "gap_length"]
+        summary, columns=["gap_id", "sample", "asm_unit", "asm_seq", "aln_status", "max_stringency", "gap_length"]
     )
 
     return summary
@@ -425,29 +435,29 @@ def main():
 
     summary = summarize_status(gap_table)
     summary = gaps.merge(summary, on="gap_id", how="outer")
-    chrom_count_stats = summary.groupby(["chrom", "aln_status", "stringency"]).size().reset_index()
+    chrom_count_stats = summary.groupby(["chrom", "aln_status", "max_stringency"]).size().reset_index()
     chrom_count_stats.rename({0: "count"}, axis=1, inplace=True)
-    chrom_size_stats = summary.groupby(["chrom", "aln_status", "stringency"])["gap_length"].median().reset_index()
+    chrom_size_stats = summary.groupby(["chrom", "aln_status", "max_stringency"])["gap_length"].median().reset_index()
     chrom_size_stats.rename({"gap_length": "median_gap_length"}, axis=1, inplace=True)
     chrom_size_stats["median_gap_length"] = chrom_size_stats["median_gap_length"].round(0).astype(int)
-    chrom_count_stats = chrom_count_stats.merge(chrom_size_stats, on=["chrom", "aln_status", "stringency"], how="outer")
+    chrom_count_stats = chrom_count_stats.merge(chrom_size_stats, on=["chrom", "aln_status", "max_stringency"], how="outer")
 
-    genome_count_stats = summary.groupby(["aln_status", "stringency"]).size().reset_index()
+    genome_count_stats = summary.groupby(["aln_status", "max_stringency"]).size().reset_index()
     genome_count_stats.rename({0: "count"}, axis=1, inplace=True)
-    genome_size_stats = summary.groupby(["aln_status", "stringency"])["gap_length"].median().reset_index()
+    genome_size_stats = summary.groupby(["aln_status", "max_stringency"])["gap_length"].median().reset_index()
     genome_size_stats.rename({"gap_length": "median_gap_length"}, axis=1, inplace=True)
     genome_size_stats["median_gap_length"] = genome_size_stats["median_gap_length"].round(0).astype(int)
-    genome_count_stats = genome_count_stats.merge(genome_size_stats, on=["aln_status", "stringency"], how="outer")
+    genome_count_stats = genome_count_stats.merge(genome_size_stats, on=["aln_status", "max_stringency"], how="outer")
     genome_count_stats["chrom"] = "genome"
 
     genome_stats = pd.concat([genome_count_stats, chrom_count_stats], axis=0, ignore_index=False)
     genome_stats["sample"] = args.sample
     genome_stats["asm_unit"] = args.assembly
     genome_stats["sex"] = karyotype
-    genome_stats.sort_values(["chrom", "aln_status", "stringency"], inplace=True)
+    genome_stats.sort_values(["chrom", "aln_status", "max_stringency"], inplace=True)
     genome_stats = genome_stats[[
         "sample", "asm_unit", "sex",
-        "chrom", "aln_status", "stringency",
+        "chrom", "aln_status", "max_stringency",
         "count", "median_gap_length"
     ]].copy()
 
