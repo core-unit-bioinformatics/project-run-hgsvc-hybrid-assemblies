@@ -281,7 +281,7 @@ rule split_normalized_flagger:
 
 rule annotate_gaps_with_qc_info:
     input:
-        gap = rules.hprc_gaps_to_bed.output.bed,
+        gaps = rules.hprc_gaps_to_bed.output.bed,
         isect_table = rules.simplify_hprc_gap_intersection.output.tsv,
         flagger = DIR_PROC.joinpath(
             "regions", "gaps", "norm_tables",
