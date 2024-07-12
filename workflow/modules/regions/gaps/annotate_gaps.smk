@@ -327,6 +327,31 @@ rule annotate_gaps_with_qc_info:
         "--out-table {output.table} --out-summary {output.summary}"
 
 
+localrules: merge_hprc_gap_summaries
+rule merge_hprc_gap_summaries:
+    input:
+        summaries = expand(
+            rules.annotate_gaps_with_qc_info.output.summary,
+            sample=SAMPLES,
+            allow_missing=True
+        )
+    output:
+        summary = DIR_RES.joinpath(
+            "regions", "gaps", "summary",
+            "SAMPLES.vrk-ps-sseq.{refgenome}.hprc-gaps.summary.tsv"
+        )
+    run:
+        import pandas as pd
+
+        merged = pd.concat([
+            pd.read_csv(summary_file, sep="\t", header=0)
+            for summary_file in input.summaries
+        ], axis=0, ignore_index=False)
+
+        merged.sort_values(["sample", "asm_unit", "stringency"], inplace=True)
+        merged.to_csv(output.summary, sep="\t", header=True, index=False)
+    # END OF RUN BLOCK
+
 
 rule run_all_annotate_gaps:
     input:
@@ -355,5 +380,9 @@ rule run_all_annotate_gaps:
             rules.annotate_gaps_with_qc_info.output.summary,
             sample=SAMPLES,
             asm_unit=["hap1", "hap2"],
+            refgenome=["t2tv2"]
+        ),
+        mrg_summary = expand(
+            rules.merge_hprc_gap_summaries.output.summary,
             refgenome=["t2tv2"]
         )
