@@ -256,7 +256,14 @@ def process_gap_alnblock_table(sample, asm_unit, file_path, flagger_file, nucfre
                     if row.aln_label != "ALN":
                         continue
                     ctg, start, end = split_aln_context(row.aln_info)
-                    ctg_chrom = chrom_assign[ctg]
+                    try:
+                        ctg_chrom = chrom_assign[ctg]
+                    except KeyError:
+                        # example case: NA19347.vrk-ps-sseq // haplotype1-0000060
+                        # a ~16 kbp sequence that only aligns with MAPQ 0 and is
+                        # hence disregarded for the chromosome assignment
+                        # --- assume this to be the standard case and skip this
+                        continue
                     if ctg_chrom != gap_chrom:
                         continue
                     flagger_summary = summarize_regions(flagger, ctg, start, end)
