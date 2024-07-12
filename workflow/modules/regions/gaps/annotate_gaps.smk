@@ -349,7 +349,7 @@ rule merge_hprc_gap_summaries:
             for summary_file in input.summaries
         ], axis=0, ignore_index=False)
 
-        merged.sort_values(["sample", "asm_unit", "chrom", "stringency"], inplace=True)
+        merged.sort_values(["sample", "asm_unit", "chrom", "max_stringency"], inplace=True)
         merged.to_csv(output.summary, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
 
