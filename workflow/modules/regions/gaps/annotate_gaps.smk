@@ -333,6 +333,7 @@ rule merge_hprc_gap_summaries:
         summaries = expand(
             rules.annotate_gaps_with_qc_info.output.summary,
             sample=SAMPLES,
+            asm_unit=["hap1", "hap2"],
             allow_missing=True
         )
     output:
