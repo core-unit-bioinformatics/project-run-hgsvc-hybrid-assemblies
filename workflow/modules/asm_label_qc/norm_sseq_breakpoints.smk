@@ -47,6 +47,7 @@ rule translate_hpc_breakpoint_coordinates:
         mem_mb=lambda wildcards, attempt: 1024 * attempt
     run:
         import pandas as pd
+        import pandas.errors as pderr
         import pathlib as pl
         import io
 
@@ -55,8 +56,9 @@ rule translate_hpc_breakpoint_coordinates:
             "unitig", "hpc_start", "hpc_end"
         ]
 
-        df = pd.read_csv(input.tsv, sep="\t", header=0)
-        if df.empty:
+        try:
+            df = pd.read_csv(input.tsv, sep="\t", header=0)
+        except pderr.EmptyDataError:
             buffer = io.StringIO()
             buffer.write("\t".join(out_columns) + "\n")
             with open(input.gsize) as listing:
