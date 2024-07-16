@@ -82,21 +82,31 @@ rule translate_hpc_breakpoint_coordinates:
                 selector = select_tig & select_start & select_end
                 if not selector.any():
                     raise RuntimeError(f"No coord mapping for {wildcards.sample} / {row}")
-                cmap_sub = cmap.loc[selector, :]
-                assert cmap_sub.shape[0] == 1
+                cmap_sub = cmap.loc[selector, :].copy().sort_values("query_start", inplace=False)
+                assert cmap_sub.shape[0] < 3
                 # assume breakpoint is always somewhere "in the middle"
                 # of the contig and the graph-to-linear alignment is surrounding
-                # this location. Hence, the coordinates in cmap should
+                # this location. Hence, the coordinates in cmap_sub should
                 # be smaller/larger
-                # --- larger minus smaller
-                offset_start = row.start_hpc - cmap_sub["query_start"].iloc[0]
-                assert offset_start >= 0
-                # --- larger minus smaller
-                offset_end = cmap_sub["query_end"].iloc[0] - row.end_hpc
-                assert offset_end >= 0
+                if cmap_sub.shape[0] == 2:
+                    # spanning a "non-alignment" break --- annoying ...
+                    offset_start = row.start_hpc - cmap_sub["query_start"].iloc[0]
+                    assert offset_start >= 0
+                    offset_end = cmap_sub["query_end"].iloc[1] - row.end_hpc
+                    assert offset_end >= 0
 
-                expanded_start = cmap_sub["target_start_plain"].iloc[0] + offset_start
-                expanded_end = cmap_sub["target_end_plain"].iloc[0] - offset_end
+                    expanded_start = cmap_sub["target_start_plain"].iloc[0] + offset_start
+                    expanded_end = cmap_sub["target_end_plain"].iloc[1] - offset_end
+                else:
+                    # --- larger minus smaller
+                    offset_start = row.start_hpc - cmap_sub["query_start"].iloc[0]
+                    assert offset_start >= 0
+                    # --- larger minus smaller
+                    offset_end = cmap_sub["query_end"].iloc[0] - row.end_hpc
+                    assert offset_end >= 0
+
+                    expanded_start = cmap_sub["target_start_plain"].iloc[0] + offset_start
+                    expanded_end = cmap_sub["target_end_plain"].iloc[0] - offset_end
                 assert expanded_start < expanded_end
                 out_bed.append(
                     (
