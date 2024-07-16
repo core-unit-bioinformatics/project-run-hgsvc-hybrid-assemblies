@@ -89,14 +89,24 @@ rule translate_hpc_breakpoint_coordinates:
                 # this location. Hence, the coordinates in cmap_sub should
                 # be smaller/larger
                 if cmap_sub.shape[0] == 2:
-                    # spanning a "non-alignment" break --- annoying ...
+                    # spanning a "non-alignment" break --- annoying, now
+                    # need to consider alignment orientation as well
+                    # to select correct "target_N_plain" coordinate
+                    if (cmap_sub["align_orient"] > 0).all():
+                        start_index = 0
+                        end_index = 1
+                    elif (cmap_sub["align_orient"] < 0).all():
+                        start_index = 1
+                        end_index = 0
+                    else:
+                        raise ValueError(cmap_sub)
                     offset_start = row.start_hpc - cmap_sub["query_start"].iloc[0]
                     assert offset_start >= 0
                     offset_end = cmap_sub["query_end"].iloc[1] - row.end_hpc
                     assert offset_end >= 0
 
-                    expanded_start = cmap_sub["target_start_plain"].iloc[0] + offset_start
-                    expanded_end = cmap_sub["target_end_plain"].iloc[1] - offset_end
+                    expanded_start = cmap_sub["target_start_plain"].iloc[start_index] + offset_start
+                    expanded_end = cmap_sub["target_end_plain"].iloc[end_index] - offset_end
                 else:
                     # --- larger minus smaller
                     offset_start = row.start_hpc - cmap_sub["query_start"].iloc[0]
