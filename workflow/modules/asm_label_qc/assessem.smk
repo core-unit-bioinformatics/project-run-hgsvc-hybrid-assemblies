@@ -27,7 +27,8 @@ rule prepare_region_cache:
             "{sample}.nucfreq-flagged.bed.gz"
         ),
         sd95 = rules.split_segdup_annotation.output.sd95,
-        sd98 = rules.split_segdup_annotation.output.sd98
+        sd98 = rules.split_segdup_annotation.output.sd98,
+        sseqbrkp = rules.translate_hpc_breakpoint_coordinates.output.bed
     output:
         hdf = DIR_RES.joinpath(
             "asm_label_qc", "region_cache",
@@ -95,5 +96,5 @@ rule run_all_assessem_jobs:
         embeds = expand(
             rules.compute_embedding.output,
             sample=SAMPLES,
-            bin_size=["100k", "20k", "10k", "5k", "1k", "100"]
+            bin_size=["20k", "10k", "5k", "1k", "100"]
         )

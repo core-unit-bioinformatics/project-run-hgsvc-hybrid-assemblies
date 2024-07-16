@@ -68,6 +68,9 @@ def get_assessem_cli_parameters(input_files, get_list):
         elif file_name.endswith(".sd-098.tsv.gz"):
             track_labels.append("sd98")
             score_columns.append("binary")
+        elif file_name.endswith("sseq-switch-breaks.bed"):
+            track_labels.append("sseqbrkp")
+            score_columns.append("score")
         else:
             raise ValueError(f"Cannot process filename: {file_name}")
     if get_list == "files":
