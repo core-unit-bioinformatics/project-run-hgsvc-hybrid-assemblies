@@ -74,7 +74,7 @@ rule translate_hpc_breakpoint_coordinates:
             cmap = cmap.loc[cmap["query_name"].isin(df["unitig"].unique()), :].copy()
             cmap = cmap.loc[cmap["tp_align_type"] != 2, :].copy()
 
-            output = []
+            out_bed = []
             for row in df.itertuples():
                 select_tig = cmap["query_name"] == row.unitig
                 select_start = row.start_hpc < cmap["query_end"]
@@ -89,26 +89,26 @@ rule translate_hpc_breakpoint_coordinates:
                 # this location. Hence, the coordinates in cmap should
                 # be smaller/larger
                 # --- larger minus smaller
-                offset_start = row.start_hpc - cmap_sub["query_start"]
+                offset_start = row.start_hpc - cmap_sub["query_start"].iloc[0]
                 assert offset_start >= 0
                 # --- larger minus smaller
-                offset_end = cmap_sub["query_end"] - row.end_hpc
+                offset_end = cmap_sub["query_end"].iloc[0] - row.end_hpc
                 assert offset_end >= 0
 
-                expanded_start = cmap_sub["target_start_plain"] + offset_start
-                expanded_end = cmap_sub["target_end_plain"] - offset_end
-                assert expanded_start > expanded_end
-                output.append(
+                expanded_start = cmap_sub["target_start_plain"].iloc[0] + offset_start
+                expanded_end = cmap_sub["target_end_plain"].iloc[0] - offset_end
+                assert expanded_start < expanded_end
+                out_bed.append(
                     (
                         cmap_sub["target_name"].iloc[0], expanded_start, expanded_end,
                         "SSEQBRKP", 1, row.unitig, row.start_hpc, row.end_hpc
                     )
                 )
-            output = pd.DataFrame.from_records(
-                output, columns=out_columns
+            out_bed = pd.DataFrame.from_records(
+                out_bed, columns=out_columns
             )
 
-            output.to_csv(output.bed, sep="\t", header=True, index=False)
+            out_bed.to_csv(output.bed, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
 
 
