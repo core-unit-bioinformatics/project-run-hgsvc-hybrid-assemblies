@@ -35,7 +35,7 @@ rule translate_hpc_breakpoint_coordinates:
             "results/assemblies/verkko",
             f"{wildcards.sample.split('.')[0]}.ps-sseq",
             "aux",
-            f"{wildcards.sample.split('.')[0]}.graph-linear-hpc-map.tsv.gz"
+            f"{wildcards.sample.split('.')[0]}.ps-sseq.graph-linear-hpc-map.tsv.gz"
         ),
         gsize = rules.prep_verkko_fasta_index.output.sizes
     output:
