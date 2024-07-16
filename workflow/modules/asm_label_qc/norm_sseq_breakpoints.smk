@@ -71,7 +71,7 @@ rule translate_hpc_breakpoint_coordinates:
                 pass
         else:
             cmap = pd.read_csv(input.cmap, sep="\t", header=0)
-            cmap = cmap.loc[cmap["target_name"].isin(df["unitig"].unique()), :].copy()
+            cmap = cmap.loc[cmap["query_name"].isin(df["unitig"].unique()), :].copy()
             cmap = cmap.loc[cmap["tp_align_type"] != 2, :].copy()
 
             output = []
