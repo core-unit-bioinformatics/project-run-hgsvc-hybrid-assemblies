@@ -23,7 +23,7 @@ rule split_breakpoints_by_sample:
                 pass
         else:
             df.sort_values(["unitig", "start_hpc", "end_hpc"], inplace=True)
-            df.to_csv(output.tsv, sep="\t", header=True)
+            df.to_csv(output.tsv, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
 
 
@@ -82,7 +82,7 @@ rule translate_hpc_breakpoint_coordinates:
                 selector = select_tig & select_start & select_end
                 if not selector.any():
                     raise RuntimeError(f"No coord mapping for {wildcards.sample} / {row}")
-                cmap_sub = cmap.loc[selector]
+                cmap_sub = cmap.loc[selector, :]
                 assert cmap_sub.shape[0] == 1
                 # assume breakpoint is always somewhere "in the middle"
                 # of the contig and the graph-to-linear alignment is surrounding
