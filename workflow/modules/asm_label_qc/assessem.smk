@@ -98,5 +98,5 @@ rule run_all_assessem_jobs:
         embeds = expand(
             rules.compute_embedding.output,
             sample=SAMPLES,
-            bin_size=["20k", "10k", "5k", "1k", "100"]
+            bin_size=["10k", "5k", "1k", "100"]
         )
