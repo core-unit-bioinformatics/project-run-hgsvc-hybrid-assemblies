@@ -40,12 +40,39 @@ rule split_centromere_annotation:
         df.sort_values(["sample", "seq", "start", "end"], inplace=True)
         df.rename({"seq": "#seq"}, axis=1, inplace=True)
 
+        ann_samples = set()
         for sample, cens in df.groupby("sample"):
             out_file = DIR_RES.joinpath(
                 "asm_label_qc", "norm_tables", "centromeres",
                 f"{sample}.active_asat_HOR_arrays_v3.bed"
             )
             cens.to_csv(out_file, sep="\t", header=True, index=False)
+            ann_samples.add(sample)
+
+        remain = SAMPLES - ann_samples
+        if remain:
+            for sample in sorted(remain):
+                gsize = DIR_PROC.joinpath(
+                    "asm_label_qc", "assembly_size",
+                    f"{sample}.sizes.txt"
+                ).resolve(strict=True)
+                mock = pd.read_csv(gsize, sep="\t", header=None, names=["seq", "end"])
+                mock["start"] = 0
+                mock["score"] = 0
+                mock["chrom"] = "chrUN"
+                mock["sample"] = sample
+                mock["strand"] = "."
+                mock.rename({"seq": "#seq"}, axis=1, inplace=True)
+                mock = mock[["#seq", "start", "end", "chrom", "score", "strand", "sample"]]
+                mock.sort_values(["#seq", "start", "end"], inplace=True)
+                out_file = DIR_RES.joinpath(
+                    "asm_label_qc", "norm_tables", "centromeres",
+                    f"{sample}.active_asat_HOR_arrays_v3.bed"
+                )
+                mock.to_csv(out_file, sep="\t", header=True, index=False)
+                mock_file = out_file.with_suffix(".bed.MOCK")
+                with open(mock_file, "w"):
+                    pass
     # END OF RUN BLOCK
 
 
