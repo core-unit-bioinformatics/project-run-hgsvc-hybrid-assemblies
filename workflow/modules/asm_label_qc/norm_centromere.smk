@@ -29,7 +29,7 @@ rule split_centromere_annotation:
         def assign_assembler(seq):
             if any(x in seq for x in ["h1tg", "h2tg"]):
                 return ".hsm-ps-sseq"
-            elif any(x in seq for x in ["haplotype1", "haplotype2"]):
+            elif any(x in seq for x in ["haplotype1", "haplotype2", "unassigned"]):
                 return ".vrk-ps-sseq"
             else:
                 raise ValueError(seq)
