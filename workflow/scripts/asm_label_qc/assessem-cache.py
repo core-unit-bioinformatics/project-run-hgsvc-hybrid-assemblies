@@ -249,9 +249,17 @@ def prepare_track_file_regions(track_file, score_column, offset_map, cat_thresho
     regions["end"] += regions["coord_offset"]
     regions = regions[["start", "end", "score"]].copy()
 
-    uniq_scores = regions["score"].unique().size
+    uniq_scores = regions["score"].unique()
+    if uniq_scores.min() == 0:
+        # the annotations will be converted into
+        # numpy arrays w/ a default of 0, hence
+        # zero values should be ignored when determining
+        # the score type
+        uniq_scores = uniq_scores.size - 1
+    else:
+        uniq_scores = uniq_scores.size
 
-    if uniq_scores < 3:
+    if uniq_scores < 2:
         score_type = "binary"
     elif uniq_scores < cat_threshold:
         score_type = "categorical"

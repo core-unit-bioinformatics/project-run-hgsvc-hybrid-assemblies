@@ -28,8 +28,9 @@ rule prepare_region_cache:
         cen = DIR_RES.joinpath(
             "asm_label_qc", "norm_tables", "centromeres",
             "{sample}.active_asat_HOR_arrays_v3.bed"
-        )
-        #sseqbrkp = rules.translate_hpc_breakpoint_coordinates.output.bed
+        ),
+        sseqbrkp = rules.translate_hpc_breakpoint_coordinates.output.bed,
+        busco = rules.normalize_busco_issue_annotation.output.bed
     output:
         hdf = DIR_RES.joinpath(
             "asm_label_qc", "region_cache",
