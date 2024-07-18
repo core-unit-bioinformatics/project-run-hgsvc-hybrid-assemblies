@@ -59,9 +59,9 @@ def get_assessem_cli_parameters(input_files, get_list):
             mapq = parts[-4]
             track_labels.append(f"rd_{read_type}_{mapq}")
             score_columns.append("cov")
-        elif file_name.endswith(".nucfreq-flagged.bed.gz"):
+        elif file_name.endswith(".nucfreq-cov-bin.bed.gz"):
             track_labels.append("nucfreq")
-            score_columns.append("num_hets")
+            score_columns.append("score")
         elif file_name.endswith(".sd-095.tsv.gz"):
             track_labels.append("sd95")
             score_columns.append("binary")
@@ -70,6 +70,9 @@ def get_assessem_cli_parameters(input_files, get_list):
             score_columns.append("binary")
         elif file_name.endswith("sseq-switch-breaks.bed"):
             track_labels.append("sseqbrkp")
+            score_columns.append("score")
+        elif file_name.endswith("active_asat_HOR_arrays_v2.bed"):
+            track_labels.append("centro")
             score_columns.append("score")
         else:
             raise ValueError(f"Cannot process filename: {file_name}")

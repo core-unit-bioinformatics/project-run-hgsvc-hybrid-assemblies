@@ -22,13 +22,14 @@ rule prepare_region_cache:
         ont_mq60 = DIR_RES.joinpath("asm_label_qc", "norm_tables", "read_depth",
             "{sample}.ont.mq60.mosdepth-windowed.tsv.gz"
         ),
-        nucfreq = WORKDIR_EVAL.joinpath(
-            "results/regions/{sample}",
-            "{sample}.nucfreq-flagged.bed.gz"
-        ),
+        nucfreq = rules.bin_nucfreq_regions_by_coverage.output.bed,
         sd95 = rules.split_segdup_annotation.output.sd95,
         sd98 = rules.split_segdup_annotation.output.sd98,
-        sseqbrkp = rules.translate_hpc_breakpoint_coordinates.output.bed
+        cen = DIR_RES.joinpath(
+            "asm_label_qc", "norm_tables", "centromeres",
+            "{sample}.active_asat_HOR_arrays_v2.bed"
+        )
+        #sseqbrkp = rules.translate_hpc_breakpoint_coordinates.output.bed
     output:
         hdf = DIR_RES.joinpath(
             "asm_label_qc", "region_cache",

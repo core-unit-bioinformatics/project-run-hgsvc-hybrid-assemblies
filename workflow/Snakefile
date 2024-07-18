@@ -17,6 +17,8 @@ include: "modules/asm_label_qc/norm_merqury.smk"
 include: "modules/asm_label_qc/norm_read_depth.smk"
 include: "modules/asm_label_qc/norm_segdups.smk"
 include: "modules/asm_label_qc/norm_sseq_breakpoints.smk"
+include: "modules/asm_label_qc/norm_centromere.smk"
+include: "modules/asm_label_qc/norm_nucfreq.smk"
 include: "modules/asm_label_qc/assessem.smk"
 
 include: "modules/coverage/contig_cov.smk"
