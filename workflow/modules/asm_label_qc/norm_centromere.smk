@@ -49,7 +49,7 @@ rule split_centromere_annotation:
             cens.to_csv(out_file, sep="\t", header=True, index=False)
             ann_samples.add(sample)
 
-        remain = SAMPLES - ann_samples
+        remain = set(SAMPLES) - ann_samples
         if remain:
             for sample in sorted(remain):
                 gsize = DIR_PROC.joinpath(
