@@ -109,11 +109,11 @@ def get_assessem_mem(bin_size):
     num_bin_size = binsize_to_int(bin_size)
 
     if num_bin_size > int(5e4):
-        mem_est = 8192
+        mem_est = 16384
     elif num_bin_size > int(9e3):
-        mem_est = 12288
-    elif num_bin_size > int(5e2):
         mem_est = 24576
+    elif num_bin_size > int(5e2):
+        mem_est = 32768
     else:
         mem_est = 65536
     return mem_est
@@ -124,9 +124,9 @@ def get_assessem_hrs(bin_size):
     num_bin_size = binsize_to_int(bin_size)
 
     if num_bin_size > int(5e4):
-        hrs_est = 4
+        hrs_est = 6
     elif num_bin_size > int(9e3):
-        hrs_est = 24
+        hrs_est = 36
     else:
         hrs_est = 48
     return hrs_est
