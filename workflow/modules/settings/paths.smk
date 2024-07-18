@@ -38,12 +38,12 @@ SEGDUP_ROOT_FOLDER.resolve(strict=True)
 
 CENTROMERE_ANNOTATION = BASE_SHARE_LOCATION.joinpath(
     "ebi_upload/20230926_assembly_annotations/cen_coords",
-    "hgsvc3_verkko_v1.4.1_hifiasm_v0.19.6_nonredundant_complete_and_accurate_active_asat_HOR_arrays_v2.list"
+    "hgsvc3_verkko_v1.4.1_hifiasm_v0.19.6_nonredundant_complete_and_accurate_active_asat_HOR_arrays_v3.list"
 ).resolve(strict=True)
 
 CENREGION_ANNOTATION = BASE_SHARE_LOCATION.joinpath(
     "ebi_upload/20230926_assembly_annotations/cen_coords",
-    "hgsvc3_verkko_v1.4.1_hifiasm_v0.19.6_nonredundant_complete_and_accurate_centromeric_regions_v2.list"
+    "hgsvc3_verkko_v1.4.1_hifiasm_v0.19.6_nonredundant_complete_and_accurate_centromeric_regions_v3.list"
 ).resolve(strict=True)
 
 # project repo
