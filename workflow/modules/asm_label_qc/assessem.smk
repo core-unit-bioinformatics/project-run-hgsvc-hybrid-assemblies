@@ -27,7 +27,7 @@ rule prepare_region_cache:
         sd98 = rules.split_segdup_annotation.output.sd98,
         cen = DIR_RES.joinpath(
             "asm_label_qc", "norm_tables", "centromeres",
-            "{sample}.active_asat_HOR_arrays_v2.bed"
+            "{sample}.active_asat_HOR_arrays_v3.bed"
         )
         #sseqbrkp = rules.translate_hpc_breakpoint_coordinates.output.bed
     output:
