@@ -11,7 +11,7 @@ rule normalize_busco_issue_annotation:
             "asm_label_qc", "norm_tables", "busco",
             "{sample}.busco-issues.bed"
         )
-    shell:
+    run:
         import pandas as pd
         df = pd.read_csv(input.bed, sep="\t", header=0)
         df.drop("gene", axis=1, inplace=True)
