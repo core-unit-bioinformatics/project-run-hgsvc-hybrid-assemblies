@@ -7,7 +7,7 @@ rule split_centromere_annotation:
         beds = expand(
             DIR_RES.joinpath(
                 "asm_label_qc", "norm_tables", "centromeres",
-                "{sample}.active_asat_HOR_arrays_v2.bed"
+                "{sample}.active_asat_HOR_arrays_v3.bed"
             ),
             sample=SAMPLES
         )
@@ -43,7 +43,7 @@ rule split_centromere_annotation:
         for sample, cens in df.groupby("sample"):
             out_file = DIR_RES.joinpath(
                 "asm_label_qc", "norm_tables", "centromeres",
-                f"{sample}.active_asat_HOR_arrays_v2.bed"
+                f"{sample}.active_asat_HOR_arrays_v3.bed"
             )
             cens.to_csv(out_file, sep="\t", header=True, index=False)
     # END OF RUN BLOCK

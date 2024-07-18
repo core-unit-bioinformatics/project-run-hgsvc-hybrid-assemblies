@@ -71,7 +71,7 @@ def get_assessem_cli_parameters(input_files, get_list):
         elif file_name.endswith("sseq-switch-breaks.bed"):
             track_labels.append("sseqbrkp")
             score_columns.append("score")
-        elif file_name.endswith("active_asat_HOR_arrays_v2.bed"):
+        elif file_name.endswith("active_asat_HOR_arrays_v3.bed"):
             track_labels.append("centro")
             score_columns.append("score")
         else:
