@@ -1,4 +1,5 @@
 
+localrules: split_centromere_annotation
 rule split_centromere_annotation:
     input:
         listing = CENTROMERE_ANNOTATION
@@ -21,7 +22,7 @@ rule split_centromere_annotation:
             end = int(end)
             assert start < end
             return seq, start, end
-        seqs = df["seq_loc"].apply()
+        seqs = df["seq_loc"].apply(get_seq)
         seqs = pd.DataFrame.from_records(seqs, index=df.index, columns=["seq", "start", "end"])
         df = df.join(seqs)
         df.drop("seq_loc", axis=1, inplace=True)
