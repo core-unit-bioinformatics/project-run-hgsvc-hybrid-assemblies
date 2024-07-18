@@ -12,10 +12,10 @@ rule bin_nucfreq_regions_by_coverage:
         )
     run:
         import pandas as pd
+        import sys
 
         df = pd.read_csv(input.bed, sep="\t", header=0)
-        max_cov = df["hifi_pct_median_cov"].max()
-        bins = [0, 50, 90, 110, 150, 200, max_cov + 1]
+        bins = [0, 50, 90, 110, 150, 200, sys.maxsize]
         df["score"] = pd.cut(
             df["hifi_pct_median_cov"].values,
             bins, right=False, include_lowest=True,
