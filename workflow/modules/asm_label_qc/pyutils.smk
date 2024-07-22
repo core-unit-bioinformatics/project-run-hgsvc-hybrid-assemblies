@@ -115,7 +115,7 @@ def get_assessem_mem(bin_size):
     elif num_bin_size > int(5e2):
         mem_est = 32768
     else:
-        mem_est = 65536
+        mem_est = 163840
     return mem_est
 
 
