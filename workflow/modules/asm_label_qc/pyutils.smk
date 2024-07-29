@@ -145,7 +145,7 @@ def determine_embed_feature_set(wildcard_fset):
     defined_sets = {
         "full": None,
         "no-mq0": "rd_hifi_mq00 rd_ont_mq00",
-        "no-rd", "rd_hifi_mq00 rd_hifi_mq60 rd_ont_mq00 rd_ont_mq60",
+        "no-rd": "rd_hifi_mq00 rd_hifi_mq60 rd_ont_mq00 rd_ont_mq60"
     }
 
     feature_set = defined_sets[wildcard_fset]
