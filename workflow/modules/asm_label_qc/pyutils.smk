@@ -130,3 +130,25 @@ def get_assessem_hrs(bin_size):
     else:
         hrs_est = 48
     return hrs_est
+
+
+def determine_embed_feature_set(wildcard_fset):
+    """Known features for embedding:
+    busco, centro, flagger, inspect_hifi, inspect_ont, merqury,
+    nucfreq, rd_hifi_mq00, rd_hifi_mq60, rd_ont_mq00, rd_ont_mq60,
+    sd95, sd98, sseqbrkp
+    """
+
+    param_setting = ""
+
+    param_name = "--skip-features"
+    defined_sets = {
+        "full": None,
+        "no-mq0": "rd_hifi_mq00 rd_ont_mq00",
+        "no-rd", "rd_hifi_mq00 rd_hifi_mq60 rd_ont_mq00 rd_ont_mq60",
+    }
+
+    feature_set = defined_sets[wildcard_fset]
+    if feature_set is not None:
+        param_setting = f"{param_name} {feature_set}"
+    return feature_set

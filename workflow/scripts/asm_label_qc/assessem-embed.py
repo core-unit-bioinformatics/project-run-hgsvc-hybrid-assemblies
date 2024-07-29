@@ -48,6 +48,25 @@ def parse_command_line():
     )
 
     parser.add_argument(
+        "--skip-features", "-sf",
+        type=str,
+        nargs="*",
+        dest="skip_features",
+        default=None,
+        help="Space-separated list of features to omit from embedding."
+    )
+
+    parser.add_argument(
+        "--use-features", "-uf",
+        type=str,
+        nargs="*",
+        dest="use_features",
+        default=None,
+        help="Space-separated list of features to use for embedding."
+    )
+
+
+    parser.add_argument(
         "--verbose", "-vb",
         action="store_true",
         default=False,
@@ -143,13 +162,41 @@ def load_cached_track_data(data_cache, track_info, genome_size, bin_size, blunt_
     return data
 
 
-def build_dataset(data_cache, bin_size, timer):
+def build_final_data_track_list(track_labels, select_tracks, skip_tracks):
+
+    if select_tracks is None and skip_tracks is None:
+        keep_tracks = sorted(track_labels)
+    elif select_tracks is None:
+        # skip tracks contains labels
+        assert all(label in track_labels for label in skip_tracks), f"Unknown track label: {skip_tracks}"
+        keep_tracks = sorted(track_labels - set(skip_tracks))
+    elif skip_tracks is None:
+        # select tracks contains labels
+        assert all(label in track_labels for label in select_tracks), f"Unknown track label: {select_tracks}"
+    else:
+        # user wants to be funny
+        info_msg = (
+            "You specified both track labels to select and track "
+            "labels to omit for the embedding process. That is "
+            "illogical and only the 'select' labels will be honored "
+            f"in the following: {select_tracks}"
+        )
+        sys.stderr.write(f"\n{info_msg}\n")
+        keep_tracks = sorted(select_tracks)
+    return keep_tracks
+
+
+def build_dataset(data_cache, bin_size, select_tracks, skip_tracks, timer):
 
     genome_size, _ = load_cached_genome_infos(data_cache)
     num_bins = genome_size // bin_size
     blunt_end = num_bins * bin_size
 
-    track_infos, _ = load_cached_track_infos(data_cache)
+    track_infos, track_labels = load_cached_track_infos(data_cache)
+
+    use_track_labels = build_final_data_track_list(track_labels, select_tracks, skip_tracks)
+    track_infos = track_infos.loc[use_track_labels, :].copy()
+
     num_tracks = track_infos.shape[0]
 
     num_tracks = len(track_infos)
@@ -199,7 +246,11 @@ def main():
     timer["assessem-embed"] = ["Total runtime", timeit.default_timer(), None, None]
     args = parse_command_line()
 
-    dataset = build_dataset(args.data_cache, args.bin_size, timer)
+    dataset = build_dataset(
+        args.data_cache, args.bin_size,
+        args.use_features, args.skip_features,
+        timer
+    )
     args.binned_data.parent.mkdir(exist_ok=True, parents=True)
     #dataset.to_feather(args.binned_data, compression='lz4')
     dataset.to_csv(args.binned_data, sep="\t", header=True, index=False)

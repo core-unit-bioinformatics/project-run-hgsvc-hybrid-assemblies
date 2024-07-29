@@ -82,14 +82,20 @@ rule compute_embedding:
         time_hrs=lambda wildcards, attempt: get_assessem_hrs(wildcards.bin_size) * attempt,
     params:
         script=DIR_SCRIPTS.joinpath("asm_label_qc", "assessem-embed.py"),
-        bin_size=lambda wildcards: binsize_to_int(wildcards.bin_size)
+        bin_size=lambda wildcards: binsize_to_int(wildcards.bin_size),
+        fset=lambda wildcards: determine_embed_feature_set(wildcards.feature_set)
     shell:
         "{params.script} --verbose --data-cache {input.cache} "
-        "--bin-size {params.bin_size} --out-binned {output.dataset} "
-        "--out-trans {output.embed} > {log}"
+        "--bin-size {params.bin_size} {params.fset} "
+        "--out-binned {output.dataset} --out-trans {output.embed} > {log}"
 
 
 rule run_all_assessem_jobs:
+    # note: a binning resolution of 100 bp
+    # can be handled wrt memory (200+ GB but feasible)
+    # but requires too much runtime to finish (failed w/ 96 hrs)
+    # Hence, drop the 100 bp and compensate by selectively
+    # excluding the read depth features from the embedding
     input:
         cache = expand(
             rules.prepare_region_cache.output.hdf,
@@ -98,5 +104,6 @@ rule run_all_assessem_jobs:
         embeds = expand(
             rules.compute_embedding.output,
             sample=SAMPLES,
-            bin_size=["10k", "5k", "1k", "100"]
+            bin_size=["10k", "1k"],
+            feature_set=["full", "no-mq0", "no-rd"]
         )
