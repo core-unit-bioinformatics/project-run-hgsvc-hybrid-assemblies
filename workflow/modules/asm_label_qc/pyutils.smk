@@ -151,4 +151,4 @@ def determine_embed_feature_set(wildcard_fset):
     feature_set = defined_sets[wildcard_fset]
     if feature_set is not None:
         param_setting = f"{param_name} {feature_set}"
-    return feature_set
+    return param_setting
