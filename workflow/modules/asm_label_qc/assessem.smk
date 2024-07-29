@@ -61,19 +61,19 @@ rule compute_embedding:
     output:
         embed = DIR_RES.joinpath(
             "asm_label_qc", "embedding",
-            "{sample}.{bin_size}.embed-dataset.npy"
+            "{sample}.{bin_size}.{feature_set}.embed-dataset.npy"
         ),
         dataset = DIR_RES.joinpath(
             "asm_label_qc", "embedding",
-            "{sample}.{bin_size}.binned-dataset.tsv.gz"
+            "{sample}.{bin_size}.{feature_set}.binned-dataset.tsv.gz"
         )
     benchmark:
         DIR_RSRC.joinpath(
-            "asm_label_qc", "embedding", "{sample}.{bin_size}.assessem-embed.rsrc"
+            "asm_label_qc", "embedding", "{sample}.{bin_size}.{feature_set}.assessem-embed.rsrc"
         )
     log:
         DIR_LOG.joinpath(
-            "asm_label_qc", "embedding", "{sample}.{bin_size}.assessem-embed.log"
+            "asm_label_qc", "embedding", "{sample}.{bin_size}.{feature_set}.assessem-embed.log"
         )
     conda:
         DIR_ENVS.joinpath("assessem.yaml")
