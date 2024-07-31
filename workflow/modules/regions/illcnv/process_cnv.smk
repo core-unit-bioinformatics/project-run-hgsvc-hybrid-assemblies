@@ -35,11 +35,11 @@ rule intersect_cnvs_with_alnblocks:
             "results", "regions", "{sample}",
             "{sample}.asm-hap1.hg38.ctg-aln-gap.ref-coord.bed"
         ),
-        hap2_blocks = hap1_blocks = WORKDIR_EVAL.joinpath(
+        hap2_blocks = WORKDIR_EVAL.joinpath(
             "results", "regions", "{sample}",
             "{sample}.asm-hap2.hg38.ctg-aln-gap.ref-coord.bed"
         ),
-        un_blocks = hap1_blocks = WORKDIR_EVAL.joinpath(
+        un_blocks = WORKDIR_EVAL.joinpath(
             "results", "regions", "{sample}",
             "{sample}.asm-unassigned.hg38.ctg-aln-gap.ref-coord.bed"
         )
