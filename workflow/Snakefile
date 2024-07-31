@@ -34,6 +34,7 @@ include: "modules/regions/hla/extract.smk"
 include: "modules/regions/gaps/pyutils.smk"
 include: "modules/regions/gaps/eval_hprc.smk"
 include: "modules/regions/gaps/annotate_gaps.smk"
+include: "modules/regions/illcnv/process_cnv.smk"
 
 include: "modules/extract_chrom/pyutils.smk"
 include: "modules/extract_chrom/10_preselect_tigs.smk"

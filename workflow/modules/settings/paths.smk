@@ -53,6 +53,12 @@ assert DIR_SNAKEFILE.name == "workflow", DIR_SNAKEFILE
 # annotations folder
 DIR_ANNOTATIONS = DIR_SNAKEFILE.parent.joinpath("annotations").resolve(strict=True)
 
+
+### ONE MORE DATA TABLE
+ILLCNV_ANNOTATION = DIR_ANNOTATIONS.joinpath("roi", "20240725_ill_specific_CNVs.flat.bed").resolve(strict=True)
+####
+
+
 DIR_SCRIPTS = DIR_SNAKEFILE.joinpath("scripts").resolve(strict=True)
 
 DIR_ENVS = DIR_SNAKEFILE.joinpath("envs").resolve(strict=True)
