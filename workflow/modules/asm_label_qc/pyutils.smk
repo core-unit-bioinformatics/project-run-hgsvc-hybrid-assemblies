@@ -42,7 +42,7 @@ def get_assessem_cli_parameters(input_files, get_list):
         if file_name.endswith(".flagger-labels.tsv.gz"):
             track_labels.append("flagger")
             score_columns.append("score")
-        elif file_name.endswith(".flagger-binary.tsv.gz")
+        elif file_name.endswith(".flagger-binary.tsv.gz"):
             track_labels.append("flagbin")
             score_columns.append("binary")
         elif file_name.endswith(".hifi.inspector-errors.tsv.gz"):
