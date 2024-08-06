@@ -107,5 +107,5 @@ rule run_all_assessem_jobs:
             rules.compute_embedding.output,
             sample=SAMPLES,
             bin_size=["10k", "1k"],
-            feature_set=["full", "no-mq0", "no-rd"]
+            feature_set=["full", "no-mq0", "no-rd", "mrgfull"]
         )
