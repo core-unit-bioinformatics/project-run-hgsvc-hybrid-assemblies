@@ -3,6 +3,7 @@ rule prepare_region_cache:
     input:
         sizes = DIR_PROC.joinpath("asm_label_qc", "assembly_size", "{sample}.sizes.txt"),
         flagger = rules.normalize_flagger_annotation.output.bed_like,
+        flagbin = rules.binarize_flagger_subset.output.bed,
         inspect_hifi = DIR_RES.joinpath("asm_label_qc", "norm_tables",
             "inspector", "{sample}.hifi.inspector-errors.tsv.gz"
         ),
@@ -23,6 +24,7 @@ rule prepare_region_cache:
             "{sample}.ont.mq60.mosdepth-windowed.tsv.gz"
         ),
         nucfreq = rules.bin_nucfreq_regions_by_coverage.output.bed,
+        nfbin = rules.binarize_nucfreq_output.output.bed,
         sd95 = rules.split_segdup_annotation.output.sd95,
         sd98 = rules.split_segdup_annotation.output.sd98,
         cen = DIR_RES.joinpath(

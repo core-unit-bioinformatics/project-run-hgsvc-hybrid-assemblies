@@ -42,6 +42,9 @@ def get_assessem_cli_parameters(input_files, get_list):
         if file_name.endswith(".flagger-labels.tsv.gz"):
             track_labels.append("flagger")
             score_columns.append("score")
+        elif file_name.endswith(".flagger-binary.tsv.gz")
+            track_labels.append("flagbin")
+            score_columns.append("binary")
         elif file_name.endswith(".hifi.inspector-errors.tsv.gz"):
             track_labels.append("inspect_hifi")
             score_columns.append("binary")
@@ -59,9 +62,12 @@ def get_assessem_cli_parameters(input_files, get_list):
             mapq = parts[-4]
             track_labels.append(f"rd_{read_type}_{mapq}")
             score_columns.append("cov")
-        elif file_name.endswith(".nucfreq-cov-bin.bed.gz"):
+        elif file_name.endswith(".nucfreq-cov-bin.tsv.gz"):
             track_labels.append("nucfreq")
             score_columns.append("score")
+        elif file_name.endswith(".nucfreq-binary.tsv.gz"):
+            track_labels.append("nfbin")
+            score_columns.append("binary")
         elif file_name.endswith(".sd-095.tsv.gz"):
             track_labels.append("sd95")
             score_columns.append("binary")
@@ -139,16 +145,13 @@ def determine_embed_feature_set(wildcard_fset):
     sd95, sd98, sseqbrkp
     """
 
-    param_setting = ""
-
-    param_name = "--skip-features"
     defined_sets = {
-        "full": None,
-        "no-mq0": "rd_hifi_mq00 rd_ont_mq00",
-        "no-rd": "rd_hifi_mq00 rd_hifi_mq60 rd_ont_mq00 rd_ont_mq60"
+        "full": "--skip-features nfbin flagbin",
+        "no-mq0": "--skip-features rd_hifi_mq00 rd_ont_mq00 nfbin flagbin",
+        "no-rd": "--skip-features rd_hifi_mq00 rd_hifi_mq60 rd_ont_mq00 rd_ont_mq60 nfbin flagbin",
+        "mrgfull": "--skip-features nucfreq flagger --merge-features nfbin flagbin merqury inspect_hifi inspect_ont"
     }
 
-    feature_set = defined_sets[wildcard_fset]
-    if feature_set is not None:
-        param_setting = f"{param_name} {feature_set}"
-    return param_setting
+    changed_setting = defined_sets[wildcard_fset]
+
+    return changed_setting

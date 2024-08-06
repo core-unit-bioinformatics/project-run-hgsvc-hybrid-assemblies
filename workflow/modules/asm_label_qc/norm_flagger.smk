@@ -35,6 +35,27 @@ rule normalize_flagger_annotation:
         df.to_csv(output.bed_like, sep="\t", header=True, index=False)
 
 
+localrules: binarize_flagger_subset
+rule binarize_flagger_subset:
+    input:
+        bed = rules.normalize_flagger_annotation.output.bed_like
+    output:
+        bed = DIR_RES.joinpath(
+            "asm_label_qc", "norm_tables",
+            "flagger", "{sample}.flagger-binary.tsv.gz"
+        )
+    run:
+        import pandas as pd
+
+        df = pd.read_csv(input.bed, sep="\t", header=0, usecols=["chrom", "start", "end", "score"])
+
+        # reduce flagger labels to clear non-haploid cases, i.e. ignore HAP and UNK
+        df = df.loc[df["score"] > 1, :].copy()
+        df.drop("score", axis=1, inplace=True)
+        df.to_csv(output.bed, sep="\t", header=True, index=False)
+    # END OF RUN BLOCK
+
+
 rule run_normalize_flagger_results:
     input:
         tables = expand(

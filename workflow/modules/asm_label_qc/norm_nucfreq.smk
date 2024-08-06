@@ -6,9 +6,9 @@ rule bin_nucfreq_regions_by_coverage:
             "{sample}.nucfreq.covann.tsv.gz"
         )
     output:
-        bed = DIR_PROC.joinpath(
+        bed = DIR_RES.joinpath(
             "asm_label_qc", "norm_tables", "nucfreq",
-            "{sample}.nucfreq-cov-bin.bed.gz"
+            "{sample}.nucfreq-cov-bin.tsv.gz"
         )
     run:
         import pandas as pd
@@ -22,7 +22,23 @@ rule bin_nucfreq_regions_by_coverage:
             labels=False
         )
         df = df[["contig", "start", "end", "score", "asm_unit", "num_hets"]]
-        df.rename({"contig": "#seq"}, axis=1, inplace=True)
+        df.to_csv(output.bed, sep="\t", header=True, index=False)
+    # END OF RUN BLOCK
+
+
+localrules: binarize_nucfreq_output
+rule binarize_nucfreq_output:
+    input:
+        bed = rules.bin_nucfreq_regions_by_coverage.output.bed
+    output:
+        bed = DIR_RES.joinpath(
+            "asm_label_qc", "norm_tables", "nucfreq",
+            "{sample}.nucfreq-binary.tsv.gz"
+        )
+    run:
+        import pandas as pd
+
+        df = pd.read_csv(input.bed, sep="\t", header=0, usecols=["contig", "start", "end"])
         df.to_csv(output.bed, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
 
