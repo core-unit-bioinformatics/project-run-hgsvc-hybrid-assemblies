@@ -19,11 +19,10 @@ rule merge_issue_labels:
     resources:
         mem_mb=lambda wildcards, attempt: 4096 * attempt
     params:
-        grep=lambda wildcards: " " if wildcards.span == "wg" else " | grep -v unassigned | "
+        grep=lambda wildcards: " | " if wildcards.span == "wg" else " | grep -v unassigned | "
     shell:
         "cat {input.beds}"
         " {params.grep} "
-            " | "
         "sort -V -k1,1 -k2n,3n"
             " | "
         "bedtools merge -c 4 -o collapse -i /dev/stdin"
