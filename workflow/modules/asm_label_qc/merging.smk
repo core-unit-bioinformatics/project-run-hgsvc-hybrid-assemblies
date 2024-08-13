@@ -35,7 +35,7 @@ rule merge_issue_labels:
         " {params.grep} "
         "sort -V -k1,1 -k2n,3n"
             " | "
-        "bedtools merge -c 4 -o -d -1 collapse -i /dev/stdin"
+        "bedtools merge -c 4 -o collapse -d -1 -i /dev/stdin"
             " | "
         "gzip > {output.bed}"
 
