@@ -134,8 +134,8 @@ rule translate_hpc_breakpoint_coordinates:
     # END OF RUN BLOCK
 
 
-localrules: add_nucfreq_merge_label
-rule add_nucfreq_merge_label:
+localrules: add_sseqbreak_merge_label
+rule add_sseqbreak_merge_label:
     input:
         bed = rules.translate_hpc_breakpoint_coordinates.output.bed
     output:
@@ -146,11 +146,15 @@ rule add_nucfreq_merge_label:
     run:
         import pandas as pd
         df = pd.read_csv(input.bed, sep="\t", header=0)
-        df["raw_label"] = "NUCFRQ"
-        df["length"] = (df["end"] - df["start"]).astype(int)
-        df["merge_label"] = df["raw_label"] + "::" + df["length"].astype(str)
-        df = df[["chrom", "start", "end", "merge_label"]]
-        df.to_csv(output.bed, sep="\t", header=False, index=False)
+        if "MOCK" in df["name"].values:
+            with open(output.bed, "w"):
+                pass
+        else:
+            df["raw_label"] = "SSQBRK"
+            df["length"] = (df["end"] - df["start"]).astype(int)
+            df["merge_label"] = df["raw_label"] + "::" + df["length"].astype(str)
+            df = df[["#seq", "start", "end", "merge_label"]]
+            df.to_csv(output.bed, sep="\t", header=False, index=False)
     # END OF RUN BLOCK
 
 
@@ -158,5 +162,9 @@ rule run_all_normalize_sseq_breakpoints:
     input:
         bed = expand(
             rules.translate_hpc_breakpoint_coordinates.output.bed,
+            sample=SAMPLES
+        ),
+        mrg_bed = expand(
+            rules.add_sseqbreak_merge_label.output.bed,
             sample=SAMPLES
         )
