@@ -26,10 +26,40 @@ rule normalize_busco_issue_annotation:
     # END OF RUN BLOCK
 
 
+
+localrules: add_busco_merge_label
+rule add_busco_merge_label:
+    input:
+        bed = rules.normalize_busco_issue_annotation.output.bed
+    output:
+        bed = DIR_RES.joinpath(
+            "asm_label_qc", "merge_tables", "by-sample",
+            "{sample}", "{sample}.busco.mrg-labels.bed"
+        )
+    run:
+        import pandas as pd
+        df = pd.read_csv(input.bed, sep="\t", header=0)
+        rename = {
+            "Duplicated": "BSCDUP",
+            "Fragmented": "BSCFRG"
+        }
+        df["raw_label"] = df["label"].replace(rename, inplace=False)
+        df["length"] = (df["end"] - df["start"]).astype(int)
+        df["merge_label"] = df["raw_label"] + "::" + df["length"].astype(str)
+
+        df = df[["#seq_name", "start", "end", "merge_label"]]
+        df.to_csv(output.bed, sep="\t", header=False, index=False)
+    # END OF RUN BLOCK
+
+
 rule run_all_normalize_busco:
     input:
         bed = expand(
             rules.normalize_busco_issue_annotation.output.bed,
+            sample=SAMPLES
+        ),
+        mrg = expand(
+            rules.add_busco_merge_label.output.bed,
             sample=SAMPLES
         )
 

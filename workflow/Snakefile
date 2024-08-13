@@ -21,6 +21,7 @@ include: "modules/asm_label_qc/norm_centromere.smk"
 include: "modules/asm_label_qc/norm_nucfreq.smk"
 include: "modules/asm_label_qc/norm_busco.smk"
 include: "modules/asm_label_qc/assessem.smk"
+include: "modules/asm_label_qc/merging.smk"
 
 include: "modules/coverage/contig_cov.smk"
 

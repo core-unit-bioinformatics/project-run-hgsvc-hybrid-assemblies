@@ -56,9 +56,41 @@ rule binarize_flagger_subset:
     # END OF RUN BLOCK
 
 
+localrules: add_flagger_merge_label
+rule add_flagger_merge_label:
+    input:
+        bed = rules.normalize_flagger_annotation.output.bed_like
+    output:
+        bed = DIR_RES.joinpath(
+            "asm_label_qc", "merge_tables", "by-sample",
+            "{sample}", "{sample}.flagger.mrg-labels.bed"
+        )
+    run:
+        import pandas as pd
+        df = pd.read_csv(input.bed, sep="\t", header=0)
+        df = df.loc[~(df["name"] == "Hap"), :].copy()
+        renamer = {
+            "Unk": "FLGUNK",
+            "Err": "FLGERR",
+            "Col": "FLGCOL",
+            "Dup": "FLGDUP"
+        }
+        df["raw_label"] = df["name"].replace(renamer, inplace=False)
+        df["length"] = (df["end"] - df["start"]).astype(int)
+
+        df["merge_label"] = df["raw_label"] + "::" + df["length"].astype(str)
+        df = df[["chrom", "start", "end", "merge_label"]]
+        df.to_csv(output.bed, sep="\t", header=False, index=False)
+    # END OF RUN BLOCK
+
+
 rule run_normalize_flagger_results:
     input:
         tables = expand(
             rules.normalize_flagger_annotation.output.bed_like,
+            sample=SAMPLES
+        ),
+        mrg_bed = expand(
+            rules.add_flagger_merge_label.output.bed,
             sample=SAMPLES
         )

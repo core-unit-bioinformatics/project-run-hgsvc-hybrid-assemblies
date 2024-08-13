@@ -76,6 +76,36 @@ rule split_centromere_annotation:
     # END OF RUN BLOCK
 
 
+localrules: add_centro_merge_label
+rule add_centro_merge_label:
+    input:
+        bed = DIR_RES.joinpath(
+            "asm_label_qc", "norm_tables", "centromeres",
+            "{sample}.active_asat_HOR_arrays_v3.bed"
+        )
+    output:
+        bed = DIR_RES.joinpath(
+            "asm_label_qc", "merge_tables", "by-sample",
+            "{sample}", "{sample}.centro.mrg-labels.bed"
+        )
+    run:
+        import pandas as pd
+        df = pd.read_csv(input.bed, sep="\t", header=0)
+        if df.empty:
+            with open(output.bed, "w"):
+                pass
+        else:
+            df["length"] = (df["end"] - df["start"]).astype(int)
+            df["merge_label"] = "CENTRO::" + df["length"].astype(str)
+            df = df[["#seq", "start", "end", "merge_label"]]
+            df.to_csv(output.bed, sep="\t", header=False, index=False)
+    # END OF RUN BLOCK
+
+
 rule run_all_normalize_centromeres:
     input:
-        beds = rules.split_centromere_annotation.output.beds
+        beds = rules.split_centromere_annotation.output.beds,
+        mrg = expand(
+            rules.add_centro_merge_label.output.bed,
+            sample=SAMPLES
+        )

@@ -59,3 +59,55 @@ rule split_segdup_annotation:
         sd98.to_csv(output.sd98, header=True, index=False, sep="\t")
 
     # END OF RUN BLOCK
+
+
+localrules: add_seqgdup_merge_label
+rule add_segdup_merge_label:
+    input:
+        sd95 = DIR_RES.joinpath(
+            "asm_label_qc", "norm_tables",
+            "segdups", "{sample}.sd-095.tsv.gz"
+        ),
+        sd98 = DIR_RES.joinpath(
+            "asm_label_qc", "norm_tables",
+            "segdups", "{sample}.sd-098.tsv.gz"
+        ),
+    output:
+        bed = DIR_RES.joinpath(
+            "asm_label_qc", "merge_tables", "by-sample",
+            "{sample}", "{sample}.segdup.mrg-labels.bed"
+        )
+    run:
+        import pandas as pd
+
+        concat = []
+        for input_file in [input.sd95, input.sd98]:
+            if "sd-095" in str(input_file):
+                label = "SEGD95"
+            elif "sd--098" in str(input_file):
+                label = "SEGD98"
+            else:
+                raise
+
+            df = pd.read_csv(input_file, sep="\t", header=0)
+            df["raw_label"] = label
+            df["length"] = (df["end"] - df["start"]).astype(int)
+            df["merge_label"] = df["raw_label"] + "::" + df["length"].astype(str)
+            df = df[["chrom", "start", "end", "merge_label"]]
+            concat.append(df)
+        concat = pd.concat(concat, axis=0, ignore_index=False)
+        concat.sort_values(["seq", "start", "end"], inplace=True)
+        concat.to_csv(output.bed, sep="\t", header=False, index=False)
+    # END OF RUN BLOCK
+
+
+rule run_all_normalize_segdups:
+    input:
+        segdups = expand(
+            rules.split_segdup_annotation.output,
+            sample=SAMPLES
+        ),
+        mrg_bed = expand(
+            rules.add_segdup_merge_label.output.bed,
+            sample=SAMPLES
+        )

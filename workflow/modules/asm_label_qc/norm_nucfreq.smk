@@ -43,9 +43,33 @@ rule binarize_nucfreq_output:
     # END OF RUN BLOCK
 
 
+localrules: add_nucfreq_merge_label
+rule add_nucfreq_merge_label:
+    input:
+        bed = rules.binarize_nucfreq_output.output.bed
+    output:
+        bed = DIR_RES.joinpath(
+            "asm_label_qc", "merge_tables", "by-sample",
+            "{sample}", "{sample}.nucfreq.mrg-labels.bed"
+        )
+    run:
+        import pandas as pd
+        df = pd.read_csv(input.bed, sep="\t", header=0)
+        df["raw_label"] = "NUCFRQ"
+        df["length"] = (df["end"] - df["start"]).astype(int)
+        df["merge_label"] = df["raw_label"] + "::" + df["length"].astype(str)
+        df = df[["chrom", "start", "end", "merge_label"]]
+        df.to_csv(output.bed, sep="\t", header=False, index=False)
+    # END OF RUN BLOCK
+
+
 rule run_all_bin_nucfreq_regions:
     input:
         beds = expand(
             rules.bin_nucfreq_regions_by_coverage.output.bed,
+            sample=SAMPLES
+        ),
+        mrg_bed = expand(
+            rules.add_nucfreq_merge_label.output.bed,
             sample=SAMPLES
         )

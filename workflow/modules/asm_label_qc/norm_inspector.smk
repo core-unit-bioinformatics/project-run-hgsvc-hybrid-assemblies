@@ -49,6 +49,46 @@ rule normalize_inspector_output:
         concat.to_csv(output.bed_like, sep="\t", header=True, index=False)
 
 
+localrules: add_inspector_merge_label
+rule add_inspector_merge_label:
+    input:
+        hifi = DIR_RES.joinpath(
+            "asm_label_qc", "norm_tables",
+            "inspector", "{sample}.hifi.inspector-errors.tsv.gz"
+        ),
+        ont = DIR_RES.joinpath(
+            "asm_label_qc", "norm_tables",
+            "inspector", "{sample}.ont.inspector-errors.tsv.gz"
+        ),
+    output:
+        bed = DIR_RES.joinpath(
+            "asm_label_qc", "merge_tables", "by-sample",
+            "{sample}", "{sample}.inspector.mrg-labels.bed"
+        )
+    run:
+        import pandas as pd
+
+        concat = []
+        for input_file in [input.hifi, input.ont]:
+            df = pd.read_csv(input_file, sep="\t", header=0)
+            if ".hifi." in str(input_file):
+                label = "ISPCHF"
+            elif ".ont." in str(input_file):
+                label = "ISPCON"
+            df["raw_label"] = label
+            df["length"] = (df["end"] - df["start"]).astype(int)
+            df["merge_label"] = df["raw_label"] + "::" + df["length"].astype(str)
+            df = df[["chrom", "start", "end", "merge_label"]]
+            concat.append(df)
+
+        concat = pd.concat(concat, axis=0, ignore_index=False)
+        concat.sort_values(["chrom", "start", "end"], inplace=True)
+        concat.to_csv(output.bed, sep="\t", header=False, index=False)
+    # END OF RUN BLOCK
+
+
+
+
 rule run_normalize_inspector_results:
     input:
         tables = expand(
