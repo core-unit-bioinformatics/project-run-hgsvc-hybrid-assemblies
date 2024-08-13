@@ -4,11 +4,11 @@ rule merge_issue_labels:
         beds = expand(
             DIR_RES.joinpath(
                 "asm_label_qc", "merge_tables", "by-sample",
-                "{sample}", "{sample}.{annotations}.mrg-labels.bed"
-            )
-        ),
-        annotations=["sseqbreak", "flagger", "nucfreq", "merqury", "busco", "inspector"],
-        allow_missing=True
+                "{sample}", "{sample}.{annotation}.mrg-labels.bed"
+            ),
+            annotation=["sseqbreak", "flagger", "nucfreq", "merqury", "busco", "inspector"],
+            allow_missing=True
+        )
     output:
         bed = DIR_RES.joinpath(
             "asm_label_qc", "merge_tables", "by-sample",
