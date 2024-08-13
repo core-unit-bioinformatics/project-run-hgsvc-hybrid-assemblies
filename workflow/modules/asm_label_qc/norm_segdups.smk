@@ -61,7 +61,7 @@ rule split_segdup_annotation:
     # END OF RUN BLOCK
 
 
-localrules: add_seqgdup_merge_label
+localrules: add_segdup_merge_label
 rule add_segdup_merge_label:
     input:
         sd95 = DIR_RES.joinpath(

@@ -21,7 +21,7 @@ rule merge_issue_labels:
     params:
         grep=lambda wildcards: " " if wildcards.span == "wg" else " | grep -v unassigned | "
     shell:
-        "cat {input.bed}"
+        "cat {input.beds}"
         " {params.grep} "
             " | "
         "sort -V -k1,1 -k2n,3n"
