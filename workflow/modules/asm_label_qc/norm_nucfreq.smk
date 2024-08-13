@@ -58,7 +58,7 @@ rule add_nucfreq_merge_label:
         df["raw_label"] = "NUCFRQ"
         df["length"] = (df["end"] - df["start"]).astype(int)
         df["merge_label"] = df["raw_label"] + "::" + df["length"].astype(str)
-        df = df[["chrom", "start", "end", "merge_label"]]
+        df = df[["contig", "start", "end", "merge_label"]]
         df.to_csv(output.bed, sep="\t", header=False, index=False)
     # END OF RUN BLOCK
 
