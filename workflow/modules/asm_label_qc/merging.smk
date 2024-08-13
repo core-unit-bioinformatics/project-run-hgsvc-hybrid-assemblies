@@ -1,4 +1,14 @@
 
+
+
+DEFINED_MERGE_SPANS = {
+    "wg": " | ",
+    "ps": " | grep -v unassigned | ",
+    "wg-no-ont": " | grep -v ISPCON | ",
+    "ps-no-ont": " | grep -v unassigned | grep -v ISPCON | ",
+}
+
+
 rule merge_issue_labels:
     input:
         beds = expand(
@@ -19,7 +29,7 @@ rule merge_issue_labels:
     resources:
         mem_mb=lambda wildcards, attempt: 4096 * attempt
     params:
-        grep=lambda wildcards: " | " if wildcards.span == "wg" else " | grep -v unassigned | "
+        grep=lambda wildcards: DEFINED_MERGE_SPANS[wildcards.span]
     shell:
         "cat {input.beds}"
         " {params.grep} "
@@ -35,5 +45,5 @@ rule run_all_merge_issues:
         bed = expand(
             rules.merge_issue_labels.output.bed,
             sample=SAMPLES,
-            span=["wg", "ps"]
+            span=["wg", "ps", "wg-no-ont", "ps-no-ont"]
         )
