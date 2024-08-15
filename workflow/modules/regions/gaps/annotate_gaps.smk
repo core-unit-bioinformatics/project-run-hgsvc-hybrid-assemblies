@@ -352,7 +352,7 @@ rule merge_hprc_gap_details:
         for table in sorted(input.tables):
             filename = pl.Path(table).name
             sample = filename.split(".")[0]
-            au = filename.split(".")[1].split("-")[-1]
+            au = filename.split(".")[2].split("-")[-1]
 
             df = pd.read_csv(table, sep="\t", header=0)
             df["aln_span"] = df["end"] - df["start"]
