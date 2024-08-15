@@ -356,8 +356,8 @@ rule merge_hprc_gap_details:
 
             df = pd.read_csv(table, sep="\t", header=0)
 
-            select_flagger = df["flagger_pct"] < t
-            select_nucfreq = df["nucfreq_pct"] < t
+            select_flagger = df["flagger_pct"] < params.threshold
+            select_nucfreq = df["nucfreq_pct"] < params.threshold
             select_covered = df["align_status"] == "covered"
 
             column_label = f"closed_at_err_{params.threshold}pct"
