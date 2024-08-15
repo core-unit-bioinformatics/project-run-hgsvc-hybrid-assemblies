@@ -341,7 +341,7 @@ rule merge_hprc_gap_details:
             "SAMPLES.vrk-ps-sseq.{refgenome}.hprc-gaps.ctg-summary-{err_t}.tsv"
         )
     resources:
-        mem_mb=lambda wildcards, attempt: 16384 * attempt
+        mem_mb=lambda wildcards, attempt: 2048 * attempt
     params:
         threshold = lambda wildcards: int(wildcards.err_t.strip("pct"))
     run:
@@ -366,25 +366,49 @@ rule merge_hprc_gap_details:
             if select_rows.any():
                 df.loc[select_rows, column_label] = 1
 
-            df = df[["chrom", "gap_start", "gap_end", "gap_id", "gap_length", "seq", column_label]]
+            # for partial contig alignments, several rows may exist
+            # w/ the same gap but, logically, this cannot represent
+            # a fully covered gap, so drop those rows for deduplication purposes
+            dups = df["gap_id"].duplicated(False)
+            not_covered = df["align_status"] != "covered"
+            # drop if partial and duplicated
+            deselect = ~(dups & not_covered)
+            df = df.loc[deselect, :].copy()
+
+            dups = df["gap_id"].duplicated(False)
+            if dups.any():
+                # if still duplicates, this means that minimap and mashmap
+                # generated two distinct alignments for the same sequence,
+                # example: gap 09ab63f42e8d4d3810e203a3ea5a9cd2 in HG02106/H2
+                # in this case, we select the alignment with largest span
+                drop_indices = []
+                for gap_id, alns in df.loc[dups, :].groupby("gap_id"):
+                    max_span = alns["aln_span"].idxmax()
+                    drop_indices.extend([i for i in alns.index if i != max_span])
+                df.drop(drop_indices, axis=0, inplace=True)
+
+            df = df[["chrom", "gap_start", "gap_end", "gap_id", "gap_length", "seq", "closed_at_err_1pct"]]
             df.rename(
                 {
                     "gap_start": "start",
                     "gap_end": "end",
                     "seq": f"{sample}.{au}.ctg",
-                    column_label: f"{sample}.{au}.closed_{params.threshold}pct"
+                    "closed_at_err_1pct": f"{sample}.{au}.closed_1pct"
                 }, axis=1, inplace=True
             )
-            df[f"{sample}.{au}.loc_exists"] = 1
-            if merged is None:
-                merged = df
-            else:
-                merged = merged.merge(df, on=["chrom", "start", "end", "gap_id", "gap_length"], how="outer")
+            df[f"{sample}.{au}.gap_exists"] = 1
 
+            assert df["gap_id"].nunique() == df.shape[0]
+            df.set_index(["chrom", "start", "end", "gap_id", "gap_length"], inplace=True)
+            merged.append(df)
+
+        merged = pd.concat(merged, axis=1, ignore_index=False, join="outer")
         ctg_columns = [c for c in merged.columns if c.endswith("ctg")]
         merged[ctg_columns] = merged[ctg_columns].fillna("no-ctg", inplace=False)
-        stat_columns = [c for c in merged.columns if "closed" in c or "exists" in c]
+        stat_columns = [c for c in merged.columns if "closed" in c]
         merged[stat_columns] = merged[stat_columns].fillna(-1, inplace=False).astype(int)
+        exist_columns = [c for c in merged.columns if "exists" in c]
+        merged[exist_columns] = merged[exist_columns].fillna(0, inplace=False).astype(int)
 
         merged.to_csv(output.summary, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
