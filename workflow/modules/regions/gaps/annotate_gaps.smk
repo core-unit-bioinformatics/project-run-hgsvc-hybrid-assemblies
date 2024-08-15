@@ -355,6 +355,7 @@ rule merge_hprc_gap_details:
             au = filename.split(".")[1].split("-")[-1]
 
             df = pd.read_csv(table, sep="\t", header=0)
+            df["aln_span"] = df["end"] - df["start"]
 
             select_flagger = df["flagger_pct"] < params.threshold
             select_nucfreq = df["nucfreq_pct"] < params.threshold
