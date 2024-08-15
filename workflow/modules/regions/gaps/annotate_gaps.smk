@@ -388,16 +388,17 @@ rule merge_hprc_gap_details:
                     drop_indices.extend([i for i in alns.index if i != max_span])
                 df.drop(drop_indices, axis=0, inplace=True)
 
-            df = df[["chrom", "gap_start", "gap_end", "gap_id", "gap_length", "seq", "closed_at_err_1pct"]]
+            df = df[["chrom", "gap_start", "gap_end", "gap_id", "gap_length", "seq", column_label]]
             df.rename(
                 {
                     "gap_start": "start",
                     "gap_end": "end",
                     "seq": f"{sample}.{au}.ctg",
-                    "closed_at_err_1pct": f"{sample}.{au}.closed_1pct"
+                    column_label: f"{sample}.{au}.closed_{params.threshold}pct"
                 }, axis=1, inplace=True
             )
-            df[f"{sample}.{au}.gap_exists"] = 1
+
+            df[f"{sample}.{au}.loc_exists"] = 1
 
             assert df["gap_id"].nunique() == df.shape[0]
             df.set_index(["chrom", "start", "end", "gap_id", "gap_length"], inplace=True)
@@ -406,8 +407,10 @@ rule merge_hprc_gap_details:
         merged = pd.concat(merged, axis=1, ignore_index=False, join="outer")
         ctg_columns = [c for c in merged.columns if c.endswith("ctg")]
         merged[ctg_columns] = merged[ctg_columns].fillna("no-ctg", inplace=False)
+
         stat_columns = [c for c in merged.columns if "closed" in c]
         merged[stat_columns] = merged[stat_columns].fillna(-1, inplace=False).astype(int)
+
         exist_columns = [c for c in merged.columns if "exists" in c]
         merged[exist_columns] = merged[exist_columns].fillna(0, inplace=False).astype(int)
 
