@@ -419,6 +419,7 @@ rule merge_hprc_gap_details:
         exist_columns = [c for c in merged.columns if "exists" in c]
         merged[exist_columns] = merged[exist_columns].fillna(0, inplace=False).astype(int)
 
+        merged.sort_index(inplace=True)
         merged.to_csv(output.summary, sep="\t", header=True, index=True)
     # END OF RUN BLOCK
 
