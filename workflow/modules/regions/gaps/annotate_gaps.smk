@@ -348,7 +348,7 @@ rule merge_hprc_gap_details:
         import pandas as pd
         import pathlib as pl
 
-        merged = None
+        merged = []
         for table in sorted(input.tables):
             filename = pl.Path(table).name
             sample = filename.split(".")[0]
