@@ -341,7 +341,7 @@ rule merge_hprc_gap_details:
             "SAMPLES.vrk-ps-sseq.{refgenome}.hprc-gaps.ctg-summary-{err_t}.tsv"
         )
     resources:
-        mem_mb=lambda wildcards, attempt: 2048 * attempt
+        mem_mb=lambda wildcards, attempt: 4096 * attempt
     params:
         threshold = lambda wildcards: int(wildcards.err_t.strip("pct"))
     run:
