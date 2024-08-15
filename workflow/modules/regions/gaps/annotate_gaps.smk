@@ -349,6 +349,7 @@ rule merge_hprc_gap_details:
         import pathlib as pl
 
         merged = []
+        sex_lut = dict()
         for table in sorted(input.tables):
             filename = pl.Path(table).name
             sample = filename.split(".")[0]
@@ -356,6 +357,8 @@ rule merge_hprc_gap_details:
 
             df = pd.read_csv(table, sep="\t", header=0)
             df["aln_span"] = df["end"] - df["start"]
+            hap_sex = df["sex"].iloc[0]
+            sex_lut[f"{sample}.{au}"] = hap_sex
 
             select_flagger = df["flagger_pct"] < params.threshold
             select_nucfreq = df["nucfreq_pct"] < params.threshold
@@ -402,8 +405,7 @@ rule merge_hprc_gap_details:
                     column_label: f"{sample}.{au}.closed_{params.threshold}pct"
                 }, axis=1, inplace=True
             )
-
-            df[f"{sample}.{au}.loc_exists"] = 1
+            df[f"{sample}.{au}.sex"] = hap_sex
 
             assert df["gap_id"].nunique() == df.shape[0]
             df.set_index(["chrom", "start", "end", "gap_id", "gap_length"], inplace=True)
@@ -416,8 +418,8 @@ rule merge_hprc_gap_details:
         stat_columns = [c for c in merged.columns if "closed" in c]
         merged[stat_columns] = merged[stat_columns].fillna(-1, inplace=False).astype(int)
 
-        exist_columns = [c for c in merged.columns if "exists" in c]
-        merged[exist_columns] = merged[exist_columns].fillna(0, inplace=False).astype(int)
+        for hap_assm, hap_sex in sex_lut.items():
+            merged[f"{hap_assm}.sex"] = merged[f"{hap_assm}.sex"].fillna(hap_sex, inplace=False)
 
         merged.sort_index(inplace=True)
         merged.to_csv(output.summary, sep="\t", header=True, index=True)
