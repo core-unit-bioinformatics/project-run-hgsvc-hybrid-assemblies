@@ -367,6 +367,11 @@ rule merge_hprc_gap_details:
             if select_rows.any():
                 df.loc[select_rows, column_label] = 1
 
+            select_open = df[column_label] == 0
+            # same as: ~select_rows ...
+            if select_open.any():
+                df.loc[select_open, "seq"] = "no-cov"
+
             # for partial contig alignments, several rows may exist
             # w/ the same gap but, logically, this cannot represent
             # a fully covered gap, so drop those rows for deduplication purposes
