@@ -1,3 +1,13 @@
+######################################
+# NB - This module is outdated
+# and has been replaced by
+# 'annotate_gaps.smk', which includes
+# the Flagger and NucFreq error
+# annotation
+# JUST HERE FOR REFERENCE
+######################################
+
+
 import pathlib
 
 # HPRC gap file must exist

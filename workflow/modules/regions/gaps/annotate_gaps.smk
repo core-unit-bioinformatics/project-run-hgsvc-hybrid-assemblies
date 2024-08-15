@@ -327,6 +327,69 @@ rule annotate_gaps_with_qc_info:
         "--out-table {output.table} --out-summary {output.summary}"
 
 
+rule merge_hprc_gap_details:
+    input:
+        tables = expand(
+            rules.annotate_gaps_with_qc_info.output.table,
+            sample=SAMPLES,
+            asm_unit=["hap1", "hap2"],
+            refgenome=["t2tv2"]
+        )
+    output:
+        summary = DIR_RES.joinpath(
+            "regions", "gaps", "summary",
+            "SAMPLES.vrk-ps-sseq.{refgenome}.hprc-gaps.ctg-summary-{err_t}.tsv"
+        )
+    resources:
+        mem_mb=lambda wildcards, attempt: 2048 * attempt
+    params:
+        threshold = lambda wildcards: int(wildcards.err_t.strip("pct"))
+    run:
+        import pandas as pd
+        import pathlib as pl
+
+        merged = None
+        for table in sorted(input.tables):
+            filename = pl.Path(table).name
+            sample = filename.split(".")[0]
+            au = filename.split(".")[1].split("-")[-1]
+
+            df = pd.read_csv(table, sep="\t", header=0)
+
+            select_flagger = df["flagger_pct"] < t
+            select_nucfreq = df["nucfreq_pct"] < t
+            select_covered = df["align_status"] == "covered"
+
+            column_label = f"closed_at_err_{params.threshold}pct"
+            df[column_label] = 0
+            select_rows = select_flagger & select_nucfreq & select_covered
+            if select_rows.any():
+                df.loc[select_rows, column_label] = 1
+
+            df = df[["chrom", "gap_start", "gap_end", "gap_id", "gap_length", "seq", column_label]]
+            df.rename(
+                {
+                    "gap_start": "start",
+                    "gap_end": "end",
+                    "seq": f"{sample}.{au}.ctg",
+                    column_label: f"{sample}.{au}.closed_{params.threshold}pct"
+                }, axis=1, inplace=True
+            )
+            df[f"{sample}.{au}.loc_exists"] = 1
+            if merged is None:
+                merged = df
+            else:
+                merged = merged.merge(df, on=["chrom", "start", "end", "gap_id", "gap_length"], how="outer")
+
+        ctg_columns = [c for c in merged.columns if c.endswith("ctg")]
+        merged[ctg_columns] = merged[ctg_columns].fillna("no-ctg", inplace=False)
+        stat_columns = [c for c in merged.columns if "closed" in c or "exists" in c]
+        merged[stat_columns] = merged[stat_columns].fillna(-1, inplace=False).astype(int)
+
+        merged.to_csv(output.summary, sep="\t", header=True, index=False)
+    # END OF RUN BLOCK
+
+
 localrules: merge_hprc_gap_summaries
 rule merge_hprc_gap_summaries:
     input:
@@ -386,4 +449,9 @@ rule run_all_annotate_gaps:
         mrg_summary = expand(
             rules.merge_hprc_gap_summaries.output.summary,
             refgenome=["t2tv2"]
+        ),
+        ctg_summary = expand(
+            rules.merge_hprc_gap_details.output.summary,
+            refgenome=["t2tv2"],
+            err_t=["1pct"]
         )
