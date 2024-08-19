@@ -58,7 +58,10 @@ rule add_contig_size:
         )
     run:
         import pandas as pd
-        df = pd.read_csv(input.table, sep="\t", header=0)
+        df = pd.read_csv(
+            input.table, sep="\t", header=None,
+            names=["seq", "start", "end", "labels"]
+        )
         size_lut = dict()
         with open(input.sizes, "r") as table:
             for line in table:
