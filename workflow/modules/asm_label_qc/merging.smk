@@ -24,6 +24,8 @@ rule merge_issue_labels:
             "asm_label_qc", "merge_tables", "by-sample",
             "{sample}", "{sample}.merged-issues.{span}.bed.gz"
         )
+    wildcard_constraints:
+        span = "(" + "|".join(["wg", "ps", "wg-no-ont", "ps-no-ont"]) + ")"
     conda:
         DIR_ENVS.joinpath("bedtools.yaml")
     resources:
