@@ -87,7 +87,8 @@ rule add_telomere_flag:
                 "proc/70-annotate/telomeres/seqtk",
                 "{sample}.asm-{asm_unit}.telo.tsv"
             ),
-            asm_unit=MAIN_ASSEMBLY_UNITS
+            asm_unit=MAIN_ASSEMBLY_UNITS,
+            allow_missing=True
         ),
         table = rules.add_contig_size.output.table
     output:
