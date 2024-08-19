@@ -169,7 +169,7 @@ rule merge_segdups_for_label_annotation:
     resources:
         mem_mb=lambda wildcards, attempt: 2048 * attempt
     shell:
-        "cat {input.tsv}"
+        "zcat {input.tsv}"
             " | "
         "grep -v seq"
             " | "
