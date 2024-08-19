@@ -177,7 +177,7 @@ rule merge_segdups_for_label_annotation:
             " | "
         "bedtools merge -d -1 -i /dev/stdin"
             " | "
-        "gzip > {output.bed}"
+        "gzip > {output.merged}"
 
 
 rule add_segdup_flag:
