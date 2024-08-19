@@ -211,7 +211,7 @@ rule add_ngap_sizes:
         ngaps = WORKDIR_EVAL.joinpath(
             "results/regions", "{sample}",
             "{sample}.ngaps.bed"
-        )
+        ),
         table = rules.add_segdup_flag.output.table
     output:
         table = DIR_RES.joinpath(
