@@ -199,7 +199,7 @@ rule add_segdup_flag:
         import gzip
         df = pd.read_csv(input.table, sep="\t", header=0)
         df["overlaps_segdup98"] = 0
-        with gzip.open(input.centro, "rt") as annotation:
+        with gzip.open(input.segdup, "rt") as annotation:
             for line in annotation:
                 seq, start, end = line.strip().split()
                 select_seq = df["seq"] == seq
