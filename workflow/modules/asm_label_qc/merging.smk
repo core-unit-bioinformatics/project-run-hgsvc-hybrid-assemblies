@@ -224,6 +224,8 @@ rule add_ngap_sizes:
             "asm_label_qc", "merge_tables", "by-sample",
             "{sample}", "{sample}.merged-issues.{span}.augmented.bed.gz"
         )
+    resources:
+        mem_mb = lambda wildcards, attempt: 1024 * attempt
     run:
         import pandas as pd
         import collections as col
