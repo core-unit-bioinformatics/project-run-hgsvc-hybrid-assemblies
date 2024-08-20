@@ -124,7 +124,7 @@ rule add_telomere_flag:
 rule add_centromere_flag:
     input:
         centro = rules.add_centro_merge_label.output.bed,
-        table = rules.add_contig_size.output.table
+        table = rules.add_telomere_flag.output.table
     output:
         table = temp(
             DIR_PROC.joinpath(
