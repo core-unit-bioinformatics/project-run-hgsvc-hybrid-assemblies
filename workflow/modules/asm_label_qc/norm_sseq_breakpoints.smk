@@ -16,7 +16,15 @@ rule split_breakpoints_by_sample:
         df.rename({"window_min": "start_hpc", "window_max": "end_hpc"}, axis=1, inplace=True)
         df["sample"] = df["sample"] + ".vrk-ps-sseq"
         df = df.loc[df["sample"] == wildcards.sample, :].copy()
-        if df.empty:
+        # DEBUG 2024-08-20 skip HG00514 while investigating missing sequence issue
+        # only the Strand-seq breakpoints connect back to the unphased version via
+        # the assembly graph and are thus potentially incompatible
+        if wildcards.sample == "HG00514.vrk-ps-sseq":
+            with open(output.tsv, "w") as dump:
+                pass
+            with open(str(output.tsv) + ".EMPTY", "w") as dump:
+                pass
+        elif df.empty:
             with open(output.tsv, "w") as dump:
                 pass
             with open(str(output.tsv) + ".EMPTY", "w") as dump:
