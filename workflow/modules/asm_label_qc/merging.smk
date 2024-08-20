@@ -231,8 +231,8 @@ rule add_ngap_sizes:
         import collections as col
         ngaps = pd.read_csv(input.ngaps, sep="\t", header=0)
         ngaps_lut = col.Counter(
-            (ctg, total_len) for ctg, total_len in
-            ngaps.groupby("#contig")["length"].sum().items()
+            dict((ctg, total_len) for ctg, total_len in
+            ngaps.groupby("#contig")["length"].sum().items())
         )
         df = pd.read_csv(input.table, sep="\t", header=0)
         df["ngap_length"] = df["seq"].apply(lambda seq: ngaps_lut[seq])
