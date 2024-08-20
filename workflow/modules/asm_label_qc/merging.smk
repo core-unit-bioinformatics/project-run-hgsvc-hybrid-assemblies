@@ -194,6 +194,8 @@ rule add_segdup_flag:
                 "{sample}", "{sample}.merged-issues.{span}.aug-segdup.bed.gz"
             )
         )
+    resources:
+        mem_mb=lambda wildcards, attempt: 1024 * attempt
     run:
         import pandas as pd
         import gzip
