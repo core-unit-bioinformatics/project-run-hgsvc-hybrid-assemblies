@@ -23,7 +23,7 @@ include: "modules/asm_label_qc/norm_busco.smk"
 include: "modules/asm_label_qc/norm_deepvariant.smk"
 include: "modules/asm_label_qc/assessem.smk"
 include: "modules/asm_label_qc/merging.smk"
-inlcude: "modules/asm_label_qc/merge_stats.smk"
+include: "modules/asm_label_qc/merge_stats.smk"
 
 include: "modules/coverage/contig_cov.smk"
 
