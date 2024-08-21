@@ -16,7 +16,7 @@ rule merge_issue_labels:
                 "asm_label_qc", "merge_tables", "by-sample",
                 "{sample}", "{sample}.{annotation}.mrg-labels.bed"
             ),
-            annotation=["sseqbreak", "flagger", "nucfreq", "merqury", "busco", "inspector"],
+            annotation=["sseqbreak", "flagger", "nucfreq", "merqury", "busco", "inspector", "deepvariant"],
             allow_missing=True
         )
     output:
