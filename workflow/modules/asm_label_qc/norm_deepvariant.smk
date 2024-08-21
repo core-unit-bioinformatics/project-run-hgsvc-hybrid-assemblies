@@ -4,6 +4,10 @@ rule add_deepvariant_merge_label:
         vcf = WORKDIR_EVAL.joinpath(
             "results/regions", "{sample}",
             "{sample}.asmerr-hifi-onlyPRI.dv-wg.vcf.gz"
+        ),
+        sizes = DIR_PROC.joinpath(
+            "asm_label_qc", "assembly_size",
+            "{sample}.sizes.txt"
         )
     output:
         bed = DIR_RES.joinpath(
@@ -20,6 +24,11 @@ rule add_deepvariant_merge_label:
             names=["seq", "vcf_start", "name", "ref", "alt", "qual", "filter", "info", "format", "sample"],
             usecols=["seq", "vcf_start", "ref", "alt"]
         )
+
+        # the DeepVariant error calls comprise the whole assembly, e.g., also the rDNA,
+        # which is not the case for any of the other annotations. Hence, filter the VCF.
+        known = set(pd.read_csv(input.sizes, sep="\t", header=None, names=["seq", "size"])["seq"].values)
+        vcf = vcf.loc[vcf["seq"].isin(known), :].copy()
 
         def process_vcf_row(row):
             start = row.vcf_start - 1
