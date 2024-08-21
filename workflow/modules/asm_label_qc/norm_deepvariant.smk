@@ -29,6 +29,7 @@ rule add_deepvariant_merge_label:
         # which is not the case for any of the other annotations. Hence, filter the VCF.
         known = set(pd.read_csv(input.sizes, sep="\t", header=None, names=["seq", "size"])["seq"].values)
         vcf = vcf.loc[vcf["seq"].isin(known), :].copy()
+        assert vcf.shape[0] > 0
 
         def process_vcf_row(row):
             start = row.vcf_start - 1
@@ -51,7 +52,7 @@ rule add_deepvariant_merge_label:
             record = row.seq, start, end, f"DEEPVR::{record_len}"
             return record
 
-        norm_records = vcf.apply(process_vcf_row, axis=1)
+        norm_records = (vcf.apply(process_vcf_row, axis=1)).tolist()
         norm_records = pd.DataFrame.from_records(norm_records, columns=["seq", "start", "end", "label"])
         norm_records.sort_values(["seq", "start", "end"], inplace=True)
         norm_records.to_csv(output.bed, sep="\t", header=False, index=False)
