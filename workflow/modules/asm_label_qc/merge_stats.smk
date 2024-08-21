@@ -11,7 +11,7 @@ rule compute_merged_label_count_statistics:
         mem_mb=lambda wildcards, attempt: 1024 * attempt
     run:
         import pandas as pd
-        import collectionas as col
+        import collections as col
         import pickle as pck
 
         df = pd.read_csv(input.regions, sep="\t", header=0)
