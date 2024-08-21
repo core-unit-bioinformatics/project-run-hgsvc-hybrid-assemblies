@@ -13,6 +13,7 @@ rule compute_merged_label_count_statistics:
         import pandas as pd
         import collections as col
         import pickle as pck
+        import itertools as itt
 
         df = pd.read_csv(input.regions, sep="\t", header=0)
 
