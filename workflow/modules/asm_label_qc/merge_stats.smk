@@ -8,7 +8,7 @@ rule compute_merged_label_count_statistics:
             "{sample}", "{sample}.merged-issues.{span}.augmented.count-stats.pck"
         )
     resources:
-        mem_mb=lambda wildcards, attempt: 1024 * attempt
+        mem_mb=lambda wildcards, attempt: 2048 * attempt
     run:
         import pandas as pd
         import collections as col
@@ -91,6 +91,8 @@ rule compute_association_label_annotation:
         )
     conda:
         DIR_ENVS.joinpath("assessem.yaml")
+    resources:
+        mem_mb=lambda wildcards, attempt: 2048 * attempt
     params:
         script=DIR_SCRIPTS.joinpath("asm_label_qc", "label_assoc.py")
     shell:
