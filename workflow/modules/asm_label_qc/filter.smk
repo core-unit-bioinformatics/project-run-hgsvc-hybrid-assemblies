@@ -84,7 +84,7 @@ rule summarize_region_stats:
         prefix = "error" if wildcards.regionset == "errors" else "clean"
 
         df["length"] = df["end"] - df["start"]
-        region_dist = df["length"].describe([0.5, 0.25, 0.50, 0.75, 0.95])
+        region_dist = df["length"].describe([0.05, 0.25, 0.50, 0.75, 0.95])
         region_dist.rename(
             {
                 "count": f"{prefix}_regions_num",
