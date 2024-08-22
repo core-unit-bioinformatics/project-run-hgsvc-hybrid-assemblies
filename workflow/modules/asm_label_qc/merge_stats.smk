@@ -118,7 +118,10 @@ rule merge_label_annotation_associations:
         import pathlib as pl
         concat = []
         for table in sorted(input.tables):
-            df = pd.read_csv(table, sep="\t", header=0)
+            df = pd.read_csv(table, sep="\t", header=0, dtype={
+                "fet_pvalue": str,
+                "adj_pvalue": str,
+            })
             sample = pl.Path(table).name.split(".merged-issues.")[0]
             df.insert(0, "sample", sample)
             concat.append(df)
