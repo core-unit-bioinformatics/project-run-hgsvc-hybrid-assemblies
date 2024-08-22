@@ -205,12 +205,12 @@ rule extract_error_flag_global_summary:
             total_regions_bp = reduced_rows[sample]["ASSM_total_regions_bp"]
             assm_size = reduced_rows[sample]["ASSM_total_gapless_length"]
             total_flagged_pct = round(total_regions_bp / assm_size * 100, 3)
-            reduced_rows[sample]["total_merged_flagged_pct"] = total_flagged_pct
+            reduced_rows[sample]["ASSM_total_merged_flagged_pct"] = total_flagged_pct
             if "no-ont" not in wildcards.span:
                 ont_single_bp = reduced_rows[sample]["ISPCON_single_label_bp"]
                 adj_flagged_bp = total_regions_bp - ont_single_bp
                 adj_flagged_pct = round(adj_flagged_bp / assm_size * 100, 3)
-                reduced_rows[sample]["total_merged_flagged_ontfree_pct"] = adj_flagged_pct
+                reduced_rows[sample]["ASSM_total_merged_flagged_ontfree_pct"] = adj_flagged_pct
 
             for label in flag_labels:
                 try:
@@ -224,7 +224,7 @@ rule extract_error_flag_global_summary:
         df = pd.DataFrame.from_dict(reduced_rows, orient="index")
         df.fillna(0., inplace=True)
 
-        df.to_csv(output.table, sep="\t", header=True, index=True)
+        df.to_csv(output.table, sep="\t", header=True, index=True, index_label="sample")
     # END OF RUN BLOCK
 
 
