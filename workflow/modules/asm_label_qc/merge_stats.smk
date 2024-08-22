@@ -143,6 +143,7 @@ rule extract_error_flag_global_summary:
     run:
         import pandas as pd
         import collections as col
+        import pickle as pck
 
         def extract_per_label_stats(counts):
             data_rows = []
