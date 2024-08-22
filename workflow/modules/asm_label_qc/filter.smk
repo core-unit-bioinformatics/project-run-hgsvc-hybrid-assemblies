@@ -158,4 +158,4 @@ rule run_all_summarize_error_regions:
             span=["ps-no-ont", "wg-no-ont"],
             regionset=["errors", "complement"]
         ),
-        mrg_regions = rules.merge_region_error_complement_stats.output.table
+        mrg_regions = rules.merge_region_error_complement_stats.output.merged
