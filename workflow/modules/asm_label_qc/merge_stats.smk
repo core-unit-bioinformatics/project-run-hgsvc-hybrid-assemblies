@@ -199,7 +199,7 @@ rule extract_error_flag_global_summary:
                     value = counts.loc[counts["statistic"] == stat, "count"].values[0]
                 except IndexError:
                     value = 0
-            reduced_rows[sample][f"{prefix}_{stat}"] = value
+                reduced_rows[sample][f"{prefix}_{stat}"] = value
         for sample in samples:
             total_regions_num = reduced_rows[sample]["ASSM_total_regions_num"]
             total_regions_bp = reduced_rows[sample]["ASSM_total_regions_bp"]
