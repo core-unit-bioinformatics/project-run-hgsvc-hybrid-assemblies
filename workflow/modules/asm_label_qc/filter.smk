@@ -84,6 +84,7 @@ rule summarize_region_stats:
         prefix = "error" if wildcards.regionset == "errors" else "clean"
 
         df["length"] = df["end"] - df["start"]
+        total_length = df["length"].sum()
         region_dist = df["length"].describe([0.05, 0.25, 0.50, 0.75, 0.95])
         region_dist.rename(
             {
@@ -99,8 +100,10 @@ rule summarize_region_stats:
                 "max": f"{prefix}_region_size_max",
             }, inplace=True
         )
+        region_dist = region_dist.to_frame().transpose()
         region_dist.insert(0, "sample", wildcards.sample)
-        region_dist.to_csv(output.table, sep="\t", header=0, index=False)
+        region_dist.insert(2, f"{prefix}_regions_bp", total_length)
+        region_dist.to_csv(output.table, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
 
 
