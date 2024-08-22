@@ -7,7 +7,7 @@ rule subset_merged_issues_oneplus:
         table = DIR_RES.joinpath(
             "asm_label_qc", "merge_tables", "by-sample",
             "{sample}", "{sample}.merged-issues.{span}.subset-1p.tsv.gz"
-        )
+        ),
         error_regions = DIR_RES.joinpath(
             "asm_label_qc", "merge_tables", "by-sample",
             "{sample}", "{sample}.merged-issues.{span}.subset-1p.errors.bed.gz"
@@ -20,19 +20,13 @@ rule subset_merged_issues_oneplus:
             return len(distinct)
 
         df = pd.read_csv(input.table, sep="\t", header=0)
-        df["distinct_labels"] = df["labels"]
+        df["distinct_labels"] = df["labels"].apply(count_distinct_labels)
         sub = df.loc[df["distinct_labels"] > 1, :].copy()
         sub.to_csv(output.table, sep="\t", header=True, index=False)
 
         sub = sub[["seq", "start", "end"]].copy()
         sub.rename({"seq": "#seq"}, axis=1, inplace=True)
-        sub.to_csv(error_regions, sep="\t", header=True, index=False)
-
-        df.drop_duplicates("seq", inplace=True)
-        df.insert(1, "start", 0)
-        df = df[["seq", "start", "seq_length"]]
-        df.rename({"seq": "#seq", "seq_length": "end"}, axis=1, inplace=True)
-        df.to_csv(output.whole_genome, sep="\t", header=True, index=False)
+        sub.to_csv(output.error_regions, sep="\t", header=True, index=False)
     # END OF RUN BLOCK
 
 
@@ -73,18 +67,41 @@ rule summarize_region_stats:
             "{sample}", "{sample}.merged-issues.{span}.subset-1p.{regionset}.bed.gz"
         )
     output:
-        table = clean = DIR_RES.joinpath(
+        table = DIR_RES.joinpath(
             "asm_label_qc", "merge_tables", "by-sample",
             "{sample}", "{sample}.merged-issues.{span}.subset-1p.{regionset}.stats.tsv"
         )
     run:
         import pandas as pd
-        df = pd.read_csv(input.regions, sep="\t", header=None, names=["seq", "start", "end"])
-        num_regions = df.shape[0]
+        if wildcards.regionset == "complement":
+            header = None
+            names = ["seq", "start", "end"]
+        else:
+            header=0
+            names = None
+        df = pd.read_csv(input.regions, sep="\t", header=header, names=names)
+
+        prefix = "error" if wildcards.regionset == "errors" else "clean"
+
         df["length"] = df["end"] - df["start"]
-        region_dist = df["length"].describe([0, 0.25, 0.50, 0.75, 1])
-        print(region_dist)
-        raise
+        region_dist = df["length"].describe([0.5, 0.25, 0.50, 0.75, 0.95])
+        region_dist.rename(
+            {
+                "count": f"{prefix}_regions_num",
+                "mean": f"{prefix}_region_size_mean",
+                "std": f"{prefix}_region_size_stddev",
+                "min": f"{prefix}_region_size_min",
+                "5%": f"{prefix}_region_size_pct05",
+                "25%": f"{prefix}_region_size_pct25",
+                "50%": f"{prefix}_region_size_pct50",
+                "75%": f"{prefix}_region_size_pct75",
+                "95%": f"{prefix}_region_size_pct95",
+                "max": f"{prefix}_region_size_max",
+            }, inplace=True
+        )
+        region_dist.insert(0, "sample", wildcards.sample)
+        region_dist.to_csv(output.table, sep="\t", header=0, index=False)
+    # END OF RUN BLOCK
 
 
 rule run_all_summarize_error_regions:
@@ -93,5 +110,5 @@ rule run_all_summarize_error_regions:
             rules.summarize_region_stats.output.table,
             sample=SAMPLES,
             span=["ps-no-ont", "wg-no-ont"],
-            regionset=["error", "complement"]
+            regionset=["errors", "complement"]
         )
