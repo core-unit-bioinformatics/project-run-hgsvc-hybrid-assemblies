@@ -70,6 +70,8 @@ rule add_contig_size:
 
         df["seq_length"] = df["seq"].apply(lambda x: size_lut[x])
         missing = set(size_lut.keys()) - set(df["seq"].values)
+        if "ps" in wildcards.span:
+            missing = [seq for seq in missing if "unassigned" not in seq]
         if missing:
             add_new_rows = []
             for m in missing:
