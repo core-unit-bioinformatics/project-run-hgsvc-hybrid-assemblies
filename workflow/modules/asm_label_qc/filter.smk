@@ -107,6 +107,49 @@ rule summarize_region_stats:
     # END OF RUN BLOCK
 
 
+localrules: merge_region_error_complement_stats
+rule merge_region_error_complement_stats:
+    input:
+        errors = expand(
+            rules.summarize_region_stats.output.table,
+            sample=SAMPLES,
+            regionset="errors",
+            allow_missing=True
+        ),
+        clean = expand(
+            rules.summarize_region_stats.output.table,
+            sample=SAMPLES,
+            regionset="complement",
+            allow_missing=True
+        ),
+    output:
+        merged = DIR_RES.joinpath(
+            "asm_label_qc", "merge_tables",
+            "{sample}.merged-issues.{span}.subset-1p.regions.stats.tsv"
+        )
+    resources:
+        mem_mb=lambda wildcards, attempt: 1024 * attempt
+    run:
+        import pandas as pd
+        error_concat = []
+        clean_concat = []
+        for err_file in sorted(input.errors):
+            df = pd.read_csv(err_file, sep="\t", header=0)
+            error_concat.append(df)
+        for clean_file in sorted(input.clean):
+            df = pd.read_csv(clean_file, sep="\t", header=0)
+            clean_concat.append(df)
+        merged = pd.concat(
+            [
+                pd.concat(error_concat, axis=0, ignore_index=False).set_index("sample"),
+                pd.concat(clean_concat, axis=0, ignore_index=False).set_index("sample")
+            ], axis=1, ignore_index=False
+        )
+        merged.sort_index(inplace=True)
+        merged.to_csv(output.merged, sep="\t", header=True, index=True)
+    # END OF RUN BLOCK
+
+
 rule run_all_summarize_error_regions:
     input:
         tables = expand(
@@ -114,4 +157,5 @@ rule run_all_summarize_error_regions:
             sample=SAMPLES,
             span=["ps-no-ont", "wg-no-ont"],
             regionset=["errors", "complement"]
-        )
+        ),
+        mrg_regions = rules.merge_region_error_complement_stats.output.table
