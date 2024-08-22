@@ -125,7 +125,7 @@ rule merge_region_error_complement_stats:
     output:
         merged = DIR_RES.joinpath(
             "asm_label_qc", "merge_tables",
-            "{sample}.merged-issues.{span}.subset-1p.regions.stats.tsv"
+            f"SAMPLES.{ASSEMBLER}.merged-issues.{{span}}.subset-1p.regions.stats.tsv"
         )
     resources:
         mem_mb=lambda wildcards, attempt: 1024 * attempt
@@ -158,4 +158,7 @@ rule run_all_summarize_error_regions:
             span=["ps-no-ont", "wg-no-ont"],
             regionset=["errors", "complement"]
         ),
-        mrg_regions = rules.merge_region_error_complement_stats.output.merged
+        mrg_regions = expand(
+            rules.merge_region_error_complement_stats.output.merged,
+            span=["ps-no-ont", "wg-no-ont"]
+        )
