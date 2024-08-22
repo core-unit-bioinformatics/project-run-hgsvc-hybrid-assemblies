@@ -175,6 +175,9 @@ rule extract_error_flag_global_summary:
             df.insert(0, "sample", sample)
             df.insert(1, "assembly", au)
             concat.append(df)
+        concat = pd.concat(concat, axis=0, ignore_index=False)
+        concat.sort_values(["sample", "label"], inplace=True)
+        concat.reset_index(drop=True, inplace=True)
 
         reduced_rows = col.defaultdict(dict)
         flag_labels = set()
