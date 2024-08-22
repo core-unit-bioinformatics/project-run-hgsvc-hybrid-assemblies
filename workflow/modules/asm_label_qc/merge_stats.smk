@@ -209,7 +209,7 @@ rule extract_error_flag_global_summary:
             if "no-ont" not in wildcards.span:
                 ont_single_bp = reduced_rows[sample]["ISPCON_single_label_bp"]
                 adj_flagged_bp = total_regions_bp - ont_single_bp
-                adj_flagged_pct = roun(adj_flagged_bp / assm_size * 100, 3)
+                adj_flagged_pct = round(adj_flagged_bp / assm_size * 100, 3)
                 reduced_rows[sample]["total_merged_flagged_ontfree_pct"] = adj_flagged_pct
 
             for label in flag_labels:
