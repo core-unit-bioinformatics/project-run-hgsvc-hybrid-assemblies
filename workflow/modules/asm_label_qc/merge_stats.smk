@@ -213,8 +213,12 @@ rule extract_error_flag_global_summary:
                 reduced_rows[sample]["total_merged_flagged_ontfree_pct"] = adj_flagged_pct
 
             for label in flag_labels:
-                label_single_regions = reduced_rows[sample][f"{label}_single_regions_num"]
-                uniq_pct = round(label_single_regions / total_regions_num * 100, 3)
+                try:
+                    label_single_regions = reduced_rows[sample][f"{label}_single_regions_num"]
+                except KeyError:  # happens for SSQBRK
+                    uniq_pct = 0.
+                else:
+                    uniq_pct = round(label_single_regions / total_regions_num * 100, 3)
                 reduced_rows[sample][f"{label}_regions_uniq_pct"] = uniq_pct
 
         df = pd.DataFrame.from_dict(reduced_rows, orient="index")
