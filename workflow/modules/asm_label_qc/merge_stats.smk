@@ -167,7 +167,7 @@ rule extract_error_flag_global_summary:
         concat = []
         for cache_file in sorted(input.dumps):
             sample = pl.Path(cache_file).name.split(".merged-issues.")[0]
-            au = cache_file.name.split(".")[3]
+            au = pl.Path(cache_file).name.split(".")[3]
             with open(cache_file, "rb") as dump:
                 counts = pck.load(dump)
             df = extract_per_label_stats(counts)
