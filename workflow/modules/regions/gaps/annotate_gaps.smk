@@ -409,7 +409,7 @@ rule merge_hprc_gap_details:
                     "gap_start": "start",
                     "gap_end": "end",
                     "seq": f"{sample}.{au}.ctg",
-                    column_label: f"{sample}.{au}.closed_{wildcards.err_t}pct"
+                    column_label: f"{sample}.{au}.closed_{wildcards.err_t}"
                 }, axis=1, inplace=True
             )
             df[f"{sample}.{au}.sex"] = hap_sex
