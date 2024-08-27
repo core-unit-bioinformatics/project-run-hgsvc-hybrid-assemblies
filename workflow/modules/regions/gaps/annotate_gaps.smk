@@ -327,6 +327,13 @@ rule annotate_gaps_with_qc_info:
         "--out-table {output.table} --out-summary {output.summary}"
 
 
+ERROR_THRESHOLD_MAP = {
+    "1pct": 1.,
+    "01pct": 0.1,
+    "5pct": 5.
+}
+
+
 rule merge_hprc_gap_details:
     input:
         tables = expand(
@@ -343,7 +350,7 @@ rule merge_hprc_gap_details:
     resources:
         mem_mb=lambda wildcards, attempt: 2048 * attempt
     params:
-        threshold = lambda wildcards: int(wildcards.err_t.strip("pct"))
+        threshold = lambda wildcards: ERROR_THRESHOLD_MAP[wildcards.err_t],
     run:
         import pandas as pd
         import pathlib as pl
@@ -364,7 +371,7 @@ rule merge_hprc_gap_details:
             select_nucfreq = df["nucfreq_pct"] < params.threshold
             select_covered = df["align_status"] == "covered"
 
-            column_label = f"closed_at_err_{params.threshold}pct"
+            column_label = f"closed_at_err_{wildcards.err_t}"
             df[column_label] = 0
             select_rows = select_flagger & select_nucfreq & select_covered
             if select_rows.any():
@@ -489,5 +496,5 @@ rule run_all_annotate_gaps:
         ctg_summary = expand(
             rules.merge_hprc_gap_details.output.summary,
             refgenome=["t2tv2"],
-            err_t=["1pct"]
+            err_t=["1pct", "5pct", "01pct"]
         )
