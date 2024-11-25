@@ -31,9 +31,21 @@ rule run_ribotin_on_verkko:
         "touch {output.checkfile}"
 
 
+## DEBUG
+# sample NA19331 fails - diagnosed by Mikko as follows:
+# (via Slack / Oct. 26. 2023)
+#
+# Looks like the genome has some weird repeats going on within the rDNA which break ribotin's assumptions.
+# There's a repeat type that the KY962518.1 rDNA reference calls "similar to Long Repeat 1" which usually
+# seems to be a few kbp long, but in this sample on one (or more) of the morphs it's at least 30kbp long
+# so too long to be spanned by hifi reads. This means the resulting MBG graph is no longer locally acyclic which ribotin assumed.
+# There's no quick fix so for now I'd say just leave this sample out of the analysis until I've fixed this in a future version
+
+DEBUG_RIBOTIN_SAMPLES = [smp for smp in PLAIN_SAMPLES if smp != "NA19331"]
+
 rule run_all_ribotin:
     input:
         checkfiles = expand(
             rules.run_ribotin_on_verkko.output.checkfile,
-            sample=SAMPLES
+            sample=DEBUG_RIBOTIN_SAMPLES
         )
