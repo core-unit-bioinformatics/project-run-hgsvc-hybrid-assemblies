@@ -1,5 +1,3 @@
-# AUTOGEN TABLE - DO NOT EDIT
-# notebooks/plotting/main_fig1/plot-qv-estimates.ipynb|20241206T1049
 sample	sequence	merqury_error_kmer	merqury_total_kmer	merqury_qv_est	merqury_error_rate	asm_unit	assembler	seq_length	variant_adj_length	variant_num_errors	variant_qv_est	assembly
 HG00096	h1tg000001l#1-90193146	2680	90193126	58.4925	1.41497e-06	hap1	hifiasm	90193146	90193146	516	52.0	HG00096.hsm-ps-sseq
 HG00096	h1tg000002l#1-95820490	1107	95820470	62.5953	5.50139e-07	hap1	hifiasm	95820490	95820490	751	51.0	HG00096.hsm-ps-sseq
