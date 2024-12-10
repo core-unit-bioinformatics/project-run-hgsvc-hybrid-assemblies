@@ -1,4 +1,30 @@
-# Notes on samples
+# HGSVC phase3 project repository (HHU)
+
+# Notes for revision
+
+Following the update of the HG00514 Verkko assembly, only a subset of customized workflows was executed.
+
+Updated:
+
+```
+# update of for SIG-MHC, extracted MHC region from new assembly
+workflow::modules::regions::hla::extract.smk
+
+# update of rDNA / ribotin runs, forwarded to Mir Henglin
+workflow::modules::rdna::ribotin.smk
+
+# update of alignment support for CHS trio (child HG00514)
+workflow::modules::asm_compare::trio_align.smk
+
+# update of HPRC gap evaluation
+workflow::modules::regions::gaps::annotate_gaps.smk
+```
+
+The integrative QC analysis ("assembly label QC") was not updated because the complete
+run requires the annotation of centromeres, which is not available for HG00514 v2.
+
+
+# development notes / outdated
 
 ## Verkko (env) updates
 
