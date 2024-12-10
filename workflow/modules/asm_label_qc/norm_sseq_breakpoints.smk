@@ -19,12 +19,11 @@ rule split_breakpoints_by_sample:
         # DEBUG 2024-08-20 skip HG00514 while investigating missing sequence issue
         # only the Strand-seq breakpoints connect back to the unphased version via
         # the assembly graph and are thus potentially incompatible
-        if wildcards.sample == "HG00514.vrk-ps-sseq":
-            with open(output.tsv, "w") as dump:
-                pass
-            with open(str(output.tsv) + ".EMPTY", "w") as dump:
-                pass
-        elif df.empty:
+        # === DEBUG resolve 2024-12-10
+        # the new Verkko assembly for HG00514 does not contain any large-scale
+        # Strand-seq breaks / phasing errors
+        # see details in table annotations/external/20241204_HG00514-vrk-v2_sseq-brkp.csv
+        if df.empty:
             with open(output.tsv, "w") as dump:
                 pass
             with open(str(output.tsv) + ".EMPTY", "w") as dump:
