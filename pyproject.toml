@@ -4,17 +4,22 @@ type = "run"
 name = "hgsvc-hybrid-assemblies"
 start_date = 2022-07-01
 end_data = 2099-12-31
-version = "prototype"
+version = "2"
 
 [[cubi.project.workflow]]
 pid = "https://github.com/core-unit-bioinformatics/workflow-smk-build-kmer-db"
-name = "workflow-smk-build-kmer-db"
+name = "build-kmer-db"
 version = "prototype"
 
 [[cubi.project.workflow]]
 pid = "https://github.com/core-unit-bioinformatics/workflow-smk-genome-hybrid-assembly"
-name = "workflow-smk-genome-hybrid-assembly"
-version = "prototype"
+name = "genome-hybrid-assembly"
+version = "v1.4.1-ptyp"
+
+[[cubi.project.workflow]]
+pid = "https://github.com/core-unit-bioinformatics/workflow-smk-assembly-evaluation"
+name = "assembly-evaluation"
+version = "v1.1-ptyp"
 
 [cubi.metadata]
 pid = "undefined"
