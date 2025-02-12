@@ -1,6 +1,28 @@
 # HGSVC phase3 project repository (HHU)
 
-# Notes for revision
+## Repository info
+
+This repository contains custom code (jupyter notebooks, small snakemake workflows and python scripts) implementing various analyses
+for the HGSVC phase 3 manuscript:
+
+```
+Logsdon, Ebert, Audano, Loftus et al.,
+Complex genetic variation in nearly complete human genomes
+https://doi.org/10.1101/2024.09.24.614721 bioRxiv
+```
+
+The code was written *specifically* for the purposes of this project and, thus, does not address generalized use cases.
+
+Processes and analyses realized with the code in this repository are, e.g., internal data management, post-processing of
+workflow results (*de novo* assembly and evaluation, see workflow info in pyproject.toml)
+mostly for the purpose of plotting and creating summary tables.
+
+The snakemake workflows implement small-scale processes such as extracting the MHC/HLA region or the Chromosome Y
+from each assembly.
+
+## Internal / WIP notes
+
+### Notes for revision
 
 Following the update of the HG00514 Verkko assembly, only a subset of customized workflows was executed.
 
@@ -24,9 +46,9 @@ The integrative QC analysis ("assembly label QC") was not updated because the co
 run requires the annotation of centromeres, which is not available for HG00514 v2.
 
 
-# development notes / outdated
+### development notes / outdated
 
-## Verkko (env) updates
+#### Verkko (env) updates
 
 Last commit before updating MBG and GraphAligner to get bug fixes for last set of samples:
 
@@ -52,26 +74,25 @@ for samples:
 - HG00732 / PUR mother
 
 
-## Removed
+#### Removed
 
 NA19320 - cell line does not grow, insufficient ONT
 
-## Confirmed contamination
+#### Confirmed contamination
 
 NA18939 HiFi - resequencing
 
-## Potential contamination
+#### Potential contamination
 
 HG04036 HiFi - v1.4.1+dirty assembly completed
 NA21487 HiFi - v1.4.1+dirty assembly completed
 
-# Notes on Verkko
+#### Notes on Verkko
 
 Production version currently is v1.4+dirty [added commits #3119b39 and #4f6a54e]
 
-# Notes on nomenclature
+#### Notes on nomenclature
 
-## Trio kmer DBs
-
-HXT - Illumina HiSeq X Ten
-NVS - Illumina NovaSeq (6000)
+1. Trio kmer DBs
+    - HXT - Illumina HiSeq X Ten
+    - NVS - Illumina NovaSeq (6000)
